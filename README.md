@@ -71,6 +71,28 @@ cd frontend && npm install && cd ..
 | Review console (frontend) | http://localhost:3000 |
 | Triage API (FastAPI)      | http://localhost:8000/api/health |
 | Agent Framework DevUI     | http://localhost:8080 |
+| Langfuse (traces)         | http://localhost:3001 |
+
+## Observability (Langfuse)
+
+The Aspire AppHost also runs a **self-hosted [Langfuse](https://langfuse.com)**
+stack (Postgres, ClickHouse, Redis, MinIO, plus the Langfuse web + worker) and
+wires the agent's **Microsoft Agent Framework OpenTelemetry** traces to it. Every
+triage run shows up as a trace — the top-level `triage_contract` span, the
+`invoke_agent` call, each LLM `chat`, and each tool call — so you can see prompts,
+responses, token usage and latency per contract.
+
+- Requires **Docker** (the six Langfuse containers). The agent buffers and retries,
+  so the app starts immediately and traces appear once Langfuse is healthy.
+- Open http://localhost:3001 and sign in with **`admin@northgate.local` /
+  `langfuse-admin`** — the project and API keys are provisioned headlessly, so no
+  setup is needed. Traces land in the **Contract Triage** project.
+- Only meaningful when an LLM is configured (see below) — offline heuristic runs
+  still produce the workflow span but no LLM `chat` spans.
+- Credentials are demo defaults in [`apphost/apphost.mts`](apphost/apphost.mts);
+  `ENABLE_SENSITIVE_DATA=true` captures prompts/responses (dev only). Without
+  Aspire (Option B), point the `OTEL_*` vars in `agent/.env` at your own Langfuse
+  (self-hosted or Cloud) — see [`agent/.env.example`](agent/.env.example).
 
 ## How the graph maps to code
 
