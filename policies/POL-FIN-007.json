@@ -1,0 +1,65 @@
+{
+  "id": "POL-FIN-007",
+  "title": "Insurance & E&O Coverage Policy",
+  "version": null,
+  "type": "internal-policy",
+  "owner": "Northgate Systems Ltd — Finance",
+  "status": "stub — chapter content to be populated",
+  "description": "Finance policy setting Northgate's insurance coverage levels and how insurance requirements in contracts are handled; cited alongside Playbook §3.1 wherever liability caps and insurance evidence are negotiated.",
+  "related_legislation": [
+    "Unfair Contract Terms Act 1977, s.2(1) (liability that cannot be excluded)"
+  ],
+  "cited_in_contracts": [
+    "CR-2025-005", "CR-2026-002", "CR-2026-041"
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Purpose & Scope",
+      "synopsis": "What the policy covers: Northgate's maintained insurance programme and the rules for accepting insurance-related obligations in customer and supplier contracts.",
+      "content": null
+    },
+    {
+      "number": 2,
+      "title": "Coverage Types & Minimum Levels",
+      "synopsis": "The insurance lines Northgate maintains (professional indemnity / E&O, cyber, public liability, employer's liability) with current coverage limits — the ceiling for what can be promised contractually.",
+      "content": null
+    },
+    {
+      "number": 3,
+      "title": "Evidence of Insurance",
+      "synopsis": "Responding to certificate/evidence requests: standard E&O certificate provision, no naming of counterparties as additional insureds without approval, and handling counterparty demands for higher minimums (waiver sought before purchasing extra cover).",
+      "content": null
+    },
+    {
+      "number": 4,
+      "title": "Interaction with Liability Caps",
+      "synopsis": "Keeping contractual liability within insured levels: standard cap of 12 months' fees, data-breach super-cap up to 2× annual fees, and the approval needed for anything beyond insured limits.",
+      "content": null
+    },
+    {
+      "number": 5,
+      "title": "Claims Notification & Handling",
+      "synopsis": "Notifying the broker/insurer of circumstances that may give rise to a claim (including customer disputes and security incidents), preserving cover through timely notification, and coordination between Finance, Legal and the engagement owner.",
+      "content": null
+    },
+    {
+      "number": 6,
+      "title": "Programme Renewal & Broker Management",
+      "synopsis": "Annual renewal of the insurance programme: broker engagement, disclosure duties, reviewing limits against the contract book (aggregate caps promised vs cover held), and budgeting for premium changes.",
+      "content": null
+    },
+    {
+      "number": 7,
+      "title": "Non-Standard Requests & Escalation",
+      "synopsis": "Escalation route (Finance / broker) for uninsurable obligations, uncapped-liability demands, or coverage increases; record-keeping for waivers granted by counterparties.",
+      "content": null
+    },
+    {
+      "number": 8,
+      "title": "Records, Review & Document Control",
+      "synopsis": "Policy schedules, certificates and waiver records to be retained; policy owner (Finance Director), annual review aligned to programme renewal, and version history.",
+      "content": null
+    }
+  ]
+}

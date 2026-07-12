@@ -1,0 +1,58 @@
+{
+  "description": "Internal policy documents quoted in the contract corpus (contracts/*/edit-log.json and the 2025/2026 contract registers). Each file is a stub: substantive chapter synopses are drafted from how the policy is cited across the corpus, supplemented with standard governance chapters (training, exceptions, document control, etc.) that are not citation-derived; `content` fields are null and will be populated later.",
+  "generated_from": [
+    "contracts/*/edit-log.json",
+    "contract-register-2025.md",
+    "contract-register-2026.md"
+  ],
+  "policies": [
+    {
+      "id": "PLAYBOOK",
+      "file": "PLAYBOOK.json",
+      "title": "Northgate Contract Playbook v4 (2025)",
+      "chapters": 12,
+      "citation_count": 50,
+      "contracts_citing": 39
+    },
+    {
+      "id": "POL-PRIV-001",
+      "file": "POL-PRIV-001.json",
+      "title": "Data Protection & Privacy Policy",
+      "chapters": 14,
+      "citation_count": 12,
+      "contracts_citing": 12
+    },
+    {
+      "id": "POL-SEC-011",
+      "file": "POL-SEC-011.json",
+      "title": "Information Security & Data Residency Policy",
+      "chapters": 11,
+      "citation_count": 11,
+      "contracts_citing": 10
+    },
+    {
+      "id": "POL-FIN-007",
+      "file": "POL-FIN-007.json",
+      "title": "Insurance & E&O Coverage Policy",
+      "chapters": 8,
+      "citation_count": 4,
+      "contracts_citing": 3
+    },
+    {
+      "id": "POL-HR-003",
+      "file": "POL-HR-003.json",
+      "title": "Non-Solicitation & Contingent Worker Policy",
+      "chapters": 7,
+      "citation_count": 4,
+      "contracts_citing": 4
+    },
+    {
+      "id": "POL-LGL-002",
+      "file": "POL-LGL-002.json",
+      "title": "Signature Authority Matrix",
+      "chapters": 7,
+      "citation_count": 2,
+      "contracts_citing": 2
+    }
+  ]
+}

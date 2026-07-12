@@ -1,0 +1,87 @@
+{
+  "id": "POL-SEC-011",
+  "title": "Information Security & Data Residency Policy",
+  "version": null,
+  "type": "internal-policy",
+  "owner": "Northgate Systems Ltd — Security / IT",
+  "status": "stub — chapter content to be populated",
+  "description": "Security and hosting-location policy behind contract positions on data residency, access control, customer security schedules, incident timelines and third-party/sub-outsourced services.",
+  "related_legislation": [
+    "UK GDPR, Art. 5(1)(f) (integrity & confidentiality)",
+    "Computer Misuse Act 1990, s.1 & s.3",
+    "FCA Handbook SYSC 8 (outsourcing, where customer-regulated)"
+  ],
+  "cited_in_contracts": [
+    "CR-2025-012", "CR-2025-013", "CR-2025-018", "CR-2025-028",
+    "CR-2026-004", "CR-2026-021", "CR-2026-025", "CR-2026-026",
+    "CR-2026-032", "CR-2026-048"
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Scope & Security Governance",
+      "synopsis": "Policy scope, ownership and review cycle; relationship to POL-PRIV-001 and the security commitments Northgate is permitted to make in contracts.",
+      "content": null
+    },
+    {
+      "number": 2,
+      "title": "Data Residency & Hosting Locations",
+      "synopsis": "Approved hosting regions and residency commitments: EEA-only or UK-only data-centre restrictions that may be offered (e.g. payroll data UK-only), and EU-hosting commitments used as a governing-law fallback concession.",
+      "content": null
+    },
+    {
+      "number": 3,
+      "title": "Access Control & Least Privilege",
+      "synopsis": "Limits on counterparty and supplier access to Northgate systems and data — e.g. support access confined to ticket data, production-database access refused; authentication and privileged-access standards.",
+      "content": null
+    },
+    {
+      "number": 4,
+      "title": "Customer Security Schedules & Exceptions",
+      "synopsis": "How to review a customer's security schedule against Northgate's control set, which requirements can be accepted, and how exceptions are documented and approved.",
+      "content": null
+    },
+    {
+      "number": 5,
+      "title": "Incident Response & Notification Timelines",
+      "synopsis": "Security-incident classification and response; standard contractual breach-notification window of 48 hours (12/24-hour demands to be negotiated up), aligned with POL-PRIV-001 chapter 8.",
+      "content": null
+    },
+    {
+      "number": 6,
+      "title": "Supplier & Sub-Outsourcing Security",
+      "synopsis": "Security requirements flowed down to suppliers and sub-outsourced services, including notification obligations for sub-outsourcing and requirements for regulated customers (FCA SYSC 8).",
+      "content": null
+    },
+    {
+      "number": 7,
+      "title": "Security Testing & Authorised Access",
+      "synopsis": "Rules for penetration testing and security assessments: prior written authorisation, tightly-defined scope boundaries (Computer Misuse Act exposure), and designation of findings as Confidential Information.",
+      "content": null
+    },
+    {
+      "number": 8,
+      "title": "Data Classification & Handling",
+      "synopsis": "Northgate's classification scheme (public / internal / confidential / restricted), handling and labelling rules per class, and how classification maps to the residency and access commitments in chapters 2–3.",
+      "content": null
+    },
+    {
+      "number": 9,
+      "title": "Personnel Security & Training",
+      "synopsis": "Pre-employment screening, confidentiality undertakings, security training at induction and annual refresh, and leaver/mover access revocation aligned with the access-control standards in chapter 3.",
+      "content": null
+    },
+    {
+      "number": 10,
+      "title": "Business Continuity & Disaster Recovery",
+      "synopsis": "Backup, recovery and continuity arrangements underpinning the business-continuity commitments offered in contracts (in place of source-code escrow), including RTO/RPO targets and annual test requirements.",
+      "content": null
+    },
+    {
+      "number": 11,
+      "title": "Exceptions, Review & Document Control",
+      "synopsis": "Risk-acceptance and waiver process for deviations from this policy (Security owner sign-off, time-limited), monitoring and internal audit, annual review cycle and version history.",
+      "content": null
+    }
+  ]
+}
