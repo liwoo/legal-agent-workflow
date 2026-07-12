@@ -9,6 +9,7 @@ self-contained and runs with no filesystem coupling.
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from .models import Counterparty, InboxItem
 
@@ -165,12 +166,50 @@ def get_item(item_id: str) -> InboxItem | None:
     return _INBOX_BY_ID.get(item_id)
 
 
-def inherited_flags(item_id: str) -> list[str]:
+def inherited_flags(item_id: str, prior_ids: list[str] | None = None) -> list[str]:
+    """Flags a new item inherits from its prior-contract chain.
+
+    ``prior_ids`` overrides the built-in ``PRIOR_CHAINS`` lookup — used when the
+    chain comes from an ad-hoc intake (metadata ``related_contracts``) rather
+    than the hard-coded inbox.
+    """
+    chain = prior_ids if prior_ids is not None else PRIOR_CHAINS.get(item_id, [])
     flags: list[str] = []
-    for prior in PRIOR_CHAINS.get(item_id, []):
+    for prior in chain:
         flags.extend(PRIOR_FLAGS.get(prior, []))
     return flags
 
 
 def prior_contracts(item_id: str) -> list[str]:
     return list(PRIOR_CHAINS.get(item_id, []))
+
+
+def item_from_metadata(metadata: dict[str, Any], pdf_path: str | None = None) -> InboxItem:
+    """Build an :class:`InboxItem` from a ``metadata.json`` payload + a PDF path.
+
+    Maps the on-disk intake schema (``test/CR-2026-05N/metadata.json``) onto the
+    workflow's entry state: ``summary`` → ``what_arrived``, ``senders_ask`` →
+    ``sender_ask``, ``received_from`` → ``sender_role``, and the ``related_-
+    contracts`` chain that drives the prior-file blocker. ``pdf_path`` (absolute)
+    is stored so the ingest node can read the document via the PDF tool.
+    """
+    cp = metadata.get("counterparty")
+    counterparty = Counterparty(
+        name=cp if isinstance(cp, str) else metadata.get("counterparty_name", "Unknown"),
+        is_public_body=bool(metadata.get("is_public_body", False)),
+        is_regulated=bool(metadata.get("is_regulated", False)),
+        sector=metadata.get("sector"),
+        jurisdiction=metadata.get("jurisdiction"),
+    )
+    received = metadata.get("received_at") or metadata.get("date_received")
+    received_at = _dt(str(received)) if received else datetime(1970, 1, 1)
+    return InboxItem(
+        id=metadata.get("id", "AD-HOC"),
+        received_at=received_at,
+        sender_role=metadata.get("received_from") or metadata.get("sender_role", "unknown"),
+        counterparty=counterparty,
+        what_arrived=metadata.get("summary") or metadata.get("what_arrived", ""),
+        sender_ask=metadata.get("senders_ask") or metadata.get("sender_ask", ""),
+        related_contracts=list(metadata.get("related_contracts", []) or []),
+        pdf_path=pdf_path,
+    )

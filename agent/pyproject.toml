@@ -11,6 +11,7 @@ dependencies = [
     "uvicorn[standard]>=0.30",
     "pydantic>=2.7",
     "python-dotenv>=1.0",
+    "pypdf>=4.0",
 ]
 
 [project.optional-dependencies]
@@ -29,3 +30,7 @@ packages = ["contract_triage"]
 
 [tool.uv]
 prerelease = "allow"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
