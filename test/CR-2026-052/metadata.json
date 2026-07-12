@@ -1,0 +1,21 @@
+{
+  "type": "SaaS Order Form + DPA",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Ilex Biometrics Ltd"
+  ],
+  "counterparty": "Ilex Biometrics Ltd",
+  "date_received": "2026-07-10",
+  "status": "received",
+  "summary": "Signed-NDA prospect (CR-2026-046) requesting an order form \u2014 25 seats, Professional tier. Prospect's email mentions they would sync \"employee verification event data\" into the platform. NDA file carries an internal flag: DPIA required before any order form.",
+  "senders_ask": "Standard order form please, they're ready to go.",
+  "received_from": "AE (sales)",
+  "counterparty_paper": false,
+  "related_contracts": [
+    "CR-2026-046"
+  ],
+  "pdf": "cr-2026-052-intake.pdf",
+  "id": "CR-2026-052",
+  "name": "SaaS Order Form + DPA \u2014 Ilex Biometrics Ltd",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}

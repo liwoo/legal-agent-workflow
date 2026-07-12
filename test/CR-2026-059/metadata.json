@@ -1,0 +1,21 @@
+{
+  "type": "Amendment Request",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Draycott Field Services Ltd"
+  ],
+  "counterparty": "Draycott Field Services Ltd",
+  "date_received": "2026-07-12",
+  "status": "received",
+  "summary": "Customer email (no draft attached) asking to reduce from 60 to 40 seats mid-term, citing restructuring. Their 24-month order form (CR-2026-015) includes the negotiated termination-for-convenience/ETF mechanics at month 12.",
+  "senders_ask": "What are our options? They're a reference customer.",
+  "received_from": "CSM (customer success)",
+  "counterparty_paper": false,
+  "related_contracts": [
+    "CR-2026-015"
+  ],
+  "pdf": "cr-2026-059-intake.pdf",
+  "id": "CR-2026-059",
+  "name": "Amendment Request \u2014 Draycott Field Services Ltd",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}

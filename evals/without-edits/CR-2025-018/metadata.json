@@ -1,0 +1,13 @@
+{
+  "id": "CR-2025-018",
+  "name": "Supplier Agreement \u2014 Bramley Payroll Services Ltd",
+  "type": "Supplier Agreement",
+  "counterparty": "Bramley Payroll Services Ltd",
+  "date_received": "2025-07-21",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Bramley Payroll Services Ltd"
+  ],
+  "status": "received",
+  "related_contracts": []
+}

@@ -1,0 +1,19 @@
+{
+  "type": "Mutual NDA (multi-party)",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Thornbury Rail Consortium"
+  ],
+  "counterparty": "Thornbury Rail Consortium",
+  "date_received": "2026-07-11",
+  "status": "received",
+  "summary": "Consortium's NDA paper (11 pages, PDF) covering multi-party disclosure among four consortium members plus Northgate. Rail-infrastructure bid context.",
+  "senders_ask": "Need this signed before Tuesday's consortium call.",
+  "received_from": "CEO",
+  "counterparty_paper": true,
+  "related_contracts": [],
+  "pdf": "cr-2026-054-intake.pdf",
+  "id": "CR-2026-054",
+  "name": "Mutual NDA \u2014 Thornbury Rail Consortium",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}

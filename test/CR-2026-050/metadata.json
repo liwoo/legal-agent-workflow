@@ -1,0 +1,19 @@
+{
+  "type": "Mutual NDA",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Kestrel Dynamics Ltd"
+  ],
+  "counterparty": "Kestrel Dynamics Ltd",
+  "date_received": "2026-07-10",
+  "status": "received",
+  "summary": "Counterparty's own NDA paper (4 pages, Word), unsigned. Prospect is a drone-inspection company; sales wants a demo booked for w/c 20 July.",
+  "senders_ask": "Can we just sign their version? They said their legal won't look at ours.",
+  "received_from": "AE (sales)",
+  "counterparty_paper": true,
+  "related_contracts": [],
+  "pdf": "cr-2026-050-intake.pdf",
+  "id": "CR-2026-050",
+  "name": "Mutual NDA \u2014 Kestrel Dynamics Ltd",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}

@@ -1,0 +1,21 @@
+{
+  "type": "Supplier Renewal Notice",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Applause QA Collective Ltd"
+  ],
+  "counterparty": "Applause QA Collective Ltd",
+  "date_received": "2026-07-10",
+  "status": "received",
+  "summary": "Supplier's renewal notice for the QA services agreement (CR-2026-025) proposing a 9% uplift and a new clause pack (\"updated standard terms v2.3\" attached, unread). Current term expires 2026-08-31.",
+  "senders_ask": "Fine to renew? We're happy with them.",
+  "received_from": "Head of Engineering",
+  "counterparty_paper": true,
+  "related_contracts": [
+    "CR-2026-025"
+  ],
+  "pdf": "cr-2026-053-intake.pdf",
+  "id": "CR-2026-053",
+  "name": "Supplier Renewal Notice \u2014 Applause QA Collective Ltd",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}

@@ -1,0 +1,21 @@
+{
+  "type": "Statement of Work",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Kite & Anchor Creative Ltd"
+  ],
+  "counterparty": "Kite & Anchor Creative Ltd",
+  "date_received": "2026-07-11",
+  "status": "received",
+  "summary": "Agency's draft SOW under the existing framework (CR-2025-008): autumn campaign, \u00a321k, includes a new line item for \"AI-generated imagery\" not contemplated by the framework's IP clause.",
+  "senders_ask": "Same as the last two SOWs, should be quick.",
+  "received_from": "Marketing Director",
+  "counterparty_paper": false,
+  "related_contracts": [
+    "CR-2025-008"
+  ],
+  "pdf": "cr-2026-055-intake.pdf",
+  "id": "CR-2026-055",
+  "name": "SOW #4 \u2014 Kite & Anchor Creative Ltd",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}

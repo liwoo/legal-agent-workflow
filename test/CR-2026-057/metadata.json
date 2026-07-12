@@ -1,0 +1,22 @@
+{
+  "type": "SaaS Order Form (Renewal)",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Ashcombe Retail Group plc"
+  ],
+  "counterparty": "Ashcombe Retail Group plc",
+  "date_received": "2026-07-11",
+  "status": "received",
+  "summary": "Renewal paperwork for the 50-seat subscription (original CR-2025-011, DPA amended CR-2025-022). Customer has returned our renewal order form with one visible comment bubble on the uplift figure. Term expires 2026-08-15.",
+  "senders_ask": "Renewal at risk if we can't confirm pricing by end of next week.",
+  "received_from": "CSM (customer success)",
+  "counterparty_paper": false,
+  "related_contracts": [
+    "CR-2025-011",
+    "CR-2025-022"
+  ],
+  "pdf": "cr-2026-057-intake.pdf",
+  "id": "CR-2026-057",
+  "name": "SaaS Order Form (Renewal) \u2014 Ashcombe Retail Group plc",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}

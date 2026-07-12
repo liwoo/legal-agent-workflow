@@ -1,0 +1,19 @@
+{
+  "type": "Supplier Agreement",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Loquent AI Ltd"
+  ],
+  "counterparty": "Loquent AI Ltd",
+  "date_received": "2026-07-11",
+  "status": "received",
+  "summary": "Vendor's online terms of service (link) + order form (PDF) for an AI meeting-transcription tool the sales team wants. Terms reference training-data usage rights and US-hosted processing; no DPA attached.",
+  "senders_ask": "Team is already trialling the free tier \u2014 can we get the paid plan approved this week?",
+  "received_from": "Head of RevOps",
+  "counterparty_paper": true,
+  "related_contracts": [],
+  "pdf": "cr-2026-056-intake.pdf",
+  "id": "CR-2026-056",
+  "name": "Supplier Agreement \u2014 Loquent AI Ltd (meeting transcription)",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}
