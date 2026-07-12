@@ -1,0 +1,93 @@
+%% Contract Review Decision Framework — Northgate Systems Ltd
+%% Derived from the 79-contract corpus, Playbook v4 and policies POL-*.
+%% Render: mermaid CLI (mmdc -i decision-framework.mmd -o out.svg) or any mermaid viewer.
+
+flowchart TD
+
+    %% ── Legend ─────────────────────────────────────────────
+    subgraph LEGEND[Legend]
+        direction LR
+        LG1[Intake]:::intake
+        LG2{Decision}:::decision
+        LG3[Policy gate]:::gate
+        LG4[Action]:::action
+        LG5[/Done: signed/]:::done
+        LG6[/Escalation/]:::escalate
+        LG7[/Waiting on something/]:::waiting
+    end
+
+    %% ── Intake & classification ────────────────────────────
+    IN[/Inbox item/]:::intake --> CL[Classify:<br>family · paper · direction<br>data · prior file · value]:::intake
+
+    CL --> Q1{Draft attached?}:::decision
+    Q1 -- no --> E6[/MORE INFO NEEDED/]:::waiting
+
+    Q1 -- yes --> Q2{Prior file?}:::decision
+    Q2 -- yes --> PF[Pull chain + inherited flags]:::action
+    PF --> Q3{Blocking flag?}:::decision
+    Q3 -- yes --> E5[/BLOCKED<br>clear precondition first/]:::waiting
+    Q3 -- no --> Q4
+    Q2 -- no --> Q4
+
+    %% ── Fast path ──────────────────────────────────────────
+    Q4{Our template,<br>no redlines?}:::decision
+    Q4 -- yes --> E1[/SIGN-READY<br>auto-approve + spot-check/]:::done
+    Q4 -- SOW or amendment --> Q5{Within framework<br>or stated scope?}:::decision
+    Q5 -- yes --> E1
+    Q5 -- no --> G1
+    Q4 -- redlined or their paper --> G1
+
+    %% ── Policy gates ───────────────────────────────────────
+    G1{Personal data?}:::decision
+    G1 -- yes --> G1a[DPA terms · breach window<br>transfer mechanism]:::gate
+    G1a --> Q6{High-risk data,<br>no DPIA?}:::decision
+    Q6 -- yes --> E5
+    Q6 -- no --> G2
+    G1 -- no --> G2
+
+    G2{Their paper?}:::decision
+    G2 -- yes --> G2a[Statutory checklist:<br>bribery · slavery · tax<br>3rd-party · UCTA]:::gate
+    G2a --> G3
+    G2 -- no --> G3
+
+    G3{Ask beyond<br>insured cover?}:::decision
+    G3 -- yes --> G3a[Finance sign-off]:::gate
+    G3a --> Q7
+    G3 -- no --> Q7
+
+    %% ── Non-negotiable fork ────────────────────────────────
+    Q7{Non-negotiable paper?}:::decision
+    Q7 -- yes --> GA[Gap analysis<br>vs playbook]:::action
+    GA --> Q8{Refusal point hit?}:::decision
+    Q8 -- yes --> E7[/BUSINESS DECISION<br>accept as-is or decline/]:::waiting
+    Q8 -- no --> SG
+
+    %% ── Redline loop ───────────────────────────────────────
+    Q7 -- no --> RL[Map each redline<br>to playbook section]:::action
+    RL --> Q9{Where does<br>it land?}:::decision
+    Q9 -- standard --> A1[Hold position]:::action
+    Q9 -- fallback tier --> A2[Apply fallback wording<br>+ record]:::action
+    Q9 -- banned clause --> A3[Strike + offer substitute]:::action
+    Q9 -- refusal point or novel --> E4[/ESCALATE Ch.10<br>LD → +COO → +CFO<br>2-day SLA/]:::escalate
+    A1 --> Q10
+    A2 --> Q10
+    A3 --> Q10
+    Q10{All points resolved?}:::decision
+    Q10 -- no --> RL
+    Q10 -- yes --> SG
+
+    %% ── Execution & post-signature ─────────────────────────
+    SG[Signature routing<br>by value band]:::gate
+    SG --> PS[Diarise renewal · record<br>deviations · set flags]:::action
+    PS --> E2[/SIGNED<br>desk edits/]:::done
+    PS --> E3[/SIGNED<br>recorded deviation/]:::done
+
+    %% ── Styling ────────────────────────────────────────────
+    classDef intake fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
+    classDef decision fill:#fef9c3,stroke:#ca8a04,color:#5c4a03
+    classDef gate fill:#ede9fe,stroke:#7c3aed,color:#3b2a63
+    classDef action fill:#f3f4f6,stroke:#6b7280,color:#374151
+    classDef done fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef escalate fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    classDef waiting fill:#ffedd5,stroke:#ea580c,color:#7c2d12
+    style LEGEND fill:#fafafa,stroke:#d4d4d4
