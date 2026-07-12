@@ -14,6 +14,7 @@ from . import graph_spec
 from .data import get_inbox, get_item
 from .executors import HumanDecision
 from .models import EndState, InboxItem
+from .observability import workflow_span
 from .state import TriageRequest, TriageState
 from .workflow import build_workflow
 
@@ -136,7 +137,11 @@ class TriageService:
         if item is None:
             raise KeyError(item_id)
         wf = build_workflow()
-        result = await wf.run(TriageRequest(item_id=item_id))
+        with workflow_span(
+            "triage_contract",
+            **{"contract.id": item_id, "contract.counterparty": item.counterparty.name},
+        ):
+            result = await wf.run(TriageRequest(item_id=item_id))
         reqs = result.get_request_info_events()
         if reqs:
             event = reqs[0]
@@ -159,9 +164,13 @@ class TriageService:
         if pend is None:
             # nothing paused — treat as a fresh triage
             return await self.triage(item_id)
-        result = await pend.workflow.run(
-            responses={pend.request_id: HumanDecision(decision=decision, note=note)}
-        )
+        with workflow_span(
+            "resolve_contract",
+            **{"contract.id": item_id, "decision": decision},
+        ):
+            result = await pend.workflow.run(
+                responses={pend.request_id: HumanDecision(decision=decision, note=note)}
+            )
         outputs = result.get_outputs()
         state = outputs[0] if outputs else pend.state
         self.pending.pop(item_id, None)
