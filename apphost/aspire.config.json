@@ -1,0 +1,18 @@
+{
+  "appHost": {
+    "path": "apphost.mts",
+    "language": "typescript/nodejs"
+  },
+  "packages": {
+    "Aspire.Hosting.JavaScript": "13.2.0",
+    "Aspire.Hosting.Python": "13.2.0"
+  },
+  "profiles": {
+    "https": {
+      "applicationUrl": "https://localhost:17127;http://localhost:15118"
+    },
+    "http": {
+      "applicationUrl": "http://localhost:15118"
+    }
+  }
+}

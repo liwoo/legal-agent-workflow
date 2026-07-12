@@ -1,0 +1,31 @@
+[project]
+name = "contract-triage-agent"
+version = "0.1.0"
+description = "Northgate contract-triage — a Microsoft Agent Framework workflow implementing the contract-review decision graph, with a FastAPI surface and DevUI."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "agent-framework",
+    "agent-framework-devui",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.7",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["httpx>=0.27", "pytest>=8", "pytest-asyncio>=0.23"]
+
+[project.scripts]
+triage-api = "contract_triage.__main__:run_api"
+triage-devui = "contract_triage.devui_app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["contract_triage"]
+
+[tool.uv]
+prerelease = "allow"
