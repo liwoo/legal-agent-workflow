@@ -1,0 +1,18 @@
+{
+  "type": "Marketing Agency SOW",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Kite & Anchor Creative Ltd"
+  ],
+  "counterparty": "Kite & Anchor Creative Ltd",
+  "date_received": "2026-01-28",
+  "date_signed": "2026-02-04",
+  "status": "signed",
+  "summary": "Marketing agency statement of work with Kite & Anchor Creative Ltd.",
+  "related_contracts": [
+    "CR-2025-008"
+  ],
+  "pdf": "marketing-agency-sow-kite-anchor-creative.pdf",
+  "id": "CR-2026-007",
+  "name": "Marketing Agency SOW — Kite & Anchor Creative Ltd"
+}

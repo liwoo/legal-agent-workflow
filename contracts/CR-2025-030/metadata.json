@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-030",
+  "name": "SOW #2 — Kite & Anchor Creative Ltd",
+  "type": "SOW",
+  "counterparty": "Kite & Anchor Creative Ltd",
+  "date_received": "2025-12-15",
+  "date_signed": "2025-12-17",
+  "parties": ["Northgate Systems Ltd", "Kite & Anchor Creative Ltd"],
+  "status": "signed",
+  "related_contracts": ["CR-2025-008"]
+}

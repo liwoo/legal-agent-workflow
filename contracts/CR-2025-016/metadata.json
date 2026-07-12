@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-016",
+  "name": "Amendment No. 1 — Pellham Manufacturing plc MSA",
+  "type": "Amendment",
+  "counterparty": "Pellham Manufacturing plc",
+  "date_received": "2025-06-26",
+  "date_signed": "2025-07-01",
+  "parties": ["Northgate Systems Ltd", "Pellham Manufacturing plc"],
+  "status": "signed",
+  "related_contracts": ["CR-2025-005", "CR-2026-023"]
+}

@@ -1,0 +1,14 @@
+{
+  "type": "Mutual NDA",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Stellmark Robotics Ltd"
+  ],
+  "date_received": "2026-03-24",
+  "date_signed": "2026-03-25",
+  "status": "signed",
+  "related_contracts": [],
+  "pdf": "mutual-nda-stellmark-robotics.pdf",
+  "id": "CR-2026-020",
+  "name": "Mutual NDA — Stellmark Robotics Ltd"
+}

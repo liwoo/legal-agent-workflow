@@ -1,0 +1,20 @@
+[
+  {
+    "edit_number": 1,
+    "date": "2025-03-31",
+    "description": "Agency's licence-only IP position reversed to assignment on payment.",
+    "legal_basis": "Playbook §4.3; Copyright, Designs and Patents Act 1988, s.90"
+  },
+  {
+    "edit_number": 2,
+    "date": "2025-04-04",
+    "description": "Mutual non-solicit limited to targeted poaching, 6-month tail.",
+    "legal_basis": "POL-HR-003"
+  },
+  {
+    "edit_number": 3,
+    "date": "2025-04-09",
+    "description": "Payment terms aligned to net 30 from agency's net 14.",
+    "legal_basis": "Playbook §2.4"
+  }
+]

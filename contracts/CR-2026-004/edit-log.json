@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2026-01-19",
+    "description": "Added anti-bribery compliance clause.",
+    "legal_basis": "Bribery Act 2010, s.7",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-01-19",
+    "description": "Added supply-chain transparency clause.",
+    "legal_basis": "Modern Slavery Act 2015, s.54",
+    "edit_number": 2
+  },
+  {
+    "date": "2026-01-22",
+    "description": "DPA annex amended (audit rights, sub-processor consent, deletion).",
+    "legal_basis": "UK GDPR, Art. 28(3); POL-PRIV-001",
+    "edit_number": 3
+  },
+  {
+    "date": "2026-01-26",
+    "description": "Data residency restricted to EEA data centres only.",
+    "legal_basis": "POL-SEC-011",
+    "edit_number": 4
+  }
+]

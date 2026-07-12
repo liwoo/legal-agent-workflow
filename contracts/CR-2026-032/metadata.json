@@ -1,0 +1,17 @@
+{
+  "type": "DPA (Customer Paper)",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Bexley Community Health Trust"
+  ],
+  "counterparty": "Bexley Community Health Trust",
+  "date_received": "2026-05-14",
+  "date_signed": "2026-05-28",
+  "status": "signed",
+  "related_contracts": [
+    "CR-2026-021"
+  ],
+  "pdf": "dpa-customer-paper-bexley-community-health-trust.pdf",
+  "id": "CR-2026-032",
+  "name": "DPA (Customer Paper)"
+}

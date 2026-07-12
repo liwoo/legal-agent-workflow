@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2026-06-16",
+    "description": "Consequential-loss carve-out for lost profits → refused; standard exclusion retained.",
+    "legal_basis": "Playbook §3.2",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-06-20",
+    "description": "Service-credit regime accepted as sole remedy for SLA misses.",
+    "legal_basis": "Playbook §3.4",
+    "edit_number": 2
+  },
+  {
+    "date": "2026-06-23",
+    "description": "Price hold added for renewal year (max 5% uplift).",
+    "legal_basis": "Playbook §6.2",
+    "edit_number": 3
+  }
+]

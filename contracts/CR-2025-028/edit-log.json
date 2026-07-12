@@ -1,0 +1,14 @@
+[
+  {
+    "edit_number": 1,
+    "date": "2025-12-05",
+    "description": "German governing law requested → E&W retained with EU-hosting commitment.",
+    "legal_basis": "Playbook §5.2; POL-SEC-011"
+  },
+  {
+    "edit_number": 2,
+    "date": "2025-12-11",
+    "description": "EU GDPR-aligned DPA module attached with EU sub-processor list.",
+    "legal_basis": "EU GDPR, Art. 28; Commission Implementing Decision (EU) 2021/914"
+  }
+]

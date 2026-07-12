@@ -1,0 +1,16 @@
+{
+  "type": "Mutual NDA",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Quarrow Analytics Inc."
+  ],
+  "counterparty": "Quarrow Analytics Inc.",
+  "counterparty_jurisdiction": "Delaware",
+  "status": "signed",
+  "date_received": "2026-02-03",
+  "date_signed": "2026-02-06",
+  "related_contracts": [],
+  "pdf": "mutual-nda-quarrow-analytics.pdf",
+  "id": "CR-2026-008",
+  "name": "Mutual NDA"
+}

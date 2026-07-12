@@ -1,0 +1,15 @@
+{
+  "id": "CR-2026-042",
+  "name": "SaaS Order Form — Penhallow Group plc",
+  "type": "SaaS Order Form",
+  "counterparty": "Penhallow Group plc",
+  "date_received": "2026-06-24",
+  "date_signed": "2026-06-30",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Penhallow Group plc"
+  ],
+  "status": "signed",
+  "related_contracts": ["CR-2026-027"],
+  "pdf": "saas-order-form-penhallow-group.pdf"
+}

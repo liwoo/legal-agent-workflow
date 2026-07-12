@@ -1,0 +1,17 @@
+{
+  "type": "Data Processing Agreement",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Brightwell Insurance Services"
+  ],
+  "counterparty": "Brightwell Insurance Services",
+  "status": "signed",
+  "date_received": "2026-02-05",
+  "date_signed": "2026-02-12",
+  "related_contracts": [
+    "CR-2026-002"
+  ],
+  "pdf": "data-processing-agreement-brightwell-insurance-services.pdf",
+  "id": "CR-2026-009",
+  "name": "Data Processing Agreement"
+}

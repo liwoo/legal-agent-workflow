@@ -1,0 +1,14 @@
+[
+  {
+    "edit_number": 1,
+    "date": "2025-05-22",
+    "description": "Written authorisation and scope boundaries tightened.",
+    "legal_basis": "Computer Misuse Act 1990, s.1 & s.3; POL-SEC-011"
+  },
+  {
+    "edit_number": 2,
+    "date": "2025-05-28",
+    "description": "Findings designated Confidential Information.",
+    "legal_basis": "POL-SEC-011"
+  }
+]

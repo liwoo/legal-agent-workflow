@@ -1,0 +1,14 @@
+[
+  {
+    "edit_number": 1,
+    "date": "2025-05-13",
+    "description": "Customer struck auto-renewal → retained with notice window widened to 90 days.",
+    "legal_basis": "Playbook §6.1"
+  },
+  {
+    "edit_number": 2,
+    "date": "2025-05-16",
+    "description": "Service credits confirmed as sole remedy for SLA misses.",
+    "legal_basis": "Playbook §3.4"
+  }
+]

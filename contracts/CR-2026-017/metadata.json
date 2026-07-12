@@ -1,0 +1,16 @@
+{
+  "type": "DPA + SCC Addendum",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Quarrow Analytics Inc."
+  ],
+  "date_received": "2026-03-11",
+  "date_signed": "2026-03-25",
+  "status": "signed",
+  "related_contracts": [
+    "CR-2026-008"
+  ],
+  "pdf": "dpa-scc-addendum-quarrow-analytics.pdf",
+  "id": "CR-2026-017",
+  "name": "DPA + SCC Addendum — Quarrow Analytics Inc."
+}

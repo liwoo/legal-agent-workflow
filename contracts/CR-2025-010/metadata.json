@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-010",
+  "name": "Mutual NDA — Brightwell Insurance Services",
+  "type": "Mutual NDA",
+  "counterparty": "Brightwell Insurance Services",
+  "date_received": "2025-04-28",
+  "date_signed": "2025-04-29",
+  "parties": ["Northgate Systems Ltd", "Brightwell Insurance Services"],
+  "status": "signed",
+  "related_contracts": ["CR-2026-002"]
+}

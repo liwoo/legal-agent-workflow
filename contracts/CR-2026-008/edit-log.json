@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-02-04",
+    "description": "Removed residuals clause.",
+    "legal_basis": "Playbook §1.4",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-02-05",
+    "description": "Governing law left as Delaware, accepted as fallback for US counterparties.",
+    "legal_basis": "Playbook §5.2",
+    "edit_number": 2
+  }
+]

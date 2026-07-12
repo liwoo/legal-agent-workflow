@@ -1,0 +1,16 @@
+{
+  "type": "Mutual NDA",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Tellhurst & Bode Recruitment"
+  ],
+  "counterparty": "Tellhurst & Bode Recruitment",
+  "date_received": "2026-01-20",
+  "date_signed": "2026-01-21",
+  "status": "signed",
+  "summary": "Mutual non-disclosure agreement with Tellhurst & Bode Recruitment.",
+  "related_contracts": [],
+  "pdf": "mutual-nda-tellhurst-bode-recruitment.pdf",
+  "id": "CR-2026-005",
+  "name": "Mutual NDA — Tellhurst & Bode Recruitment"
+}

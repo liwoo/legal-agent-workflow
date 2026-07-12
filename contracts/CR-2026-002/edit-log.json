@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-01-10",
+    "description": "Customer requested payment terms of net 60 → countered and agreed net 30.",
+    "legal_basis": "Playbook §2.4; Late Payment of Commercial Debts (Interest) Act 1998",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-01-13",
+    "description": "Customer sought unlimited liability for data breach → capped at 2× annual fees as super-cap.",
+    "legal_basis": "Playbook §3.1; POL-FIN-007",
+    "edit_number": 2
+  }
+]

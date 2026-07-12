@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-014",
+  "name": "Mutual NDA — Nordstrand Ferries AS",
+  "type": "Mutual NDA",
+  "counterparty": "Nordstrand Ferries AS",
+  "date_received": "2025-06-16",
+  "date_signed": "2025-06-17",
+  "parties": ["Northgate Systems Ltd", "Nordstrand Ferries AS"],
+  "status": "signed",
+  "related_contracts": ["CR-2026-022"]
+}

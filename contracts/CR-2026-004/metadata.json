@@ -1,0 +1,16 @@
+{
+  "type": "Supplier Agreement",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Ostrava Cloud Hosting s.r.o."
+  ],
+  "counterparty": "Ostrava Cloud Hosting s.r.o.",
+  "date_received": "2026-01-14",
+  "date_signed": "2026-01-28",
+  "status": "signed",
+  "summary": "Supplier agreement with Ostrava Cloud Hosting s.r.o. for cloud hosting services.",
+  "related_contracts": [],
+  "pdf": "supplier-agreement-ostrava-cloud-hosting.pdf",
+  "id": "CR-2026-004",
+  "name": "Supplier Agreement — Ostrava Cloud Hosting s.r.o."
+}

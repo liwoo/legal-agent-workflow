@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-003",
+  "name": "Supplier Subscription — Cloudreach CRM Ltd",
+  "type": "Supplier Subscription",
+  "counterparty": "Cloudreach CRM Ltd",
+  "date_received": "2025-02-06",
+  "date_signed": "2025-02-20",
+  "parties": ["Northgate Systems Ltd", "Cloudreach CRM Ltd"],
+  "status": "signed",
+  "related_contracts": []
+}

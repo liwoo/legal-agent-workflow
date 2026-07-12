@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2026-05-19",
+    "description": "Unlimited audit rights narrowed to annual + for-cause.",
+    "legal_basis": "Playbook §7.3; UK GDPR, Art. 28(3)(h)",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-05-21",
+    "description": "12-hour breach notification extended to 48 hours.",
+    "legal_basis": "UK GDPR, Art. 33; POL-PRIV-001",
+    "edit_number": 2
+  },
+  {
+    "date": "2026-05-26",
+    "description": "Data-retention schedule aligned to platform deletion capabilities (30-day purge).",
+    "legal_basis": "UK GDPR, Art. 5(1)(e); POL-SEC-011",
+    "edit_number": 3
+  }
+]

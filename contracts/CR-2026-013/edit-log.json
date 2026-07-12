@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2026-02-27",
+    "description": "Reseller sought exclusivity → refused; non-exclusive retained.",
+    "legal_basis": "Playbook §8.1",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-03-03",
+    "description": "Added anti-bribery and sanctions compliance warranties.",
+    "legal_basis": "Bribery Act 2010, s.7; Sanctions and Anti-Money Laundering Act 2018",
+    "edit_number": 2
+  },
+  {
+    "date": "2026-03-05",
+    "description": "Third-party enforcement rights excluded.",
+    "legal_basis": "Contracts (Rights of Third Parties) Act 1999",
+    "edit_number": 3
+  }
+]

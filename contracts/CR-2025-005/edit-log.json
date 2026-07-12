@@ -1,0 +1,20 @@
+[
+  {
+    "edit_number": 1,
+    "date": "2025-03-14",
+    "description": "Customer sought uncapped liability → capped at 12 months' fees.",
+    "legal_basis": "Playbook §3.1; POL-FIN-007"
+  },
+  {
+    "edit_number": 2,
+    "date": "2025-03-19",
+    "description": "Source-code escrow request refused; business-continuity commitment offered.",
+    "legal_basis": "Playbook §4.5"
+  },
+  {
+    "edit_number": 3,
+    "date": "2025-03-26",
+    "description": "E&O insurance evidence provided; customer's higher minimum waived.",
+    "legal_basis": "POL-FIN-007"
+  }
+]

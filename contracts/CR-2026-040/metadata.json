@@ -1,0 +1,15 @@
+{
+  "id": "CR-2026-040",
+  "name": "Mutual NDA — Beaumont Care Group",
+  "type": "Mutual NDA",
+  "counterparty": "Beaumont Care Group",
+  "date_received": "2026-06-18",
+  "date_signed": "2026-06-19",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Beaumont Care Group"
+  ],
+  "status": "signed",
+  "related_contracts": [],
+  "pdf": "mutual-nda-beaumont-care-group.pdf"
+}

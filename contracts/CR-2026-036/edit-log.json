@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2026-06-11",
+    "description": "Regulator audit/access clause accepted.",
+    "legal_basis": "Financial Services and Markets Act 2000; FCA Handbook SYSC 8",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-06-15",
+    "description": "Exit-assistance period agreed at 90 days at then-current rates.",
+    "legal_basis": "Playbook §6.5",
+    "edit_number": 2
+  },
+  {
+    "date": "2026-06-17",
+    "description": "Sub-outsourcing notification obligation added.",
+    "legal_basis": "UK GDPR, Art. 28(2); POL-PRIV-001",
+    "edit_number": 3
+  }
+]
