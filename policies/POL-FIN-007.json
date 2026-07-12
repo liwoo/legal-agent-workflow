@@ -4,62 +4,262 @@
   "version": null,
   "type": "internal-policy",
   "owner": "Northgate Systems Ltd — Finance",
-  "status": "stub — chapter content to be populated",
+  "status": "populated — chapter content drafted from synopses and corpus citations",
   "description": "Finance policy setting Northgate's insurance coverage levels and how insurance requirements in contracts are handled; cited alongside Playbook §3.1 wherever liability caps and insurance evidence are negotiated.",
   "related_legislation": [
     "Unfair Contract Terms Act 1977, s.2(1) (liability that cannot be excluded)"
   ],
   "cited_in_contracts": [
-    "CR-2025-005", "CR-2026-002", "CR-2026-041"
+    "CR-2025-005",
+    "CR-2026-002",
+    "CR-2026-041"
   ],
   "chapters": [
     {
       "number": 1,
       "title": "Purpose & Scope",
       "synopsis": "What the policy covers: Northgate's maintained insurance programme and the rules for accepting insurance-related obligations in customer and supplier contracts.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "This policy sets out the insurance programme Northgate Systems Ltd maintains and the rules for accepting insurance-related obligations in customer and supplier contracts. Its purpose is to ensure that the liability and coverage commitments Northgate makes in negotiation stay within the limits of cover actually held, so that a claim, if one arises, is met by an insurer rather than absorbed on the balance sheet."
+        },
+        {
+          "type": "para",
+          "text": "The policy applies to every contract in which insurance evidence, coverage minimums, indemnities or liability caps are negotiated. It is read alongside Playbook Section 3.1 (limitation of liability), and contract owners must apply both together: the Playbook fixes the negotiating position, this policy confirms whether the position is insurable. It is a standing reference across the corpus wherever a counterparty requests an E&O certificate or seeks to raise the ceiling on Northgate's liability."
+        },
+        {
+          "type": "para",
+          "text": "Finance owns the insurance programme and is the final authority on what cover exists and what can be promised. Legal owns the drafting of the liability and indemnity clauses. Where a contractual request would commit Northgate beyond its insured limits, this policy governs the escalation and the approval that must be obtained before the request is accepted."
+        }
+      ]
     },
     {
       "number": 2,
       "title": "Coverage Types & Minimum Levels",
       "synopsis": "The insurance lines Northgate maintains (professional indemnity / E&O, cyber, public liability, employer's liability) with current coverage limits — the ceiling for what can be promised contractually.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Northgate maintains the following lines of insurance. The limits below are the current programme ceilings and set the outer boundary for what may be promised contractually. No contract may commit Northgate to a liability or coverage level exceeding the applicable limit without the approval described in Chapters 4 and 7."
+        },
+        {
+          "type": "kv",
+          "pairs": [
+            [
+              "Professional indemnity / E&O",
+              "GBP 5,000,000 per claim and in the aggregate"
+            ],
+            [
+              "Cyber and data liability",
+              "GBP 5,000,000 in the aggregate (includes breach response and notification costs)"
+            ],
+            [
+              "Public liability",
+              "GBP 5,000,000 per occurrence"
+            ],
+            [
+              "Employer's liability",
+              "GBP 10,000,000 (statutory minimum GBP 5,000,000 exceeded)"
+            ],
+            [
+              "Directors' and officers' liability",
+              "GBP 2,000,000 in the aggregate"
+            ],
+            [
+              "Standard PI/E&O excess",
+              "GBP 25,000 each and every claim"
+            ]
+          ]
+        },
+        {
+          "type": "para",
+          "text": "Professional indemnity and cyber cover are the two lines most often engaged by customer contracts: PI/E&O responds to claims arising from defects or failures in the software and services Northgate supplies, and cyber cover responds to security incidents and data breaches. Both are written on a claims-made basis, which makes timely notification (Chapter 5) essential to preserving cover."
+        },
+        {
+          "type": "para",
+          "text": "These figures are reviewed at each annual renewal against the contract book (Chapter 6). Where a single engagement or the aggregate of promised caps approaches the programme limit, Finance must be consulted before further commitments are made."
+        }
+      ]
     },
     {
       "number": 3,
       "title": "Evidence of Insurance",
       "synopsis": "Responding to certificate/evidence requests: standard E&O certificate provision, no naming of counterparties as additional insureds without approval, and handling counterparty demands for higher minimums (waiver sought before purchasing extra cover).",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Counterparties frequently ask for evidence of insurance before or shortly after signature. Northgate's standard response is to provide a current certificate of insurance for the relevant line, most commonly the E&O certificate, issued by or through its broker. Contract owners must route certificate requests to Finance and must not send policy schedules or wordings; a certificate confirming the line and the limit is sufficient in almost all cases."
+        },
+        {
+          "type": "para",
+          "text": "In the ordinary course, an existing certificate satisfies the requirement without any change to the programme. Where a customer's stated insurance requirement sits within the limits Northgate already holds, provision of the current E&O certificate closes the point and no policy amendment is made."
+        },
+        {
+          "type": "subhead",
+          "text": "Higher minimums and additional insured requests"
+        },
+        {
+          "type": "para",
+          "text": "Where a counterparty demands a higher minimum than Northgate holds, the contract owner must first seek a waiver of the excess requirement, supported by evidence of the cover actually in place, before any additional cover is purchased. In practice counterparties accept the existing E&O evidence and waive the higher figure once the held limit is demonstrated. Purchasing incremental cover to meet a single contract is a last resort and requires Finance approval under Chapter 7."
+        },
+        {
+          "type": "para",
+          "text": "Northgate does not agree to name a counterparty as an additional insured without prior approval from Finance and the broker, as this can affect the cover and its renewal. Requests to be named as additional insured, or for waivers of subrogation, must be escalated rather than accepted at the desk."
+        }
+      ]
     },
     {
       "number": 4,
       "title": "Interaction with Liability Caps",
       "synopsis": "Keeping contractual liability within insured levels: standard cap of 12 months' fees, data-breach super-cap up to 2× annual fees, and the approval needed for anything beyond insured limits.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Contractual liability must be kept within insured levels. Northgate's standard limitation of liability is a cap of 12 months' fees paid under the contract, consistent with Playbook Section 3.1. Where a counterparty seeks uncapped or unlimited liability, the contract owner must resist and bring the position back to the 12 months' fees cap; this is the position applied across the corpus."
+        },
+        {
+          "type": "para",
+          "text": "For data breach and security incidents, Northgate will where necessary agree a higher super-cap of up to two times annual fees, but no further. Where a customer seeks unlimited liability for data breach, the negotiated outcome is a super-cap at 2x annual fees, which sits within the cyber cover held under Chapter 2. The general 12 months' fees cap continues to apply to all other heads of liability."
+        },
+        {
+          "type": "kv",
+          "pairs": [
+            [
+              "Standard liability cap",
+              "12 months' fees"
+            ],
+            [
+              "Data-breach super-cap",
+              "Up to 2x annual fees"
+            ],
+            [
+              "Position on uncapped liability",
+              "Resist; cannot be accepted without escalation"
+            ]
+          ]
+        },
+        {
+          "type": "para",
+          "text": "Certain liabilities cannot lawfully be excluded or limited, including liability for death or personal injury resulting from negligence, in line with the Unfair Contract Terms Act 1977, s.2(1); the caps above are drafted to sit above those non-excludable heads and not to purport to limit them. Any cap above the insured limits, any uncapped head other than those required by law, and any super-cap above 2x annual fees require approval under Chapter 7 before acceptance."
+        }
+      ]
     },
     {
       "number": 5,
       "title": "Claims Notification & Handling",
       "synopsis": "Notifying the broker/insurer of circumstances that may give rise to a claim (including customer disputes and security incidents), preserving cover through timely notification, and coordination between Finance, Legal and the engagement owner.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Because the PI/E&O and cyber lines are written on a claims-made basis, cover can be lost if the insurer is not notified in time. Northgate must notify its broker or insurer promptly of any circumstance that may give rise to a claim. Notification is required not only for a formal claim but also for circumstances that could become one, including material customer disputes, allegations of defect or service failure, and security incidents or suspected data breaches."
+        },
+        {
+          "type": "subhead",
+          "text": "What triggers notification"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "A customer dispute, complaint or threat that could lead to a claim against Northgate.",
+            "A security incident or suspected personal data breach (coordinated with POL-PRIV-001 and POL-SEC-011).",
+            "Any demand, letter before action or regulator contact relating to Northgate's services.",
+            "Awareness of an error or omission that could found a claim, even before the counterparty raises it."
+          ]
+        },
+        {
+          "type": "para",
+          "text": "The engagement owner must report the circumstance to Finance and Legal without delay so that broker notification is made within the insurer's required timeframe. The 48-hour incident notification standard Northgate offers to customers is a contractual commitment to the customer and is separate from insurer notification; both clocks must be managed. Contract owners must not admit liability, offer settlement or make statements about fault to the counterparty before the insurer has been notified and coordination with Finance and Legal has taken place."
+        }
+      ]
     },
     {
       "number": 6,
       "title": "Programme Renewal & Broker Management",
       "synopsis": "Annual renewal of the insurance programme: broker engagement, disclosure duties, reviewing limits against the contract book (aggregate caps promised vs cover held), and budgeting for premium changes.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "The insurance programme is renewed annually. Finance leads the renewal with the appointed broker and is responsible for meeting the disclosure duty owed to insurers: all material facts about Northgate's business, its contract book and its risk exposures must be presented fairly and accurately at renewal. A failure of fair presentation can prejudice cover, so contract owners must supply Finance with accurate information about unusual commitments when asked."
+        },
+        {
+          "type": "subhead",
+          "text": "Reviewing limits against the contract book"
+        },
+        {
+          "type": "para",
+          "text": "At renewal Finance reviews the limits held against the aggregate of liability caps promised across live contracts, to confirm that cover held is not being outrun by cover promised. Particular attention is paid to the aggregate of data-breach super-caps (up to 2x annual fees each) against the cyber aggregate limit, and to any single engagement whose cap approaches the per-claim PI/E&O limit."
+        },
+        {
+          "type": "para",
+          "text": "Finance budgets for premium movement year on year and factors expected changes in the contract book and claims experience into the renewal. Where the review shows the programme should be increased or a line added, the change is made at renewal wherever possible rather than mid-term, and the revised limits then update the ceilings recorded in Chapter 2."
+        }
+      ]
     },
     {
       "number": 7,
       "title": "Non-Standard Requests & Escalation",
       "synopsis": "Escalation route (Finance / broker) for uninsurable obligations, uncapped-liability demands, or coverage increases; record-keeping for waivers granted by counterparties.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Any request that Northgate cannot meet from its existing programme must be escalated to Finance, which will consult the broker where needed. Contract owners must not accept such requests at the desk. Escalation is required for, among other things:"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Uninsurable obligations, or indemnities broader than the insurance held.",
+            "Demands for uncapped or unlimited liability beyond the non-excludable heads required by law.",
+            "Requests for a data-breach super-cap above 2x annual fees.",
+            "Demands for coverage limits above those in Chapter 2, or to purchase incremental cover for a single contract.",
+            "Requests to name the counterparty as additional insured or to waive subrogation."
+          ]
+        },
+        {
+          "type": "para",
+          "text": "Finance decides whether the obligation can be accepted, whether cover can be extended to meet it and at what cost, or whether the request must be declined or renegotiated. Where the point is a liability cap, the decision is taken together with Legal under Playbook Section 3.1 and Chapter 4 of this policy."
+        },
+        {
+          "type": "para",
+          "text": "Where a counterparty waives a requirement Northgate could not otherwise meet, most commonly a higher insurance minimum waived on production of the current E&O certificate, the waiver must be recorded in the contract file so that the basis on which the contract was signed is auditable. Records of waivers granted are retained under Chapter 8."
+        }
+      ]
     },
     {
       "number": 8,
       "title": "Records, Review & Document Control",
       "synopsis": "Policy schedules, certificates and waiver records to be retained; policy owner (Finance Director), annual review aligned to programme renewal, and version history.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Finance retains the records that evidence the insurance programme and its use in contracts. These include the current and historic policy schedules, certificates of insurance issued to counterparties, records of waivers granted by counterparties, and any approvals given under Chapters 4 and 7. Contract owners must file insurance correspondence and waivers with the relevant contract record."
+        },
+        {
+          "type": "kv",
+          "pairs": [
+            [
+              "Policy owner",
+              "Finance Director, Northgate Systems Ltd"
+            ],
+            [
+              "Review cycle",
+              "Annually, aligned to insurance programme renewal"
+            ],
+            [
+              "Records retained",
+              "Policy schedules, certificates, waiver and approval records"
+            ],
+            [
+              "Read alongside",
+              "Playbook Section 3.1; POL-PRIV-001; POL-SEC-011; POL-LGL-002"
+            ]
+          ]
+        },
+        {
+          "type": "para",
+          "text": "This policy is reviewed at least once a year to coincide with programme renewal, so that the coverage limits recorded in Chapter 2 and the caps in Chapter 4 remain consistent with the cover actually held. Material changes to the programme, to the standard liability positions or to the escalation route are reflected here and recorded in the version history maintained by the policy owner."
+        }
+      ]
     }
   ]
 }

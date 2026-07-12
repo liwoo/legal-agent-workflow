@@ -4,57 +4,256 @@
   "version": null,
   "type": "internal-policy",
   "owner": "Northgate Systems Ltd — Legal",
-  "status": "stub — chapter content to be populated",
+  "status": "populated — chapter content drafted from synopses and corpus citations",
   "description": "Delegation-of-authority policy determining who may sign a contract based on value and type; cited when signature is routed above legal counsel's delegated limit (e.g. to COO, or CFO above the procurement threshold).",
   "related_legislation": [
     "Companies Act 2006, ss.43–44 (execution of documents)",
     "Electronic Communications Act 2000, s.7 (electronic signatures)"
   ],
   "cited_in_contracts": [
-    "CR-2026-007", "CR-2026-039"
+    "CR-2026-007",
+    "CR-2026-039"
   ],
   "chapters": [
     {
       "number": 1,
       "title": "Purpose & Principles",
       "synopsis": "Why signature authority is delegated by value band and contract type; no self-approval, and no splitting contracts to stay under a threshold.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "This policy sets out who at Northgate Systems Ltd may bind the company to a contract. Authority to execute agreements is delegated by the Board to named roles according to the value and type of commitment involved. The purpose is to ensure that every contract Northgate signs is approved by a person with sufficient seniority and independence for the exposure it creates, and that the delegation is transparent, auditable and consistently applied across the contract register."
+        },
+        {
+          "type": "para",
+          "text": "Delegation runs by value band and by contract type. A person holding a delegated limit may sign any contract that falls within that limit and is not otherwise reserved; contracts above the limit must be escalated to the next authority level. Legal Counsel holds the standing delegated limit for routine commercial agreements. Where value or type takes a contract above that limit, signature is escalated to the Chief Operating Officer, then to the Chief Financial Officer above the procurement threshold, and to the Board for exceptional commitments. This escalation order is the same one applied to off-playbook deviation approvals under PLAYBOOK chapter 10."
+        },
+        {
+          "type": "subhead",
+          "text": "Two rules that admit no exception"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "No self-approval. A person must not sign a contract in which they, or a person or entity connected to them, have a personal interest. The contract must instead be routed to an equal or higher authority level.",
+            "No splitting to stay under a threshold. A single commercial arrangement must be valued and signed as a whole. Dividing a contract into smaller orders, phases or statements of work to keep each below a signatory's limit is a breach of this policy and is treated as deliberate circumvention under chapter 6."
+          ]
+        }
+      ]
     },
     {
       "number": 2,
       "title": "Authority Bands & Thresholds",
       "synopsis": "The matrix itself: value bands and signatory levels (legal counsel's delegated limit, COO for higher-value contracts, CFO above the procurement threshold, Board for exceptional commitments), including any type-specific overrides (e.g. NDAs, amendments).",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "The matrix below maps the total value of a contract, calculated in accordance with chapter 3, to the minimum authority level required to execute it. Value bands are expressed in GBP and refer to the total committed spend or revenue over the full term. The procurement threshold, above which supplier and purchase commitments require Chief Financial Officer approval, is GBP 250,000. Where a contract qualifies under more than one row, the more senior signatory level applies."
+        },
+        {
+          "type": "kv",
+          "pairs": [
+            [
+              "Up to GBP 100,000",
+              "Legal Counsel (standing delegated limit)"
+            ],
+            [
+              "GBP 100,001 to GBP 500,000",
+              "Chief Operating Officer"
+            ],
+            [
+              "Above the procurement threshold (GBP 250,000) for supplier/purchase spend",
+              "Chief Financial Officer"
+            ],
+            [
+              "GBP 500,001 to GBP 2,000,000",
+              "Chief Financial Officer"
+            ],
+            [
+              "Above GBP 2,000,000, or any commitment that is novel, non-recurring or reputationally significant",
+              "Board (exceptional commitments)"
+            ]
+          ]
+        },
+        {
+          "type": "subhead",
+          "text": "Type-specific overrides"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Non-disclosure agreements: any qualified member of the Legal team may sign a mutual or inbound NDA regardless of the value of the underlying opportunity, provided the term does not exceed the standard 3-year maximum. NDAs that impose unusual obligations (for example assignment of jointly developed IP) are routed by value like any other contract.",
+            "Amendments and renewals: an amendment is valued on its incremental effect, not the value of the original contract. A change that increases total committed value into a higher band must be signed at the band appropriate to the new aggregate value, by the level that would sign the whole contract afresh. Administrative amendments with no financial effect may be signed at Legal Counsel level.",
+            "Reserved matters: guarantees, indemnities uncapped or exceeding the standard 12-month fee cap, source-code escrow, and any commitment purporting to waive Northgate's standard limitation of liability position require Chief Financial Officer approval as a minimum, irrespective of value.",
+            "Data-processing terms: contracts engaging the data-breach super-cap (up to 2x annual fees) or bespoke sub-processor arrangements are cross-checked against POL-PRIV-001 and POL-SEC-011 before signature at the applicable band."
+          ]
+        }
+      ]
     },
     {
       "number": 3,
       "title": "Routing & Escalation Procedure",
       "synopsis": "How a contract is routed to the right signatory: valuing a contract (total committed spend/revenue), obtaining approval evidence, and recording the signature decision in the register.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Before a contract is sent for signature the contract owner must determine its value and route it to the correct signatory. Value is the total committed spend or revenue over the full term, including committed renewals, minimum volumes and fixed fees, but excluding genuinely optional spend that Northgate is not obliged to incur. Where value is variable or uncertain, the contract owner must use a reasonable good-faith estimate of the maximum committed exposure and record the basis of that estimate."
+        },
+        {
+          "type": "subhead",
+          "text": "Approval evidence"
+        },
+        {
+          "type": "para",
+          "text": "The signatory must not execute a contract until the contract owner has provided the approval evidence appropriate to its band: a Legal review sign-off for contracts within the delegated limit, and, for escalated contracts, written confirmation from the Chief Operating Officer, Chief Financial Officer or Board as applicable. Where the contract also carries an off-playbook deviation, the deviation approval recorded under PLAYBOOK chapter 10 satisfies the evidence requirement for that point, provided it was given by a person at or above the required signatory level."
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Value the contract and identify the required signatory level from the chapter 2 matrix.",
+            "Assemble approval evidence and confirm no self-approval conflict exists.",
+            "Route to the signatory; on execution, record the signature decision, the signatory and the approval basis in the contract register edit log (citing POL-LGL-002).",
+            "File the executed document and any escalation correspondence with the register entry."
+          ]
+        },
+        {
+          "type": "para",
+          "text": "The register entry must make the routing legible after the fact. For example, where a marketing statement of work exceeded Legal Counsel's limit the register recorded that signature was routed to the Chief Operating Officer citing this policy; where a supplier order for a laptop fleet exceeded the procurement threshold the register recorded that signature was escalated to the Chief Financial Officer on the same basis."
+        }
+      ]
     },
     {
       "number": 4,
       "title": "Execution Formalities & Electronic Signature",
       "synopsis": "How documents are validly executed: simple contracts vs deeds (Companies Act 2006 ss.43–44), the approved e-signature platform and when wet-ink is required, and counterparty signatory-authority checks.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "A contract is only binding once it is validly executed. Most of Northgate's commercial agreements are simple contracts, which take effect on signature by a person with authority under this policy and do not require a witness. A deed is used only where the law or the transaction requires it, for example certain guarantees, and must be executed in accordance with sections 43 to 44 of the Companies Act 2006, either by two authorised signatories or by a director whose signature is witnessed. The contract owner must identify at the outset whether an instrument is a simple contract or a deed, because the execution formalities and the signatory requirements differ."
+        },
+        {
+          "type": "subhead",
+          "text": "Electronic signature"
+        },
+        {
+          "type": "para",
+          "text": "Northgate executes contracts electronically through its approved e-signature platform, and electronic signatures applied through that platform are valid and admissible under section 7 of the Electronic Communications Act 2000. Electronic signature is the default for simple contracts. Wet-ink signature is required where the counterparty's jurisdiction or the nature of the instrument demands it, where a deed must be executed and witnessed in a manner the platform cannot support, or where a notary, apostille or registration formality applies. The signatory levels in chapter 2 apply identically whether execution is electronic or wet-ink."
+        },
+        {
+          "type": "subhead",
+          "text": "Counterparty authority"
+        },
+        {
+          "type": "para",
+          "text": "Before execution the contract owner must take reasonable steps to confirm that the individual signing for the counterparty has authority to bind it, for example by confirming their role, obtaining board authority or a delegation letter for high-value or unusual commitments, and ensuring the named signing entity matches the contracting party. Doubt about a counterparty's signing authority is referred to Legal before Northgate signs."
+        }
+      ]
     },
     {
       "number": 5,
       "title": "Exceptions & Delegation in Absence",
       "synopsis": "Temporary delegation when a signatory is unavailable, urgent-signature exceptions, and retrospective ratification rules.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Authority under this policy attaches to roles, not only to individuals, so that a signatory's absence does not stall execution. Where a signatory is unavailable, their authority may be exercised on a temporary basis by another person, subject to the limits below. Temporary delegation does not raise a person's authority ceiling: a delegate may only exercise authority up to the band of the role delegating to them, and any contract above that band still escalates in the ordinary way."
+        },
+        {
+          "type": "subhead",
+          "text": "Temporary delegation"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "A signatory who will be unavailable must delegate in writing to a named person at the same or an adjacent authority level, stating the scope and the period of the delegation.",
+            "Where no advance delegation exists, authority passes up the escalation order (Legal Counsel, then Chief Operating Officer, then Chief Financial Officer, then Board), never down.",
+            "The General Counsel maintains the current delegation arrangements and records each temporary delegation."
+          ]
+        },
+        {
+          "type": "subhead",
+          "text": "Urgent signature and ratification"
+        },
+        {
+          "type": "para",
+          "text": "A genuinely urgent contract that cannot wait for the ordinary approval evidence may be signed by the required signatory level on the basis of a documented urgency justification, with the outstanding evidence completed immediately afterwards. A contract signed below the required authority level, or without the required approval evidence, has no standing until it is ratified. Ratification must be given in writing by a person at or above the authority level the contract should have been signed at, must be recorded against the register entry, and does not cure a self-approval conflict or a threshold-splitting breach, which are dealt with under chapter 6."
+        }
+      ]
     },
     {
       "number": 6,
       "title": "Monitoring & Breaches of this Policy",
       "synopsis": "Periodic sampling of the contract register against the matrix, treatment of contracts signed without authority (ratification vs escalation), and consequences of deliberate circumvention.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "The Legal team monitors compliance with this policy by periodic sampling of the contract register against the chapter 2 matrix. On at least a quarterly basis a sample of executed contracts is checked to confirm that each was valued correctly, routed to the required signatory level and supported by the recorded approval evidence. Sampling is risk-weighted towards high-value contracts, reserved matters and contracts carrying off-playbook deviations."
+        },
+        {
+          "type": "subhead",
+          "text": "Contracts signed without authority"
+        },
+        {
+          "type": "para",
+          "text": "Where sampling identifies a contract signed below the required authority level or without approval evidence, Legal assesses whether the exposure is acceptable. Contracts that would have been approved at the correct level are referred for ratification under chapter 5. Contracts that raise concern, or that Northgate would not have approved on the correct terms, are escalated to the Chief Operating Officer, and to the Chief Financial Officer above the procurement threshold, to decide whether to ratify, renegotiate or seek to exit."
+        },
+        {
+          "type": "subhead",
+          "text": "Deliberate circumvention"
+        },
+        {
+          "type": "para",
+          "text": "Deliberate circumvention of this policy, including splitting a contract to stay under a threshold, misvaluing a commitment to avoid escalation, or signing despite a known self-approval conflict, is a serious matter. It is escalated to the General Counsel and the relevant executive, may be treated as misconduct under POL-HR-003, and where a financial control has been evaded is reported under POL-FIN-007. The underlying contract is reviewed on its merits and does not become valid merely because it was signed."
+        }
+      ]
     },
     {
       "number": 7,
       "title": "Review & Document Control",
       "synopsis": "Policy owner (General Counsel), review triggered by organisational or threshold changes, Board approval of matrix amendments, and version history.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "The General Counsel owns this policy and is responsible for its interpretation, for maintaining the current delegation arrangements, and for keeping the authority bands aligned with Northgate's structure and financial controls. Day-to-day questions about routing and signatory levels are directed to the Legal team."
+        },
+        {
+          "type": "subhead",
+          "text": "Review"
+        },
+        {
+          "type": "para",
+          "text": "This policy is reviewed at least annually, and additionally whenever a trigger event occurs: a change to the executive roles named in the matrix, a change to the procurement threshold or the value bands, a significant reorganisation, or a change in law affecting execution of documents or electronic signatures. Amendments to the authority bands and thresholds in chapter 2 are reserved to the Board, since they alter the delegation the Board has granted; the General Counsel may make clarifying, procedural and cross-reference changes without Board approval."
+        },
+        {
+          "type": "kv",
+          "pairs": [
+            [
+              "Policy ID",
+              "POL-LGL-002"
+            ],
+            [
+              "Title",
+              "Signature Authority Matrix"
+            ],
+            [
+              "Owner",
+              "General Counsel, Northgate Systems Ltd — Legal"
+            ],
+            [
+              "Matrix amendments approved by",
+              "Board"
+            ],
+            [
+              "Review cycle",
+              "Annual, plus on trigger events"
+            ],
+            [
+              "Related policies",
+              "PLAYBOOK, POL-FIN-007, POL-HR-003, POL-PRIV-001, POL-SEC-011"
+            ]
+          ]
+        }
+      ]
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "description": "Internal policy documents quoted in the contract corpus (contracts/*/edit-log.json and the 2025/2026 contract registers). Each file is a stub: substantive chapter synopses are drafted from how the policy is cited across the corpus, supplemented with standard governance chapters (training, exceptions, document control, etc.) that are not citation-derived; `content` fields are null and will be populated later.",
+  "description": "Internal policy documents quoted in the contract corpus (contracts/*/edit-log.json and the 2025/2026 contract registers). Chapter content has been drafted from how each policy is cited across the corpus, supplemented with standard governance chapters (training, exceptions, document control, etc.). Each JSON now carries full `content` blocks per chapter, and a rendered PDF sits alongside it.",
   "generated_from": [
     "contracts/*/edit-log.json",
     "contract-register-2025.md",
