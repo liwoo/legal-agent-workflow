@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2026-04-14",
+    "summary": "Added tax-evasion facilitation prevention clause.",
+    "legal_basis": "Criminal Finances Act 2017, Part 3",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-04-16",
+    "summary": "Supplier access to production data prohibited; anonymised test data only.",
+    "legal_basis": "POL-SEC-011; UK GDPR, Art. 5(1)(c)",
+    "edit_number": 2
+  },
+  {
+    "date": "2026-04-20",
+    "summary": "Payment terms aligned to net 30 from supplier's net 14.",
+    "legal_basis": "Playbook §2.4",
+    "edit_number": 3
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "type": "Mutual NDA",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Veltrane Energy Systems GmbH"
+  ],
+  "counterparty": "Veltrane Energy Systems GmbH",
+  "status": "signed",
+  "date_received": "2026-02-19",
+  "date_signed": "2026-02-24",
+  "related_contracts": [],
+  "pdf": "mutual-nda-veltrane-energy-systems.pdf",
+  "id": "CR-2026-012",
+  "name": "Mutual NDA"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-023",
+  "name": "Mutual NDA — Girard & Fils SARL",
+  "type": "Mutual NDA",
+  "counterparty": "Girard & Fils SARL",
+  "date_received": "2025-09-29",
+  "date_signed": "2025-10-02",
+  "parties": ["Northgate Systems Ltd", "Girard & Fils SARL"],
+  "status": "signed",
+  "related_contracts": ["CR-2026-026"]
+}

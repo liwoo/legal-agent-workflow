@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2026-07-09",
+    "description": "International transfer mechanism required; IDTA appended.",
+    "legal_basis": "UK GDPR, Art. 46; Data Protection Act 2018",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-07-10",
+    "description": "Access limited to support-ticket data; production database access refused.",
+    "legal_basis": "POL-SEC-011; UK GDPR, Art. 5(1)(c)",
+    "edit_number": 2
+  },
+  {
+    "date": null,
+    "description": "Open item: supplier's liability cap under negotiation.",
+    "legal_basis": "Playbook §3.5",
+    "edit_number": 3
+  }
+]

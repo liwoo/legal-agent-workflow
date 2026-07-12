@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-004",
+  "name": "Mutual NDA — Ostrava Cloud Hosting s.r.o.",
+  "type": "Mutual NDA",
+  "counterparty": "Ostrava Cloud Hosting s.r.o.",
+  "date_received": "2025-02-18",
+  "date_signed": "2025-02-24",
+  "parties": ["Northgate Systems Ltd", "Ostrava Cloud Hosting s.r.o."],
+  "status": "signed",
+  "related_contracts": ["CR-2026-004"]
+}

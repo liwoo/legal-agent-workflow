@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-027",
+  "name": "Mutual NDA — Bexley Community Health Trust",
+  "type": "Mutual NDA",
+  "counterparty": "Bexley Community Health Trust",
+  "date_received": "2025-11-24",
+  "date_signed": "2025-11-26",
+  "parties": ["Northgate Systems Ltd", "Bexley Community Health Trust"],
+  "status": "signed",
+  "related_contracts": ["CR-2026-021"]
+}

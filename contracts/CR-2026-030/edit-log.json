@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2026-05-11",
+    "description": "Commission on renewals requested — refused; first-year fees only.",
+    "legal_basis": "Playbook §8.3",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-05-13",
+    "description": "Added anti-bribery clause covering referrer conduct.",
+    "legal_basis": "Bribery Act 2010, s.1 & s.7",
+    "edit_number": 2
+  },
+  {
+    "date": "2026-05-15",
+    "description": "Lead-data sharing clause aligned to lawful-basis requirements.",
+    "legal_basis": "UK GDPR, Art. 6(1)(f); POL-PRIV-001",
+    "edit_number": 3
+  }
+]

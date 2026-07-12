@@ -1,0 +1,16 @@
+{
+  "type": "Mutual NDA",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Ashdown Grid Services"
+  ],
+  "counterparty": "Ashdown Grid Services",
+  "date_received": "2026-06-09",
+  "date_signed": "2026-06-10",
+  "status": "signed",
+  "summary": "Mutual NDA agreement with Ashdown Grid Services.",
+  "related_contracts": [],
+  "pdf": "mutual-nda-ashdown-grid-services.pdf",
+  "id": "CR-2026-037",
+  "name": "Mutual NDA — Ashdown Grid Services"
+}

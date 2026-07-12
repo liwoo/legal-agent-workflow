@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-017",
+  "name": "Mutual NDA — Corfield Aggregates Ltd",
+  "type": "Mutual NDA",
+  "counterparty": "Corfield Aggregates Ltd",
+  "date_received": "2025-07-14",
+  "date_signed": "2025-07-15",
+  "parties": ["Northgate Systems Ltd", "Corfield Aggregates Ltd"],
+  "status": "signed",
+  "related_contracts": []
+}

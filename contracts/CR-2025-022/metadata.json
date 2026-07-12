@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-022",
+  "name": "DPA Amendment — Ashcombe Retail Group plc",
+  "type": "DPA Amendment",
+  "counterparty": "Ashcombe Retail Group plc",
+  "date_received": "2025-09-22",
+  "date_signed": "2025-10-03",
+  "parties": ["Northgate Systems Ltd", "Ashcombe Retail Group plc"],
+  "status": "signed",
+  "related_contracts": ["CR-2025-011"]
+}

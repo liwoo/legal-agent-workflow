@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-006",
+  "name": "Mutual NDA — Draycott Field Services Ltd",
+  "type": "Mutual NDA",
+  "counterparty": "Draycott Field Services Ltd",
+  "date_received": "2025-03-17",
+  "date_signed": "2025-03-18",
+  "parties": ["Northgate Systems Ltd", "Draycott Field Services Ltd"],
+  "status": "signed",
+  "related_contracts": ["CR-2026-015"]
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-04-17",
+    "summary": "Customer required French governing law → settled on E&W law, English courts, with EU-hosting side letter.",
+    "legal_basis": "Playbook §5.2; POL-SEC-011",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-04-21",
+    "summary": "EU-only sub-processor list attached to DPA.",
+    "legal_basis": "EU GDPR, Art. 28(2); Commission Implementing Decision (EU) 2021/914",
+    "edit_number": 2
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "type": "Mutual NDA",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Halverson Freight Group Ltd"
+  ],
+  "counterparty": "Halverson Freight Group Ltd",
+  "date_received": "2026-01-05",
+  "date_signed": "2026-01-06",
+  "status": "signed",
+  "summary": "Pre-sales confidentiality for platform demo and pricing discussions with a prospective logistics customer.",
+  "related_contracts": [],
+  "pdf": "mutual-nda-halverson-freight-group.pdf",
+  "id": "CR-2026-001",
+  "name": "Mutual NDA — Halverson Freight Group Ltd"
+}

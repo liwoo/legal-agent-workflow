@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-008",
+  "name": "Framework Agreement — Kite & Anchor Creative Ltd",
+  "type": "Framework Agreement",
+  "counterparty": "Kite & Anchor Creative Ltd",
+  "date_received": "2025-03-25",
+  "date_signed": "2025-04-11",
+  "parties": ["Northgate Systems Ltd", "Kite & Anchor Creative Ltd"],
+  "status": "signed",
+  "related_contracts": ["CR-2025-030", "CR-2026-007", "CR-2026-034"]
+}

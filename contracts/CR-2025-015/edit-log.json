@@ -1,0 +1,20 @@
+[
+  {
+    "edit_number": 1,
+    "date": "2025-06-25",
+    "description": "MFN pricing clause refused.",
+    "legal_basis": "Playbook §2.6"
+  },
+  {
+    "edit_number": 2,
+    "date": "2025-06-27",
+    "description": "Customer code of conduct accepted; modern-slavery reporting mirrors published statement.",
+    "legal_basis": "Modern Slavery Act 2015, s.54"
+  },
+  {
+    "edit_number": 3,
+    "date": "2025-06-30",
+    "description": "Payment terms net 45 → net 30 with direct-debit alternative.",
+    "legal_basis": "Playbook §2.4"
+  }
+]

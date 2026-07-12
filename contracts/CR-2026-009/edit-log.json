@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-02-09",
+    "description": "Customer requested 24h breach notification → agreed 48h retained.",
+    "legal_basis": "UK GDPR, Art. 33; POL-PRIV-001",
+    "edit_number": 1
+  },
+  {
+    "date": "2026-02-10",
+    "description": "Added customer audit right, limited to once annually with 30 days' notice.",
+    "legal_basis": "UK GDPR, Art. 28(3)(h); Playbook §7.3",
+    "edit_number": 2
+  }
+]

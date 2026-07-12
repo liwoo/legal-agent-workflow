@@ -1,0 +1,16 @@
+{
+  "type": "Supplier Order",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Fieldstone Devices Ltd"
+  ],
+  "counterparty": "Fieldstone Devices Ltd",
+  "date_received": "2026-06-15",
+  "date_signed": "2026-06-18",
+  "status": "signed",
+  "summary": "Supplier order agreement with Fieldstone Devices Ltd for laptop fleet.",
+  "related_contracts": [],
+  "pdf": "supplier-order-fieldstone-devices.pdf",
+  "id": "CR-2026-039",
+  "name": "Supplier Order — Fieldstone Devices Ltd"
+}

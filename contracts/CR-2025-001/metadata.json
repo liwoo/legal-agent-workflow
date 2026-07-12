@@ -1,0 +1,11 @@
+{
+  "id": "CR-2025-001",
+  "name": "Mutual NDA — Pellham Manufacturing plc",
+  "type": "Mutual NDA",
+  "counterparty": "Pellham Manufacturing plc",
+  "date_received": "2025-01-09",
+  "date_signed": "2025-01-10",
+  "parties": ["Northgate Systems Ltd", "Pellham Manufacturing plc"],
+  "status": "signed",
+  "related_contracts": []
+}
