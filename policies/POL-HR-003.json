@@ -4,56 +4,227 @@
   "version": null,
   "type": "internal-policy",
   "owner": "Northgate Systems Ltd — HR / People",
-  "status": "stub — chapter content to be populated",
+  "status": "populated — chapter content drafted from synopses and corpus citations",
   "description": "HR policy behind two recurring contract positions: the shape of acceptable non-solicitation clauses, and engagement of contractors/contingent workers including off-payroll (IR35) status determination.",
   "related_legislation": [
     "Income Tax (Earnings and Pensions) Act 2003, Part 2 Ch. 10 (off-payroll working)"
   ],
   "cited_in_contracts": [
-    "CR-2025-008", "CR-2025-009", "CR-2026-003", "CR-2026-011"
+    "CR-2025-008",
+    "CR-2025-009",
+    "CR-2026-003",
+    "CR-2026-011"
   ],
   "chapters": [
     {
       "number": 1,
       "title": "Non-Solicitation Positions",
       "synopsis": "Acceptable non-solicit clauses: mutual only (one-way clauses removed), limited to targeted poaching of individuals involved in the engagement, maximum 6-month tail, general-advertisement carve-out.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Northgate accepts non-solicitation obligations only where they are mutual. One-way clauses, under which Northgate is restrained from approaching the counterparty's staff but the counterparty is left free to approach Northgate's, must be reversed to reciprocal wording or struck. Contract owners must remove any employee non-solicit that binds only one side; this position has been applied consistently across the corpus, including the removal of a one-way non-solicitation of employees clause in CR-2026-003."
+        },
+        {
+          "type": "para",
+          "text": "Acceptable clauses are confined to targeted poaching. The restraint may cover only those individuals who were directly involved in, or came to the soliciting party's attention through, the specific engagement. It must not operate as a blanket no-hire across each party's wider workforce. In CR-2025-008 the mutual non-solicit was narrowed to targeted poaching on this basis."
+        },
+        {
+          "type": "subhead",
+          "text": "Standard limits"
+        },
+        {
+          "type": "kv",
+          "pairs": [
+            [
+              "Mutuality",
+              "Mutual only; one-way clauses reversed or removed"
+            ],
+            [
+              "Scope",
+              "Targeted individuals involved in the engagement only"
+            ],
+            [
+              "Tail",
+              "Maximum 6 months from end of engagement"
+            ],
+            [
+              "Carve-out",
+              "General advertisements and recruitment not aimed at the protected individuals are permitted"
+            ]
+          ]
+        },
+        {
+          "type": "para",
+          "text": "The restraint tail must not exceed six months from the end of the engagement. Longer tails are non-standard and must be escalated under Chapter 7. Every acceptable clause must preserve a general-advertisement carve-out: responding to, or hiring through, a bona fide public advertisement or recruitment campaign not specifically targeted at the protected individuals does not breach the restraint. Requests to remove that carve-out are to be resisted."
+        }
+      ]
     },
     {
       "number": 2,
       "title": "Contingent Worker Engagement",
       "synopsis": "When and how contractors, agencies and consultants may be engaged; required contract terms (substitution, control, mutuality-of-obligation language) that reflect genuine self-employed working practices.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Contractors, agencies and consultants may be engaged where a role is genuinely temporary, specialist or project-bound and cannot practicably be met through permanent hire. Contingent engagement must not be used as a substitute for employment where the working reality is that of an employee. The hiring manager must record the business rationale before any offer is made and before any contract is issued."
+        },
+        {
+          "type": "para",
+          "text": "Engagement terms must reflect genuine self-employed working practices and be consistent with the status determination made under Chapter 4. Where an outside-IR35 conclusion is intended, the contract drafting must actually support it. In CR-2026-011 the status-determination language and substitution clause were tightened for exactly this reason, and in CR-2025-009 the contract was aligned to reflect a completed outside-IR35 determination."
+        },
+        {
+          "type": "subhead",
+          "text": "Required contract terms"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Substitution: a genuine, unfettered right for the contractor to send a suitably qualified substitute, not subject to unreasonable veto.",
+            "Control: the contractor determines how the work is performed; Northgate specifies deliverables and outcomes, not day-to-day supervision.",
+            "Mutuality of obligation: no obligation on Northgate to offer further work and none on the contractor to accept it beyond the agreed scope.",
+            "No employee-style benefits, fixed hours, or integration into line-management structures."
+          ]
+        },
+        {
+          "type": "para",
+          "text": "Where any of these features is absent, the engagement is more likely to be inside IR35 and must be treated accordingly. Contract owners must not paste employment-style provisions into a contingent-worker agreement; drafting inconsistent with the determined status will be corrected before signature."
+        }
+      ]
     },
     {
       "number": 3,
       "title": "Vetting, Right to Work & Onboarding",
       "synopsis": "Pre-engagement checks for contingent workers: right-to-work verification, reference and background screening proportionate to role, and onboarding steps before systems access is granted.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "No contingent worker may begin work, and no systems access may be granted, until pre-engagement checks are complete. The engaging manager is responsible for confirming that each required check has been passed and evidenced before the start date."
+        },
+        {
+          "type": "subhead",
+          "text": "Pre-engagement checks"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Right-to-work verification for every individual, including any substitute, retained on file for the duration of the engagement and the statutory period thereafter.",
+            "Identity verification against government-issued documentation.",
+            "References and background screening proportionate to the role and its access level; deeper screening applies to roles touching customer data, production systems or finance.",
+            "Confirmation that the agency or personal-service company has provided evidence of its own compliance where the worker is supplied through an intermediary."
+          ]
+        },
+        {
+          "type": "para",
+          "text": "Screening must be proportionate. Northgate collects only the personal data necessary for the role, in line with POL-PRIV-001, and retains it no longer than required. Onboarding steps, including confidentiality and IP acknowledgements under Chapter 5 and access provisioning under POL-SEC-011, must be completed before the worker receives credentials. Access granted ahead of completed vetting is a policy breach and must be escalated under Chapter 7."
+        }
+      ]
     },
     {
       "number": 4,
       "title": "Off-Payroll Working (IR35) Determinations",
       "synopsis": "Status-determination process under ITEPA 2003 Part 2 Ch. 10: who runs the assessment, how outside-IR35 conclusions are documented, and how contract drafting must mirror the determined status.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Every off-payroll engagement is assessed for status under the Income Tax (Earnings and Pensions) Act 2003, Part 2 Chapter 10. The determination asks whether, absent the intermediary, the worker would be regarded as an employee of Northgate for tax purposes. A determination must be made before the engagement begins and reviewed if the working arrangement materially changes."
+        },
+        {
+          "type": "para",
+          "text": "The People team runs the assessment jointly with the engaging manager, who supplies the factual detail of how the work will be performed. The assessment turns on the same features that govern the contract terms in Chapter 2: substitution, control, and mutuality of obligation. Legal is consulted where the outcome is finely balanced."
+        },
+        {
+          "type": "subhead",
+          "text": "Documentation and contract alignment"
+        },
+        {
+          "type": "para",
+          "text": "Every conclusion, whether inside or outside IR35, is recorded in a status-determination statement setting out the reasoning and the evidence relied on, and issued to the worker and any agency. Where the conclusion is outside IR35, the contract must mirror that status; the drafting cannot assert self-employment while the substantive terms describe an employee. This alignment was applied in CR-2025-009, where the completed outside-IR35 determination was reflected in the contract, and in CR-2026-011, where the status-determination and substitution wording was tightened to match."
+        },
+        {
+          "type": "para",
+          "text": "A worker who disagrees with a determination may raise it under the dispute route in Chapter 7. Determinations and their supporting statements are retained for the statutory record-keeping period."
+        }
+      ]
     },
     {
       "number": 5,
       "title": "Confidentiality, IP & Systems Access",
       "synopsis": "Mandatory confidentiality and IP-assignment terms for contingent workers (aligned with the Contract Playbook IP positions), least-privilege systems access per POL-SEC-011, and equipment/data-handling rules.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Every contingent worker must be bound by confidentiality and intellectual-property terms before they begin work. Confidentiality obligations follow the standard corpus position, with a defined term of no more than three years for general confidential information and indefinite protection for trade secrets, and they survive the end of the engagement as set out in Chapter 6."
+        },
+        {
+          "type": "para",
+          "text": "IP created by the contingent worker in the course of the engagement must be assigned to Northgate, consistent with the Contract Playbook IP positions. Where a supplier or agency opens with a licence-only stance, contract owners must convert it to a present assignment of IP taking effect on payment; this correction was made in CR-2025-008, reversing an agency's licence-only position to assignment on payment. Any pre-existing or third-party materials the worker brings must be identified and licensed, not silently assigned."
+        },
+        {
+          "type": "subhead",
+          "text": "Systems access and equipment"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Access is granted on a least-privilege basis in accordance with POL-SEC-011: only the systems and data the role requires, for only as long as the engagement lasts.",
+            "Privileged or production access requires specific approval and is time-boxed and logged.",
+            "Northgate data must be handled on approved equipment and stored only in approved locations; personal devices are used only where expressly authorised and controlled.",
+            "Data handling follows POL-PRIV-001; personal data is accessed strictly on a need-to-know basis."
+          ]
+        }
+      ]
     },
     {
       "number": 6,
       "title": "Off-Boarding & Post-Engagement Obligations",
       "synopsis": "End-of-engagement steps: access revocation, return or deletion of Northgate materials, surviving confidentiality obligations, and re-engagement cooling-off considerations.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "At the end of an engagement the engaging manager must trigger off-boarding promptly. Systems access must be revoked on or before the last working day, in line with the least-privilege and timely-deprovisioning requirements of POL-SEC-011. Access left live after an engagement ends is a security exposure and must be reported."
+        },
+        {
+          "type": "subhead",
+          "text": "Off-boarding steps"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Revoke all credentials, tokens and physical access, including any granted to substitutes.",
+            "Recover Northgate equipment and confirm return or certified deletion of all Northgate materials, documents and copies held by the worker.",
+            "Confirm that any IP created during the engagement has been assigned and delivered.",
+            "Complete an off-boarding record noting the effective end date and completion of each step."
+          ]
+        },
+        {
+          "type": "para",
+          "text": "Confidentiality and IP-assignment obligations survive termination and continue for their stated terms; the worker remains bound by them regardless of the manner in which the engagement ends. Any applicable non-solicitation tail runs from the end of the engagement and is subject to the six-month maximum in Chapter 1. Where re-engagement of a former contingent worker is contemplated, the People team must consider status and cooling-off implications before a new engagement is offered, so that a genuine break is not undermined by an unbroken pattern of work."
+        }
+      ]
     },
     {
       "number": 7,
       "title": "Review & Escalation",
       "synopsis": "Periodic re-assessment of engagements, disputes over status determinations, and escalation for non-standard non-solicit or worker-engagement requests.",
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Engagements are re-assessed periodically to confirm they remain genuinely contingent and that the working reality still matches the recorded status. The People team reviews long-running engagements at least annually, and reviews any engagement immediately where its scope, duration or working pattern has materially changed."
+        },
+        {
+          "type": "para",
+          "text": "Where a worker disputes a status determination, the People team reviews the determination against the current facts and issues a reasoned response within a reasonable period. Legal is engaged where the dispute concerns finely balanced status questions or carries tax exposure."
+        },
+        {
+          "type": "subhead",
+          "text": "Escalation"
+        },
+        {
+          "type": "para",
+          "text": "Any request that departs from this policy must be escalated before it is accepted. This includes non-solicitation terms that are one-way, exceed the six-month tail, drop the general-advertisement carve-out, or extend beyond targeted individuals; and any contingent engagement whose drafting cannot be aligned with its determined IR35 status. Non-standard non-solicit requests are escalated to Legal under the Contract Playbook, and non-standard worker-engagement or status matters to the People team, with joint sign-off where both are engaged. Standard positions are applied by default; departures require documented approval."
+        }
+      ]
     }
   ]
 }

@@ -4,17 +4,48 @@
   "version": "v4 (2025)",
   "type": "contract-review-playbook",
   "owner": "Northgate Systems Ltd — Legal",
-  "status": "stub — chapter content to be populated",
+  "status": "populated — chapter content drafted from synopses and corpus citations",
   "description": "The legal team's negotiation playbook: standard positions, fallback tiers and refusal points for recurring redlines on commercial contracts. Cited by section (e.g. Playbook §3.1) in contract edit logs.",
   "cited_in_contracts": [
-    "CR-2025-002", "CR-2025-003", "CR-2025-004", "CR-2025-005", "CR-2025-008",
-    "CR-2025-011", "CR-2025-013", "CR-2025-015", "CR-2025-016", "CR-2025-019",
-    "CR-2025-023", "CR-2025-024", "CR-2025-025", "CR-2025-026", "CR-2025-028",
-    "CR-2026-002", "CR-2026-003", "CR-2026-006", "CR-2026-007", "CR-2026-008",
-    "CR-2026-009", "CR-2026-012", "CR-2026-013", "CR-2026-015", "CR-2026-021",
-    "CR-2026-022", "CR-2026-023", "CR-2026-025", "CR-2026-026", "CR-2026-027",
-    "CR-2026-030", "CR-2026-032", "CR-2026-036", "CR-2026-038", "CR-2026-041",
-    "CR-2026-042", "CR-2026-045", "CR-2026-047", "CR-2026-048"
+    "CR-2025-002",
+    "CR-2025-003",
+    "CR-2025-004",
+    "CR-2025-005",
+    "CR-2025-008",
+    "CR-2025-011",
+    "CR-2025-013",
+    "CR-2025-015",
+    "CR-2025-016",
+    "CR-2025-019",
+    "CR-2025-023",
+    "CR-2025-024",
+    "CR-2025-025",
+    "CR-2025-026",
+    "CR-2025-028",
+    "CR-2026-002",
+    "CR-2026-003",
+    "CR-2026-006",
+    "CR-2026-007",
+    "CR-2026-008",
+    "CR-2026-009",
+    "CR-2026-012",
+    "CR-2026-013",
+    "CR-2026-015",
+    "CR-2026-021",
+    "CR-2026-022",
+    "CR-2026-023",
+    "CR-2026-025",
+    "CR-2026-026",
+    "CR-2026-027",
+    "CR-2026-030",
+    "CR-2026-032",
+    "CR-2026-036",
+    "CR-2026-038",
+    "CR-2026-041",
+    "CR-2026-042",
+    "CR-2026-045",
+    "CR-2026-047",
+    "CR-2026-048"
   ],
   "chapters": [
     {
@@ -22,116 +53,533 @@
       "title": "Confidentiality & NDAs",
       "synopsis": "Standard positions for mutual NDAs: maximum term (3 years, not 5), the definition of Confidential Information (marked or reasonably-understood, standard carve-outs), and a firm prohibition on residuals clauses.",
       "known_sections": [
-        { "section": "1.2", "title": "NDA Term Limits" },
-        { "section": "1.3", "title": "Confidential Information Definition" },
-        { "section": "1.4", "title": "Residuals Prohibited" }
+        {
+          "section": "1.2",
+          "title": "NDA Term Limits"
+        },
+        {
+          "section": "1.3",
+          "title": "Confidential Information Definition"
+        },
+        {
+          "section": "1.4",
+          "title": "Residuals Prohibited"
+        }
       ],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Northgate's default confidentiality instrument is the approved mutual NDA (see Chapter 11). Contract owners must start from Northgate paper wherever possible; where the counterparty insists on its own form, the positions in this chapter still govern, and any departure below the refusal point must be escalated under Chapter 10. Confidentiality of personal or security-sensitive data is additionally governed by POL-PRIV-001 and POL-SEC-011."
+        },
+        {
+          "type": "subhead",
+          "text": "1.2 NDA Term Limits"
+        },
+        {
+          "type": "para",
+          "text": "The standard position is a confidentiality term of three years from disclosure, mutual in both directions. Counterparties routinely propose five years; this is our first point of resistance, not a concession. Fallback 1: hold at three years but agree that trade secrets remain protected for as long as they retain that character in law. Fallback 2: accept four years only where the deal value is material and the counterparty is a strategic account. Refusal point: any term of five years or more, or a one-way term that runs longer against Northgate than against the counterparty. In practice we have reduced five-year terms to three as a matter of course (see CR-2025-004)."
+        },
+        {
+          "type": "subhead",
+          "text": "1.3 Confidential Information Definition"
+        },
+        {
+          "type": "para",
+          "text": "Confidential Information must be limited to information that is either marked confidential or would reasonably be understood to be confidential given its nature and the circumstances of disclosure. Resist open-ended definitions that capture all information exchanged. The standard carve-outs must be present and are non-negotiable: information that is or becomes public through no fault of the receiver; was lawfully known before disclosure; is independently developed without use of the disclosed information; or is lawfully received from a third party. A compelled-disclosure exception (with notice where lawful) is also required."
+        },
+        {
+          "type": "subhead",
+          "text": "1.4 Residuals Prohibited"
+        },
+        {
+          "type": "para",
+          "text": "Residuals clauses, which permit a party to use information retained in the unaided memory of its personnel, are refused as standard and struck on sight. They hollow out the protection the NDA is meant to provide. There is no fallback tier here: the clause is removed, as we have done consistently across the corpus. If the counterparty makes acceptance of the whole agreement conditional on a residuals right, treat it as an off-playbook deviation and escalate under Chapter 10 rather than accepting it at the desk."
+        }
+      ]
     },
     {
       "number": 2,
       "title": "Commercial Terms & Pricing",
       "synopsis": "Pricing and payment positions: accepted pricing structures (including ramp schedules with pro-rated fees), standard net-30 payment terms (counter net-60 requests), late-payment interest, and refusal of most-favoured-customer/MFN commitments.",
       "known_sections": [
-        { "section": "2.2", "title": "Pricing Structures" },
-        { "section": "2.4", "title": "Payment Terms" },
-        { "section": "2.6", "title": "No MFN Commitments" }
+        {
+          "section": "2.2",
+          "title": "Pricing Structures"
+        },
+        {
+          "section": "2.4",
+          "title": "Payment Terms"
+        },
+        {
+          "section": "2.6",
+          "title": "No MFN Commitments"
+        }
       ],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "This chapter sets the commercial and payment positions. Fee mechanics interact with the finance controls in POL-FIN-007; billing, credit and interest positions must remain consistent with that policy."
+        },
+        {
+          "type": "subhead",
+          "text": "2.2 Pricing Structures"
+        },
+        {
+          "type": "para",
+          "text": "Fixed annual fees and per-unit/subscription pricing are both acceptable. Ramp schedules are acceptable where fees are pro-rated per phase and each phase has a defined start trigger, so that Northgate is not carrying discounted early-phase pricing into steady state (e.g. ramp acceptance where fees were pro-rated per phase). Avoid open-ended usage pricing without a floor. Any bespoke pricing model outside these shapes is a deviation for Chapter 10."
+        },
+        {
+          "type": "subhead",
+          "text": "2.4 Payment Terms"
+        },
+        {
+          "type": "para",
+          "text": "The standard position is net-30 from a valid invoice. Counterparties frequently open at net-45 or net-60; these are countered back to net-30 as a matter of routine, and across the corpus net-45 and net-60 requests have consistently been brought to net-30. Fallback 1: hold net-30 but offer a direct-debit alternative or a small early-settlement/direct-debit discount to sweeten the shorter term. Fallback 2: accept net-45 only for strategic accounts and only in exchange for a countervailing commercial benefit. Refusal point: net-60 or longer as a contractual right. Late-payment interest and recovery costs follow the Late Payment of Commercial Debts (Interest) Act 1998 and must not be waived below the statutory entitlement."
+        },
+        {
+          "type": "subhead",
+          "text": "2.6 No MFN Commitments"
+        },
+        {
+          "type": "para",
+          "text": "Most-favoured-customer / MFN pricing commitments are refused. They constrain future commercial freedom, are administratively unworkable, and have been declined consistently (e.g. MFN refusals). There is no fallback tier: MFN is struck. Where a customer presses for price protection, redirect them to a renewal uplift cap under Chapter 6 (section 6.2), which is a bounded and acceptable substitute."
+        }
+      ]
     },
     {
       "number": 3,
       "title": "Liability & Remedies",
       "synopsis": "Limitation-of-liability fallback tiers (standard cap 12 months' fees; data-breach super-cap up to 2× annual fees; uncapped liability refused), excluded losses, SLA service credits as sole remedy, and floors for liability accepted from vendors.",
       "known_sections": [
-        { "section": "3.1", "title": "Limitation of Liability — fallback tiers" },
-        { "section": "3.2", "title": "Excluded Losses" },
-        { "section": "3.4", "title": "SLA Remedies" },
-        { "section": "3.5", "title": "Vendor Liability Floors" }
+        {
+          "section": "3.1",
+          "title": "Limitation of Liability — fallback tiers"
+        },
+        {
+          "section": "3.2",
+          "title": "Excluded Losses"
+        },
+        {
+          "section": "3.4",
+          "title": "SLA Remedies"
+        },
+        {
+          "section": "3.5",
+          "title": "Vendor Liability Floors"
+        }
       ],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "Liability is the most heavily negotiated area in the corpus and the fallback tiers below must be applied precisely. Liability caps interact with the insurance requirements in POL-FIN-007; do not agree a cap that our cover cannot support without confirming with Finance."
+        },
+        {
+          "type": "subhead",
+          "text": "3.1 Limitation of Liability — fallback tiers"
+        },
+        {
+          "type": "para",
+          "text": "Standard position: aggregate liability capped at 12 months' fees (the fees paid or payable in the twelve months preceding the claim). Counterparties routinely challenge the cap or seek uncapped liability; the 12-month cap is retained as our anchor and has held under challenge across the corpus. Fallback 1: for data-protection and security breaches only, offer a super-cap of up to 2x annual fees, which recalculates automatically as fees grow. Fallback 2: for a strategic account, a data-breach super-cap of 18 months' fees may be agreed where 2x is resisted, but only for data-protection breaches. Refusal point: uncapped or unlimited liability of any kind, including uncapped data-breach liability, which is always brought back to the super-cap. The usual uncapped carve-outs (death/personal injury, fraud, and a party's indemnities where given) sit outside the cap and are not the subject of these tiers."
+        },
+        {
+          "type": "subhead",
+          "text": "3.2 Excluded Losses"
+        },
+        {
+          "type": "para",
+          "text": "The standard exclusion of indirect and consequential loss, loss of profit, revenue, goodwill and anticipated savings must be retained and is mutual. Resist attempts to carve lost profits back into recoverable losses; such carve-outs are refused and the standard exclusion retained (e.g. consequential-loss carve-out refused). If a counterparty insists on recovering a specific, direct and quantifiable loss category, that is a Chapter 10 escalation, not a desk concession."
+        },
+        {
+          "type": "subhead",
+          "text": "3.4 SLA Remedies"
+        },
+        {
+          "type": "para",
+          "text": "Where service levels are given, service credits are the sole and exclusive remedy for SLA misses, and this is confirmed in the drafting. Credits are capped as a percentage of the affected period's fees. Resist attempts to make credits cumulative with damages or to convert repeated misses into an uncapped termination-plus-damages right; a chronic-failure termination right (without damages) is an acceptable Fallback 1. Sole-remedy treatment has been accepted consistently across the corpus."
+        },
+        {
+          "type": "subhead",
+          "text": "3.5 Vendor Liability Floors"
+        },
+        {
+          "type": "para",
+          "text": "When Northgate is the customer, the tiers invert: we seek a floor on the supplier's liability, not a ceiling for ourselves. Standard position: the supplier's cap should be no less than 12 months' fees, with a higher figure or an uncapped carve-out for data breaches, confidentiality and IP infringement. Fallback 1: accept a 12-month cap if data-breach liability is separately enhanced. Refusal point: a supplier cap set at a nominal figure (e.g. fees for a single month, or a fixed low-value sum) that leaves Northgate materially under-protected. Open supplier-cap items are tracked and escalated rather than left unresolved (e.g. open supplier-cap item)."
+        }
+      ]
     },
     {
       "number": 4,
       "title": "Intellectual Property",
       "synopsis": "IP positions: commissioned/deliverable work must be assigned to Northgate on payment (licence-only positions reversed), and source-code escrow requests are refused with a business-continuity commitment offered instead.",
       "known_sections": [
-        { "section": "4.3", "title": "IP Ownership in Commissioned Work" },
-        { "section": "4.5", "title": "No Source Code Escrow" }
+        {
+          "section": "4.3",
+          "title": "IP Ownership in Commissioned Work"
+        },
+        {
+          "section": "4.5",
+          "title": "No Source Code Escrow"
+        }
       ],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "This chapter governs ownership of intellectual property and continuity of access to code. It is read with POL-LGL-002 on contracting authority and, for security of any escrow or continuity materials, POL-SEC-011."
+        },
+        {
+          "type": "subhead",
+          "text": "4.3 IP Ownership in Commissioned Work"
+        },
+        {
+          "type": "para",
+          "text": "Where Northgate commissions bespoke deliverables, IP in those deliverables must be assigned to Northgate on payment. Suppliers and agencies routinely open with a licence-only position; this is reversed to full assignment on payment as standard, and has been reversed consistently across the corpus (see CR-2025-008, agency licence-only reverted to assignment on payment). Fallback 1: assignment of the bespoke deliverables with the supplier retaining ownership of its pre-existing and generic tooling, licensed to Northgate perpetually and royalty-free to the extent embedded. Refusal point: a licence-only outcome for genuinely bespoke, separately-priced deliverables. Assignments should be expressed to satisfy the Copyright, Designs and Patents Act 1988, s.90. Where Northgate is the supplier, the position reverses and we grant a licence, retaining ownership of our platform and reusable components."
+        },
+        {
+          "type": "subhead",
+          "text": "4.5 No Source Code Escrow"
+        },
+        {
+          "type": "para",
+          "text": "Source-code escrow requests are refused. Escrow is costly, rarely usable in practice, and exposes our code. In place of escrow we offer a business-continuity commitment: documented continuity and disaster-recovery arrangements, and a right to continued use of the software on a defined trigger event. This substitution has been accepted across the corpus (see CR-2025-005, escrow refused and business-continuity commitment offered). Refusal point: any obligation to place live source code into third-party escrow. If a regulated customer can show a genuine regulatory requirement for escrow, escalate under Chapter 10 rather than conceding at the desk."
+        }
+      ]
     },
     {
       "number": 5,
       "title": "Governing Law & Disputes",
       "synopsis": "England & Wales governing law as default, with defined fallback jurisdictions and compensating commitments (e.g. EU hosting) when a counterparty insists on another governing law; dispute-resolution and arbitration positions.",
       "known_sections": [
-        { "section": "5.2", "title": "Governing Law Fallbacks" }
+        {
+          "section": "5.2",
+          "title": "Governing Law Fallbacks"
+        }
       ],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "The default governing law and jurisdiction for Northgate contracts is England and Wales, exclusive jurisdiction. Where hosting or data location is in issue, this chapter is read with POL-SEC-011 (hosting regions) and POL-PRIV-001 (international transfers)."
+        },
+        {
+          "type": "subhead",
+          "text": "5.2 Governing Law Fallbacks"
+        },
+        {
+          "type": "para",
+          "text": "Standard position: England and Wales law and exclusive jurisdiction, and governing law is moved to E&W as a matter of course where a counterparty has drafted otherwise. Fallback 1: a neutral common-law jurisdiction (e.g. Ireland) where the counterparty will not accept E&W and Northgate has EU-facing obligations; pair this with an EU-hosting commitment as the compensating concession (e.g. German law requested, E&W retained with EU-hosting commitment). Fallback 2: for US counterparties, Delaware law may be accepted as a fallback where a US governing law is a genuine deal-breaker. Refusal point: the counterparty's local law in a jurisdiction where Northgate has no advised position and cannot assess enforcement risk. On dispute resolution the default is litigation in the courts of the chosen jurisdiction; arbitration (seat and rules to match the governing law, under the Arbitration Act 1996 where the seat is E&W) is an acceptable alternative for cross-border deals and is preferred over local-court litigation abroad."
+        }
+      ]
     },
     {
       "number": 6,
       "title": "Term, Renewal & Exit",
       "synopsis": "Renewal mechanics and notice periods, caps on renewal price uplifts (with fallback tiers), acceptable term commitments and early-termination fees, and exit-assistance obligations at end of term.",
       "known_sections": [
-        { "section": "6.1", "title": "Renewal & Notice" },
-        { "section": "6.2", "title": "Uplift Caps — fallback" },
-        { "section": "6.4", "title": "Term Commitments & ETF" },
-        { "section": "6.5", "title": "Exit Assistance" }
+        {
+          "section": "6.1",
+          "title": "Renewal & Notice"
+        },
+        {
+          "section": "6.2",
+          "title": "Uplift Caps — fallback"
+        },
+        {
+          "section": "6.4",
+          "title": "Term Commitments & ETF"
+        },
+        {
+          "section": "6.5",
+          "title": "Exit Assistance"
+        }
       ],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "This chapter covers the life-cycle mechanics of the contract: renewal, price uplift, term length and orderly exit. Renewal-notice dates must be diarised on signature so that windows are not missed."
+        },
+        {
+          "type": "subhead",
+          "text": "6.1 Renewal & Notice"
+        },
+        {
+          "type": "para",
+          "text": "Standard position: auto-renewal for successive 12-month terms, with a 30-day non-renewal notice window, diarised on signature. Customers frequently attack auto-renewal. Fallback 1: retain auto-renewal but widen the notice window to 60 or 90 days to give the customer comfort (e.g. auto-renewal retained with notice widened to 90 days). Fallback 2: convert to renewal by mutual agreement / renewal-by-order where the customer will not accept any auto-renewal (e.g. auto-renewal converted to renewal-by-mutual-agreement). Refusal point: silent lapse with no renewal mechanism at all on a strategic account. Where auto-renewal is retained, the notice window must never be so short that it is impractical to exercise."
+        },
+        {
+          "type": "subhead",
+          "text": "6.2 Uplift Caps — fallback"
+        },
+        {
+          "type": "para",
+          "text": "Standard position: renewal-year price uplifts are capped, with a preferred cap of the greater of a fixed percentage or a recognised inflation index (e.g. CPI). Where a hard cap is required, 5% is the standard agreed figure and a first-renewal price hold at a maximum 5% uplift has been used across the corpus. Fallback 1: CPI-only with no fixed floor for a price-sensitive customer. Fallback 2: a one-year price hold in exchange for a longer committed term. Refusal point: an indefinite price freeze, which is redirected here from any MFN request under section 2.6."
+        },
+        {
+          "type": "subhead",
+          "text": "6.4 Term Commitments & ETF"
+        },
+        {
+          "type": "para",
+          "text": "Standard position: a committed initial term (typically 12-36 months) with no termination for convenience during the committed term. Where a customer requires flexibility, Fallback 1 is termination for convenience after an initial minimum period (e.g. 12 months) subject to an early-termination fee that recovers the committed but unpaid balance or unrecovered discounts (e.g. termination-for-convenience at 12 months agreed with early-termination fee). Refusal point: termination for convenience from day one with no ETF, which strands onboarding cost and committed discounts."
+        },
+        {
+          "type": "subhead",
+          "text": "6.5 Exit Assistance"
+        },
+        {
+          "type": "para",
+          "text": "On termination or expiry, Northgate provides reasonable exit assistance and data return/deletion. Standard position: a defined exit-assistance period at then-current rates, with data returned in a standard format and deleted thereafter (co-ordinated with POL-PRIV-001 on retention). A 90-day exit-assistance period at then-current rates is the standard agreed shape across the corpus. Fallback 1: a longer window for a complex migration in exchange for the customer bearing the cost. Refusal point: open-ended, free-of-charge exit assistance with no time limit."
+        }
+      ]
     },
     {
       "number": 7,
       "title": "Compliance & Audit",
       "synopsis": "Positions on customer/supplier compliance clauses and audit rights: scope, frequency, notice and cost allocation for audits, and boundaries on regulator-driven flow-down obligations.",
       "known_sections": [
-        { "section": "7.3", "title": "Audit Rights" }
+        {
+          "section": "7.3",
+          "title": "Audit Rights"
+        }
       ],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "This chapter sets the boundaries on customer and supplier compliance and audit clauses. Data-protection audits under a DPA follow POL-PRIV-001 and the DPA module in Chapter 11; security audits and evidence follow POL-SEC-011."
+        },
+        {
+          "type": "subhead",
+          "text": "7.3 Audit Rights"
+        },
+        {
+          "type": "para",
+          "text": "Standard position: audit rights are limited to once in any twelve-month period, on at least 30 days' written notice, during business hours, subject to confidentiality and to the customer bearing its own costs, plus an additional for-cause audit right on reasonable suspicion of a material breach. Customers frequently open with unlimited or on-demand audit rights; these are narrowed to annual plus for-cause as a matter of course (e.g. unlimited audit rights narrowed to annual + for-cause; audit right limited to once annually with 30 days' notice). Fallback 1: substitute a right to receive Northgate's third-party audit reports or certifications (e.g. ISO 27001, SOC 2) in place of an on-site audit, with on-site rights reserved for-cause. Refusal point: unannounced, unlimited-frequency access, or audit of systems shared with other customers. Where the audit right derives from a regulator's flow-down (e.g. UK GDPR, Art. 28(3)(h) for data-protection audits), scope it to what the regulation actually requires and no wider."
+        }
+      ]
     },
     {
       "number": 8,
       "title": "Partner, Reseller & Referral Arrangements",
       "synopsis": "Channel positions: no exclusive appointments for partners or resellers, and standard terms for referral commissions (rates, triggers, duration).",
       "known_sections": [
-        { "section": "8.1", "title": "No Exclusive Appointments" },
-        { "section": "8.3", "title": "Referral Commissions" }
+        {
+          "section": "8.1",
+          "title": "No Exclusive Appointments"
+        },
+        {
+          "section": "8.3",
+          "title": "Referral Commissions"
+        }
       ],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "This chapter governs channel arrangements: partners, resellers and referral sources. Commission approvals and payment mechanics are read with POL-FIN-007; where a partner touches personal data, POL-PRIV-001 applies."
+        },
+        {
+          "type": "subhead",
+          "text": "8.1 No Exclusive Appointments"
+        },
+        {
+          "type": "para",
+          "text": "Standard position: partner, reseller and referral appointments are non-exclusive. Exclusivity constrains Northgate's route to market and is refused, as it has been consistently (e.g. reseller exclusivity refused, non-exclusive retained). Fallback 1: a time-limited or territory-limited preferred-partner status with performance targets and a clean exit if targets are missed, but never true exclusivity. Refusal point: any exclusive appointment, or a most-favoured-partner pricing right (redirect to the same reasoning as section 2.6). Appointments must be terminable on reasonable notice and must not fetter direct sales."
+        },
+        {
+          "type": "subhead",
+          "text": "8.3 Referral Commissions"
+        },
+        {
+          "type": "para",
+          "text": "Standard position: referral commission is a defined percentage of first-year net fees for a qualified, Northgate-accepted referral, paid after the customer has paid and subject to clawback on refund or non-payment. Fallback 1: a modest commission on the first renewal for a genuinely originated account. Refusal point: commission on renewals in perpetuity, which has been declined in favour of first-year fees only (e.g. commission on renewals refused; first-year fees only). Commission triggers must be tied to Northgate's actual receipt of cleared payment, not to signature."
+        }
+      ]
     },
     {
       "number": 9,
       "title": "Variations, Amendments & Pre-Contract Documents",
       "synopsis": "Refusal of unilateral variation rights, discipline on amendment scope (amendments limited to their stated subject), and treatment of heads of terms / MoUs (non-binding except defined provisions).",
       "known_sections": [
-        { "section": "9.1", "title": "Unilateral Variation" },
-        { "section": "9.2", "title": "Amendment Scope Discipline" },
-        { "section": "9.4", "title": "Heads of Terms & MoUs" }
+        {
+          "section": "9.1",
+          "title": "Unilateral Variation"
+        },
+        {
+          "section": "9.2",
+          "title": "Amendment Scope Discipline"
+        },
+        {
+          "section": "9.4",
+          "title": "Heads of Terms & MoUs"
+        }
       ],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "This chapter disciplines how the contract can be changed and how pre-contract documents are treated. It supports the authority controls in POL-LGL-002: only authorised signatories may vary a contract, and only in writing."
+        },
+        {
+          "type": "subhead",
+          "text": "9.1 Unilateral Variation"
+        },
+        {
+          "type": "para",
+          "text": "Northgate refuses unilateral variation rights, including provisions that incorporate a counterparty's policies, standards or codes 'as amended from time to time'. Such language lets the counterparty change the deal after signature. Standard position: variations only by written agreement signed by authorised representatives of both parties. Where a policy must be incorporated, it is fixed to the version in force as at the signature date, not a moving target; open-ended incorporation is narrowed accordingly (e.g. customer policies narrowed to those as at signature date). Refusal point: any clause allowing one party to change terms, policies or pricing unilaterally, save for the bounded renewal uplift under section 6.2."
+        },
+        {
+          "type": "subhead",
+          "text": "9.2 Amendment Scope Discipline"
+        },
+        {
+          "type": "para",
+          "text": "Amendments must be limited to their stated subject. A counterparty must not use a narrow amendment (for example, an order for additional users) to smuggle in unrelated new obligations such as a bespoke SLA or new liability terms. Standard position: the amendment recites its purpose and confirms that all other terms remain unchanged; out-of-scope requests are deferred to renewal or to a separate, properly negotiated amendment (e.g. bespoke SLA in amendment deferred to renewal). Refusal point: a sweep-up amendment that materially rewrites risk allocation under cover of an administrative change."
+        },
+        {
+          "type": "subhead",
+          "text": "9.4 Heads of Terms & MoUs"
+        },
+        {
+          "type": "para",
+          "text": "Heads of terms, letters of intent and memoranda of understanding are non-binding except for defined provisions (typically confidentiality, exclusivity if any, costs and governing law). Standard position: mark such documents 'subject to contract' and expressly state which clauses are intended to bind, strengthening non-binding language where it is weak (e.g. 'subject to contract' and non-binding language strengthened). Refusal point: a pre-contract document that purports to bind Northgate to the substantive commercial terms before the definitive agreement is signed."
+        }
+      ]
     },
     {
       "number": 10,
       "title": "Escalation & Off-Playbook Approvals",
       "synopsis": "What to do when a counterparty position falls outside the fallback tiers: who can approve a deviation (Legal Director, then COO/CFO per POL-LGL-002), how deviations are recorded, and turnaround expectations for escalated points.",
       "known_sections": [],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "When a counterparty position falls outside the fallback tiers in Chapters 1-9, or reaches a stated refusal point, the contract owner must not concede at the desk. The point is escalated as an off-playbook deviation and handled under this chapter and the authority framework in POL-LGL-002."
+        },
+        {
+          "type": "subhead",
+          "text": "Who can approve a deviation"
+        },
+        {
+          "type": "para",
+          "text": "Approval authority is tiered. The Legal Director may approve deviations within Chapters 1-9 that do not increase Northgate's uncapped exposure or override a stated refusal point. Deviations that touch uncapped liability, indemnities, exclusivity, or governing law outside the section 5.2 fallbacks require the Legal Director together with the COO, and where the deviation carries financial exposure above the POL-FIN-007 threshold, the CFO. Nobody below Legal Director may sign off a refusal-point deviation."
+        },
+        {
+          "type": "subhead",
+          "text": "How deviations are recorded"
+        },
+        {
+          "type": "para",
+          "text": "Every approved deviation is recorded in the contract's edit log with the point conceded, the Playbook section it departs from, the approver, and the rationale, so that the deal history can inform future playbook changes under Chapter 12. Unrecorded deviations are treated as unauthorised."
+        },
+        {
+          "type": "kv",
+          "pairs": [
+            [
+              "Standard fallbacks (Ch.1-9)",
+              "Contract owner / desk"
+            ],
+            [
+              "Deviation within tiers",
+              "Legal Director"
+            ],
+            [
+              "Refusal-point deviation",
+              "Legal Director + COO (and CFO if over the POL-FIN-007 threshold)"
+            ],
+            [
+              "Target turnaround",
+              "2 business days for a decision on an escalated point"
+            ]
+          ]
+        }
+      ]
     },
     {
       "number": 11,
       "title": "Templates & Clause Library",
       "synopsis": "Index of approved starting documents (MSA v4, mutual NDA, DPA module, order forms, referral and reseller agreements) and the approved fallback wording for each negotiable clause; rules on when counterparty paper may be used instead.",
       "known_sections": [],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "This chapter indexes the approved starting documents and the approved fallback wording that implements the positions in Chapters 1-9. Contract owners must draft from these templates and use the approved wording rather than free-drafting concessions."
+        },
+        {
+          "type": "subhead",
+          "text": "Approved starting documents"
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "MSA v4 — master services agreement, Northgate's primary paper",
+            "Mutual NDA — the standard 3-year mutual confidentiality agreement (Chapter 1)",
+            "DPA module — data-processing addendum, with EU-only and UK-only hosting variants and a sub-processor list (POL-PRIV-001, POL-SEC-011)",
+            "Order forms — standard and ramp-schedule variants (section 2.2)",
+            "Referral agreement and Reseller agreement — non-exclusive channel paper (Chapter 8)"
+          ]
+        },
+        {
+          "type": "subhead",
+          "text": "Approved fallback wording"
+        },
+        {
+          "type": "para",
+          "text": "For each negotiable clause, the clause library holds the approved standard wording and the approved fallback wording for each tier, so that a permitted concession does not require bespoke drafting. Contract owners must use the library wording for liability caps and super-caps (section 3.1), payment terms (section 2.4), renewal and uplift (sections 6.1-6.2), governing-law fallbacks (section 5.2) and exit assistance (section 6.5). Where library wording exists, deviating from it is itself a Chapter 10 matter."
+        },
+        {
+          "type": "subhead",
+          "text": "Using counterparty paper"
+        },
+        {
+          "type": "para",
+          "text": "Northgate paper is preferred. Counterparty paper may be used where the counterparty is a large enterprise or public body that will only transact on its own template, but only if the positions in this playbook are achieved on that paper. When working on counterparty paper the contract owner must map each clause back to the relevant Chapter 1-9 section and confirm the standard position or a permitted fallback has been reached before signature."
+        }
+      ]
     },
     {
       "number": 12,
       "title": "Playbook Governance & Change Control",
       "synopsis": "Ownership and annual review of the playbook, how positions are added or changed (evidence from deal history), version history (v3 2023 → v4 2025) and training for new legal and sales team members.",
       "known_sections": [],
-      "content": null
+      "content": [
+        {
+          "type": "para",
+          "text": "The playbook is owned by Northgate Systems Ltd — Legal, and is maintained under the change-control discipline in POL-LGL-002. It is the single source of truth for negotiation positions; where it conflicts with informal practice, the playbook governs until formally changed."
+        },
+        {
+          "type": "subhead",
+          "text": "Review and change control"
+        },
+        {
+          "type": "para",
+          "text": "The Legal Director reviews the playbook at least annually. Positions are added or amended only on evidence: a pattern in the deal history (drawn from contract edit logs and Chapter 10 deviation records) showing that a standard position is consistently unachievable, or a change in law or in Northgate's risk appetite. Proposed changes are reviewed with the COO and, where they affect pricing or financial exposure, the CFO. Every change is versioned and the rationale recorded."
+        },
+        {
+          "type": "subhead",
+          "text": "Version history"
+        },
+        {
+          "type": "kv",
+          "pairs": [
+            [
+              "v3",
+              "2023 — prior baseline"
+            ],
+            [
+              "v4",
+              "2025 — current; fallback tiers made explicit for Chapters 1-9, data-breach super-cap and exit-assistance positions codified"
+            ],
+            [
+              "Owner",
+              "Northgate Systems Ltd — Legal"
+            ],
+            [
+              "Review cycle",
+              "Annual (Legal Director)"
+            ]
+          ]
+        },
+        {
+          "type": "para",
+          "text": "New members of the legal and sales teams must be trained on the playbook before running negotiations. Training covers the standard positions, the fallback tiers and refusal points in Chapters 1-9, and the escalation route in Chapter 10, so that concessions are made deliberately and within authority rather than at the desk."
+        }
+      ]
     }
   ]
 }
