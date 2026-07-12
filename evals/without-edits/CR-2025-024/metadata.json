@@ -1,0 +1,15 @@
+{
+  "id": "CR-2025-024",
+  "name": "Memorandum of Understanding \u2014 Meridian Channel Partners Ltd",
+  "type": "Memorandum of Understanding",
+  "counterparty": "Meridian Channel Partners Ltd",
+  "date_received": "2025-10-13",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Meridian Channel Partners Ltd"
+  ],
+  "status": "received",
+  "related_contracts": [
+    "CR-2026-013"
+  ]
+}

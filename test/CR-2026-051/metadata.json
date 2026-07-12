@@ -1,0 +1,19 @@
+{
+  "type": "SaaS Order Form",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Wychwood Analytics Ltd"
+  ],
+  "counterparty": "Wychwood Analytics Ltd",
+  "date_received": "2026-07-10",
+  "status": "received",
+  "summary": "Our own order form + MSA v4 returned with tracked changes from the prospect's solicitor. Redlines visible against liability, payment terms and the indemnity clause; not yet read in detail. 40 seats, Professional tier.",
+  "senders_ask": "They want to close this month \u2014 how bad are the changes?",
+  "received_from": "AE (sales)",
+  "counterparty_paper": false,
+  "related_contracts": [],
+  "pdf": "cr-2026-051-intake.pdf",
+  "id": "CR-2026-051",
+  "name": "SaaS Order Form (redlined) \u2014 Wychwood Analytics Ltd",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}

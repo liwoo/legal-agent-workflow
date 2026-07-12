@@ -1,0 +1,16 @@
+{
+  "type": "Software Reseller Agreement",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Meridian Channel Partners Ltd"
+  ],
+  "counterparty": "Meridian Channel Partners Ltd",
+  "status": "received",
+  "date_received": "2026-02-24",
+  "related_contracts": [
+    "CR-2025-024"
+  ],
+  "pdf": "software-reseller-agreement-meridian-channel-partners.pdf",
+  "id": "CR-2026-013",
+  "name": "Software Reseller Agreement"
+}

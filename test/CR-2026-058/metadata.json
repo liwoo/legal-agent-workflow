@@ -1,0 +1,21 @@
+{
+  "type": "Tender Terms & Conditions",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Oakhampton Council"
+  ],
+  "counterparty": "Oakhampton Council",
+  "date_received": "2026-07-12",
+  "status": "received",
+  "summary": "Council's invitation-to-tender pack following the May market engagement (CR-2026-033): mandatory contract terms (38 pages), no-negotiation notice, and a compliance questionnaire. Submission deadline 2026-07-31.",
+  "senders_ask": "Please confirm we can accept their terms as-is \u2014 tender doesn't allow redlines.",
+  "received_from": "Bid Manager",
+  "counterparty_paper": true,
+  "related_contracts": [
+    "CR-2026-033"
+  ],
+  "pdf": "cr-2026-058-intake.pdf",
+  "id": "CR-2026-058",
+  "name": "Tender Terms & Conditions \u2014 Oakhampton Council",
+  "review_state": "awaiting first review \u2014 no triage, no edits"
+}

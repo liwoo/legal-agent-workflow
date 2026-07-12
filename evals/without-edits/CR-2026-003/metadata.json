@@ -1,0 +1,15 @@
+{
+  "type": "Mutual NDA",
+  "parties": [
+    "Northgate Systems Ltd",
+    "Cardenal Ventures LLP"
+  ],
+  "counterparty": "Cardenal Ventures LLP",
+  "date_received": "2026-01-12",
+  "status": "received",
+  "summary": "Mutual non-disclosure agreement with Cardenal Ventures LLP.",
+  "related_contracts": [],
+  "pdf": "mutual-nda-cardenal-ventures.pdf",
+  "id": "CR-2026-003",
+  "name": "Mutual NDA \u2014 Cardenal Ventures LLP"
+}
