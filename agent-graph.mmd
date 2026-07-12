@@ -1,0 +1,97 @@
+%% Contract Review — Abstract Agent Graph (framework-agnostic)
+%% Companion to decision-framework.mmd (the concrete business flow).
+%% Semantics target a stateful graph runtime (LangGraph-style):
+%%   - Nodes read/write a single shared State object.
+%%   - Solid edges = deterministic transitions.
+%%   - Diamonds = conditional routers (branch on State).
+%%   - Dashed edges = interrupt / resume (human-in-the-loop).
+%% Render: mmdc -i agent-graph.mmd -o agent-graph.svg
+%%
+%% ── State contract ─────────────────────────────────────────
+%% State = {
+%%   item_id, classification{family,paper,direction,pii,value_band},
+%%   prior_file_ref, flags[]              # accumulated; drives routing
+%%   gate_results{dpa,statutory,finance}, # written by validators
+%%   redlines[]{clause, disposition, iteration},
+%%   interrupt{reason, owner, sla} | null,
+%%   decision, signer, side_effects[]
+%% }
+
+flowchart TD
+
+    START(( START )):::terminal --> INGEST
+
+    %% ── Intake & classification ────────────────────────────
+    INGEST[node: ingest<br>normalise payload → State]:::node --> CLASSIFY
+    CLASSIFY[node: classify<br>write classification + flags]:::node --> R_INTAKE
+
+    R_INTAKE{router: intake_gate<br>draft? prior_file? blocker?}:::router
+    R_INTAKE -- no draft --> HITL
+    R_INTAKE -- prior_file + blocking flag --> HITL
+    R_INTAKE -- ok --> R_FAST
+
+    %% ── Fast path (cheap-guard, not a full bypass) ─────────
+    R_FAST{router: triage<br>our template & no redlines?}:::router
+    R_FAST -- yes / in-scope SOW --> GUARD[node: cheap_guard<br>lightweight validation]:::node
+    GUARD --> R_GUARD{guard clean?}:::router
+    R_GUARD -- yes --> APPROVE
+    R_GUARD -- no --> FANOUT
+    R_FAST -- redlined / their paper --> FANOUT
+
+    %% ── Policy gates: fan-out → short-circuit gather ───────
+    FANOUT>fan-out: dispatch validators]:::fan
+    FANOUT -.parallel.-> V_DPA[validator: dpa<br>pii · breach · transfer]:::validator
+    FANOUT -.parallel.-> V_STAT[validator: statutory<br>bribery·slavery·tax·UCTA]:::validator
+    FANOUT -.parallel.-> V_FIN[validator: finance<br>cover vs. ask]:::validator
+    V_DPA --> GATHER
+    V_STAT --> GATHER
+    V_FIN --> GATHER
+
+    GATHER[/reducer: gather<br>join all · any-blocker short-circuit/]:::reduce
+    GATHER --> R_GATE{router: gate_outcome}:::router
+    R_GATE -- any blocker --> HITL
+    R_GATE -- finance sign-off pending --> HITL
+    R_GATE -- clear --> R_NEG
+
+    %% ── Negotiability fork ─────────────────────────────────
+    R_NEG{router: negotiability<br>non-negotiable paper?}:::router
+    R_NEG -- yes --> GAP[node: gap_analysis<br>vs. playbook]:::node
+    GAP --> R_GAP{refusal point hit?}:::router
+    R_GAP -- yes --> HITL
+    R_GAP -- no --> APPROVE
+
+    %% ── Redline loop (bounded) ─────────────────────────────
+    R_NEG -- no --> REDLINE[node: map_redline<br>clause → playbook section]:::node
+    REDLINE --> R_DISP{router: disposition}:::router
+    R_DISP -- standard --> D_HOLD[hold position]:::node
+    R_DISP -- fallback --> D_FALL[apply fallback + record]:::node
+    R_DISP -- banned --> D_STRIKE[strike + substitute]:::node
+    R_DISP -- refusal / novel --> HITL
+    D_HOLD --> LOOP
+    D_FALL --> LOOP
+    D_STRIKE --> LOOP
+    LOOP{router: loop_control<br>all resolved? iter < max?}:::router
+    LOOP -- unresolved & iter<max --> REDLINE
+    LOOP -- iter >= max --> HITL
+    LOOP -- resolved --> APPROVE
+
+    %% ── Approval & side-effects ────────────────────────────
+    APPROVE{router: approval<br>route by value_band}:::router
+    APPROVE -- band --> SIGN[node: execute<br>route signer → capture signature]:::node
+    SIGN --> EFFECTS[node: side_effects<br>diarise · record deviations · set flags]:::node
+    EFFECTS --> SIGNED(( END: SIGNED )):::terminal
+
+    %% ── Human-in-the-loop: single re-entrant interrupt ─────
+    HITL[[interrupt: human_gate<br>reason ∈ {more_info, blocked,<br>escalate, business_decision}<br>owner · sla · pause State]]:::hitl
+    HITL -. resume: resolved .-> CLASSIFY
+    HITL -. resume: declined .-> DECLINED(( END: DECLINED )):::terminal
+    HITL -. timeout / sla breach .-> ESCALATED(( END: ESCALATED )):::terminal
+
+    %% ── Styling ────────────────────────────────────────────
+    classDef terminal fill:#111827,stroke:#111827,color:#f9fafb
+    classDef node fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
+    classDef router fill:#fef9c3,stroke:#ca8a04,color:#5c4a03
+    classDef validator fill:#ede9fe,stroke:#7c3aed,color:#3b2a63
+    classDef fan fill:#e0f2fe,stroke:#0284c7,color:#075985
+    classDef reduce fill:#cffafe,stroke:#0891b2,color:#164e63
+    classDef hitl fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
