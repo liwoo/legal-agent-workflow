@@ -1,0 +1,59 @@
+{
+  "id": "POL-HR-003",
+  "title": "Non-Solicitation & Contingent Worker Policy",
+  "version": null,
+  "type": "internal-policy",
+  "owner": "Northgate Systems Ltd — HR / People",
+  "status": "stub — chapter content to be populated",
+  "description": "HR policy behind two recurring contract positions: the shape of acceptable non-solicitation clauses, and engagement of contractors/contingent workers including off-payroll (IR35) status determination.",
+  "related_legislation": [
+    "Income Tax (Earnings and Pensions) Act 2003, Part 2 Ch. 10 (off-payroll working)"
+  ],
+  "cited_in_contracts": [
+    "CR-2025-008", "CR-2025-009", "CR-2026-003", "CR-2026-011"
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Non-Solicitation Positions",
+      "synopsis": "Acceptable non-solicit clauses: mutual only (one-way clauses removed), limited to targeted poaching of individuals involved in the engagement, maximum 6-month tail, general-advertisement carve-out.",
+      "content": null
+    },
+    {
+      "number": 2,
+      "title": "Contingent Worker Engagement",
+      "synopsis": "When and how contractors, agencies and consultants may be engaged; required contract terms (substitution, control, mutuality-of-obligation language) that reflect genuine self-employed working practices.",
+      "content": null
+    },
+    {
+      "number": 3,
+      "title": "Vetting, Right to Work & Onboarding",
+      "synopsis": "Pre-engagement checks for contingent workers: right-to-work verification, reference and background screening proportionate to role, and onboarding steps before systems access is granted.",
+      "content": null
+    },
+    {
+      "number": 4,
+      "title": "Off-Payroll Working (IR35) Determinations",
+      "synopsis": "Status-determination process under ITEPA 2003 Part 2 Ch. 10: who runs the assessment, how outside-IR35 conclusions are documented, and how contract drafting must mirror the determined status.",
+      "content": null
+    },
+    {
+      "number": 5,
+      "title": "Confidentiality, IP & Systems Access",
+      "synopsis": "Mandatory confidentiality and IP-assignment terms for contingent workers (aligned with the Contract Playbook IP positions), least-privilege systems access per POL-SEC-011, and equipment/data-handling rules.",
+      "content": null
+    },
+    {
+      "number": 6,
+      "title": "Off-Boarding & Post-Engagement Obligations",
+      "synopsis": "End-of-engagement steps: access revocation, return or deletion of Northgate materials, surviving confidentiality obligations, and re-engagement cooling-off considerations.",
+      "content": null
+    },
+    {
+      "number": 7,
+      "title": "Review & Escalation",
+      "synopsis": "Periodic re-assessment of engagements, disputes over status determinations, and escalation for non-standard non-solicit or worker-engagement requests.",
+      "content": null
+    }
+  ]
+}

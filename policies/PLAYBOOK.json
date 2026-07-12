@@ -1,0 +1,137 @@
+{
+  "id": "PLAYBOOK",
+  "title": "Northgate Contract Playbook",
+  "version": "v4 (2025)",
+  "type": "contract-review-playbook",
+  "owner": "Northgate Systems Ltd — Legal",
+  "status": "stub — chapter content to be populated",
+  "description": "The legal team's negotiation playbook: standard positions, fallback tiers and refusal points for recurring redlines on commercial contracts. Cited by section (e.g. Playbook §3.1) in contract edit logs.",
+  "cited_in_contracts": [
+    "CR-2025-002", "CR-2025-003", "CR-2025-004", "CR-2025-005", "CR-2025-008",
+    "CR-2025-011", "CR-2025-013", "CR-2025-015", "CR-2025-016", "CR-2025-019",
+    "CR-2025-023", "CR-2025-024", "CR-2025-025", "CR-2025-026", "CR-2025-028",
+    "CR-2026-002", "CR-2026-003", "CR-2026-006", "CR-2026-007", "CR-2026-008",
+    "CR-2026-009", "CR-2026-012", "CR-2026-013", "CR-2026-015", "CR-2026-021",
+    "CR-2026-022", "CR-2026-023", "CR-2026-025", "CR-2026-026", "CR-2026-027",
+    "CR-2026-030", "CR-2026-032", "CR-2026-036", "CR-2026-038", "CR-2026-041",
+    "CR-2026-042", "CR-2026-045", "CR-2026-047", "CR-2026-048"
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Confidentiality & NDAs",
+      "synopsis": "Standard positions for mutual NDAs: maximum term (3 years, not 5), the definition of Confidential Information (marked or reasonably-understood, standard carve-outs), and a firm prohibition on residuals clauses.",
+      "known_sections": [
+        { "section": "1.2", "title": "NDA Term Limits" },
+        { "section": "1.3", "title": "Confidential Information Definition" },
+        { "section": "1.4", "title": "Residuals Prohibited" }
+      ],
+      "content": null
+    },
+    {
+      "number": 2,
+      "title": "Commercial Terms & Pricing",
+      "synopsis": "Pricing and payment positions: accepted pricing structures (including ramp schedules with pro-rated fees), standard net-30 payment terms (counter net-60 requests), late-payment interest, and refusal of most-favoured-customer/MFN commitments.",
+      "known_sections": [
+        { "section": "2.2", "title": "Pricing Structures" },
+        { "section": "2.4", "title": "Payment Terms" },
+        { "section": "2.6", "title": "No MFN Commitments" }
+      ],
+      "content": null
+    },
+    {
+      "number": 3,
+      "title": "Liability & Remedies",
+      "synopsis": "Limitation-of-liability fallback tiers (standard cap 12 months' fees; data-breach super-cap up to 2× annual fees; uncapped liability refused), excluded losses, SLA service credits as sole remedy, and floors for liability accepted from vendors.",
+      "known_sections": [
+        { "section": "3.1", "title": "Limitation of Liability — fallback tiers" },
+        { "section": "3.2", "title": "Excluded Losses" },
+        { "section": "3.4", "title": "SLA Remedies" },
+        { "section": "3.5", "title": "Vendor Liability Floors" }
+      ],
+      "content": null
+    },
+    {
+      "number": 4,
+      "title": "Intellectual Property",
+      "synopsis": "IP positions: commissioned/deliverable work must be assigned to Northgate on payment (licence-only positions reversed), and source-code escrow requests are refused with a business-continuity commitment offered instead.",
+      "known_sections": [
+        { "section": "4.3", "title": "IP Ownership in Commissioned Work" },
+        { "section": "4.5", "title": "No Source Code Escrow" }
+      ],
+      "content": null
+    },
+    {
+      "number": 5,
+      "title": "Governing Law & Disputes",
+      "synopsis": "England & Wales governing law as default, with defined fallback jurisdictions and compensating commitments (e.g. EU hosting) when a counterparty insists on another governing law; dispute-resolution and arbitration positions.",
+      "known_sections": [
+        { "section": "5.2", "title": "Governing Law Fallbacks" }
+      ],
+      "content": null
+    },
+    {
+      "number": 6,
+      "title": "Term, Renewal & Exit",
+      "synopsis": "Renewal mechanics and notice periods, caps on renewal price uplifts (with fallback tiers), acceptable term commitments and early-termination fees, and exit-assistance obligations at end of term.",
+      "known_sections": [
+        { "section": "6.1", "title": "Renewal & Notice" },
+        { "section": "6.2", "title": "Uplift Caps — fallback" },
+        { "section": "6.4", "title": "Term Commitments & ETF" },
+        { "section": "6.5", "title": "Exit Assistance" }
+      ],
+      "content": null
+    },
+    {
+      "number": 7,
+      "title": "Compliance & Audit",
+      "synopsis": "Positions on customer/supplier compliance clauses and audit rights: scope, frequency, notice and cost allocation for audits, and boundaries on regulator-driven flow-down obligations.",
+      "known_sections": [
+        { "section": "7.3", "title": "Audit Rights" }
+      ],
+      "content": null
+    },
+    {
+      "number": 8,
+      "title": "Partner, Reseller & Referral Arrangements",
+      "synopsis": "Channel positions: no exclusive appointments for partners or resellers, and standard terms for referral commissions (rates, triggers, duration).",
+      "known_sections": [
+        { "section": "8.1", "title": "No Exclusive Appointments" },
+        { "section": "8.3", "title": "Referral Commissions" }
+      ],
+      "content": null
+    },
+    {
+      "number": 9,
+      "title": "Variations, Amendments & Pre-Contract Documents",
+      "synopsis": "Refusal of unilateral variation rights, discipline on amendment scope (amendments limited to their stated subject), and treatment of heads of terms / MoUs (non-binding except defined provisions).",
+      "known_sections": [
+        { "section": "9.1", "title": "Unilateral Variation" },
+        { "section": "9.2", "title": "Amendment Scope Discipline" },
+        { "section": "9.4", "title": "Heads of Terms & MoUs" }
+      ],
+      "content": null
+    },
+    {
+      "number": 10,
+      "title": "Escalation & Off-Playbook Approvals",
+      "synopsis": "What to do when a counterparty position falls outside the fallback tiers: who can approve a deviation (Legal Director, then COO/CFO per POL-LGL-002), how deviations are recorded, and turnaround expectations for escalated points.",
+      "known_sections": [],
+      "content": null
+    },
+    {
+      "number": 11,
+      "title": "Templates & Clause Library",
+      "synopsis": "Index of approved starting documents (MSA v4, mutual NDA, DPA module, order forms, referral and reseller agreements) and the approved fallback wording for each negotiable clause; rules on when counterparty paper may be used instead.",
+      "known_sections": [],
+      "content": null
+    },
+    {
+      "number": 12,
+      "title": "Playbook Governance & Change Control",
+      "synopsis": "Ownership and annual review of the playbook, how positions are added or changed (evidence from deal history), version history (v3 2023 → v4 2025) and training for new legal and sales team members.",
+      "known_sections": [],
+      "content": null
+    }
+  ]
+}

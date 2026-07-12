@@ -1,0 +1,109 @@
+{
+  "id": "POL-PRIV-001",
+  "title": "Data Protection & Privacy Policy",
+  "version": null,
+  "type": "internal-policy",
+  "owner": "Northgate Systems Ltd — Legal / DPO",
+  "status": "stub — chapter content to be populated",
+  "description": "Northgate's data protection policy governing personal data processed as controller and processor: DPA terms, lawful basis, transfers, retention, breach handling and DPIAs. The most-cited policy in the contract corpus.",
+  "related_legislation": [
+    "UK GDPR (Arts. 5, 6, 9, 28, 33, 35, 46)",
+    "Data Protection Act 2018",
+    "Data (Use and Access) Act 2025",
+    "PECR 2003",
+    "Commission Implementing Decision (EU) 2021/914 (SCCs)",
+    "EU GDPR, Art. 28",
+    "CCPA 2018 (as amended by CPRA 2020)"
+  ],
+  "cited_in_contracts": [
+    "CR-2025-003", "CR-2025-018", "CR-2025-020", "CR-2025-022", "CR-2025-027",
+    "CR-2026-004", "CR-2026-009", "CR-2026-019", "CR-2026-030", "CR-2026-032",
+    "CR-2026-036", "CR-2026-046"
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Purpose, Scope & Roles",
+      "synopsis": "What the policy covers, definitions, and how Northgate's controller vs processor role is determined per engagement; interaction with the Contract Playbook and POL-SEC-011.",
+      "content": null
+    },
+    {
+      "number": 2,
+      "title": "Lawful Basis & Marketing Consent",
+      "synopsis": "Establishing lawful basis (Art. 6) for each processing purpose, including legitimate-interest assessments; consent standards for marketing lists (opted-in individuals only) and PECR requirements for electronic marketing.",
+      "content": null
+    },
+    {
+      "number": 3,
+      "title": "Processor Terms & DPA Requirements",
+      "synopsis": "Mandatory Art. 28(3) terms in every DPA — instructions, confidentiality, security, audit rights, deletion/return; substituting full processor terms where a supplier offers a thin DPA.",
+      "content": null
+    },
+    {
+      "number": 4,
+      "title": "Sub-Processors",
+      "synopsis": "Conditions for general written authorisation (Art. 28(2)), notification of new sub-processors, minimum objection window (30 days), and flow-down of processor obligations.",
+      "content": null
+    },
+    {
+      "number": 5,
+      "title": "International Transfers & Safeguards",
+      "synopsis": "Restricted-transfer rules and approved safeguards (Art. 46): EU SCCs (2021/914), UK IDTA/addendum, adequacy decisions; when to prefer EEA/UK-only hosting instead of transfer mechanisms.",
+      "content": null
+    },
+    {
+      "number": 6,
+      "title": "Data Retention & Deletion",
+      "synopsis": "Storage-limitation (Art. 5(1)(e)) and minimisation (Art. 5(1)(c)) requirements; retention schedules aligned to platform deletion capabilities (e.g. 30-day purge) and end-of-contract deletion/return commitments.",
+      "content": null
+    },
+    {
+      "number": 7,
+      "title": "Special Category & High-Risk Data; DPIAs",
+      "synopsis": "Handling of Art. 9 special-category data (health, etc.), scope exclusions to be confirmed in contract (no patient data / no student records), and when a DPIA (Art. 35) is required before signing an order form.",
+      "content": null
+    },
+    {
+      "number": 8,
+      "title": "Personal Data Breach Notification",
+      "synopsis": "Internal incident escalation and Art. 33 notification duties; contractual notification windows to customers (standard 48 hours — resist 12/24-hour demands) and coordination with POL-SEC-011 incident response.",
+      "content": null
+    },
+    {
+      "number": 9,
+      "title": "Data Subject Rights & Audit Cooperation",
+      "synopsis": "Assisting controllers with data-subject requests, audit and inspection rights under Art. 28(3)(h), and evidence/records to be maintained to demonstrate compliance.",
+      "content": null
+    },
+    {
+      "number": 10,
+      "title": "Records of Processing & Accountability",
+      "synopsis": "Maintaining the Art. 30 record of processing activities (controller and processor entries), the accountability principle (Art. 5(2)), and how processing records feed contract review and DPA negotiation.",
+      "content": null
+    },
+    {
+      "number": 11,
+      "title": "Privacy Notices & Transparency",
+      "synopsis": "Transparency obligations under Arts. 13–14: when privacy notices must be issued or updated, notice content standards, and layering for product, website and candidate/employee audiences.",
+      "content": null
+    },
+    {
+      "number": 12,
+      "title": "Training & Awareness",
+      "synopsis": "Mandatory data-protection training at induction and annual refresh, role-specific training for teams handling personal data (support, sales ops, engineering), and completion tracking.",
+      "content": null
+    },
+    {
+      "number": 13,
+      "title": "Compliance, Exceptions & Breaches of this Policy",
+      "synopsis": "Monitoring compliance with this policy, the process for requesting a documented exception (DPO approval required), and consequences of non-compliance including the disciplinary route for deliberate breaches.",
+      "content": null
+    },
+    {
+      "number": 14,
+      "title": "Ownership, Review & Document Control",
+      "synopsis": "Policy owner (DPO), annual review cycle and triggers for out-of-cycle review (new legislation, regulator guidance, incident learnings), version history and related documents (Contract Playbook, POL-SEC-011).",
+      "content": null
+    }
+  ]
+}
