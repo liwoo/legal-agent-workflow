@@ -1,7 +1,7 @@
 .DS_Store
 
 # Python
-agent/.venv/
+app/agent/.venv/
 **/__pycache__/
 *.pyc
 .env
@@ -11,9 +11,9 @@ agent/.venv/
 
 # Node / Next.js
 **/node_modules/
-frontend/.next/
-frontend/out/
+app/frontend/.next/
+app/frontend/out/
 *.tsbuildinfo
 
 # Aspire generated SDK
-apphost/.aspire/modules/
+host/.aspire/modules/

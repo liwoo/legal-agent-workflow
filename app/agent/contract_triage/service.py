@@ -20,12 +20,14 @@ from .state import TriageRequest, TriageState
 from .storage import store
 from .workflow import build_workflow
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
+# repo root is three levels up: contract_triage → agent → app → <root>
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_DATA_ROOT = _REPO_ROOT / "data"
 
 
 def _resolve_pdf(item_id: str) -> str:
     """Best-effort absolute path to an inbox item's source PDF on disk."""
-    for base in (_REPO_ROOT / "test" / item_id, _REPO_ROOT / "contracts" / item_id):
+    for base in (_DATA_ROOT / "test" / item_id, _DATA_ROOT / "contracts" / item_id):
         if base.is_dir():
             pdfs = sorted(base.glob("*.pdf"))
             if pdfs:

@@ -1,6 +1,6 @@
 """The single shared State object that flows through the triage workflow graph.
 
-The agent-graph (../../agent-graph.mmd) is a stateful LangGraph-style graph:
+The agent-graph (docs/agent-graph.mmd) is a stateful LangGraph-style graph:
 every node reads/writes one shared ``TriageState``; solid edges are
 deterministic transitions; routers branch on the state; the human_gate is a
 re-entrant interrupt. This module defines that state plus the request/result

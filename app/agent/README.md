@@ -2,7 +2,7 @@
 
 A stateful [Microsoft Agent Framework](https://github.com/microsoft/agent-framework)
 **workflow** that implements the abstract contract-review decision graph in
-[`../agent-graph.mmd`](../agent-graph.mmd). Every node reads/writes one shared
+[`../../docs/agent-graph.mmd`](../../docs/agent-graph.mmd). Every node reads/writes one shared
 `TriageState`; routers branch on it; three policy validators fan out and are
 gathered; a single re-entrant **human gate** interrupts the run for a reviewer
 decision and resumes on their response.
@@ -23,7 +23,7 @@ the helper agents in DevUI.
 
 ```
 contract_triage/
-  models.py       # vendored copy of ../models.py — the Pydantic domain types
+  models.py       # vendored copy of ../../docs/models.py — the Pydantic domain types
   state.py        # TriageState (the shared message) + request/result envelopes
   data.py         # the 10 inbox items + inherited prior-contract flags
   heuristics.py   # offline classification, policy gates, redline→playbook ladder
@@ -50,7 +50,7 @@ python -m contract_triage.devui_app  # or: triage-devui
 ```
 
 Normally you run both (plus the frontend) together via the Aspire AppHost in
-[`../apphost`](../apphost).
+[`../../host`](../../host).
 
 ## API
 
@@ -66,7 +66,7 @@ Normally you run both (plus the frontend) together via the Aspire AppHost in
 
 ## Notes
 
-- `models.py` is a copy of the repo-root `../models.py` so the agent is a
+- `models.py` is a copy of `../../docs/models.py` so the agent is a
   self-contained, deployable package; keep them in sync if the domain types change.
 - The human gate is a genuine Agent Framework `request_info` interrupt. In the
   app flow a paused run lands the contract in the reviewer's queue; `/resolve`

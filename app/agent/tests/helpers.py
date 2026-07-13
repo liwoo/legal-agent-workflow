@@ -22,8 +22,8 @@ from contract_triage.models import InboxItem
 from contract_triage.state import TriageRequest, TriageState
 from contract_triage.workflow import build_workflow
 
-# The single shared fixture (see test/README.md).
-_TEST_DIR = Path(__file__).resolve().parents[2] / "test" / "CR-2026-050"
+# The single shared fixture (see data/test/README.md).
+_TEST_DIR = Path(__file__).resolve().parents[3] / "data" / "test" / "CR-2026-050"
 SHARED_PDF = str(_TEST_DIR / "cr-2026-050-intake.pdf")
 BASE_META: dict[str, Any] = json.loads((_TEST_DIR / "metadata.json").read_text())
 

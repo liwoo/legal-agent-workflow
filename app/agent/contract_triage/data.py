@@ -1,6 +1,6 @@
 """The raw inbox the triage workflow consumes.
 
-Mirrors ``../../contract-inbox.md`` (10 items that landed 10–12 July 2026) and a
+Mirrors ``data/contract-inbox.md`` (10 items that landed 10–12 July 2026) and a
 small index of inherited flags from prior contracts (e.g. the DPIA-required flag
 on CR-2026-046 that CR-2026-052 inherits). Kept as code so the backend is
 self-contained and runs with no filesystem coupling.
@@ -187,7 +187,7 @@ def prior_contracts(item_id: str) -> list[str]:
 def item_from_metadata(metadata: dict[str, Any], pdf_path: str | None = None) -> InboxItem:
     """Build an :class:`InboxItem` from a ``metadata.json`` payload + a PDF path.
 
-    Maps the on-disk intake schema (``test/CR-2026-05N/metadata.json``) onto the
+    Maps the on-disk intake schema (``data/test/CR-2026-05N/metadata.json``) onto the
     workflow's entry state: ``summary`` → ``what_arrived``, ``senders_ask`` →
     ``sender_ask``, ``received_from`` → ``sender_role``, and the ``related_-
     contracts`` chain that drives the prior-file blocker. ``pdf_path`` (absolute)

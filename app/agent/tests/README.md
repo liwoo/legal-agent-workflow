@@ -1,7 +1,7 @@
 # Agent tests
 
 Node-targeted tests for the contract-triage workflow. Every case is seeded from
-**one** physical fixture — the `test/CR-2026-050` intake PDF and its
+**one** physical fixture — the `data/test/CR-2026-050` intake PDF and its
 `metadata.json` — and steers the graph by overriding the intake metadata text.
 
 The split is deliberate:
