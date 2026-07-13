@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from contract_triage import heuristics
+import _fake_brain as fake_brain
 from contract_triage.data import item_from_metadata
 from contract_triage.executors import HumanDecision
 from contract_triage.models import InboxItem
@@ -75,7 +75,7 @@ def classified(**overrides: Any) -> TriageState:
     """
     item = make_item(**overrides)
     state = TriageState(item=item)
-    cls, flags = heuristics.classify(item)
+    cls, flags = fake_brain.classify(item)
     state.classification = cls
     state.flags = flags
     return state

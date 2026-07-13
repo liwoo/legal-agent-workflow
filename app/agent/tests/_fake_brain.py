@@ -1,18 +1,20 @@
-"""Deterministic classification + playbook judgment.
+"""Deterministic test double for the LLM brain.
 
-This is the offline brain: keyword/rule logic grounded in the corpus, the
-Playbook ladder and the POL-* gates. It lets the whole graph run with no LLM
-(demo mode). When an LLM chat client is configured, ``agents.py`` refines these
-first-pass results — but the graph is always runnable and deterministic without
-one.
+The shipped agent is fully LLM-first: ``contract_triage.agents`` makes every
+classification, policy-gate and redline judgment via the model. This module is a
+*test-only* stand-in — the old keyword/rule logic, kept so the graph (routers,
+fan-out, human-gate, service) can be exercised deterministically and offline,
+with no live API calls. ``tests/conftest.py`` monkeypatches the ``agents``
+decision functions onto these, and ``tests/helpers.classified`` builds entry
+states with ``classify`` here. It is not imported by any production code.
 """
 
 from __future__ import annotations
 
 import re
 
-from .data import inherited_flags, prior_contracts
-from .models import (
+from contract_triage.data import inherited_flags, prior_contracts
+from contract_triage.models import (
     DataFlag,
     Direction,
     DocumentFamily,
@@ -249,6 +251,18 @@ def gate_finance(state) -> GateCheck | None:
 
 def build_gates(state) -> list[GateCheck]:
     return [g for g in (gate_privacy(state), gate_statutory(state), gate_finance(state)) if g]
+
+
+_GATE_FUNCS = {
+    GateType.PRIVACY: gate_privacy,
+    GateType.STATUTORY: gate_statutory,
+    GateType.INSURANCE: gate_finance,
+}
+
+
+def gate_for(state, gate: GateType) -> GateCheck | None:
+    """Dispatch a single gate by type — mirrors ``agents.gate_llm``'s signature."""
+    return _GATE_FUNCS[gate](state)
 
 
 # ── Redlines → playbook ladder ──────────────────────────────────────────────
