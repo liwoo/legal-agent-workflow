@@ -1,0 +1,157 @@
+# Langfuse trace stack + object stores for the contract-triage E2E harness.
+#
+# This is a faithful, framework-free translation of host/apphost.mts — it brings
+# up exactly the containers the Aspire AppHost would (same images, ports, env,
+# headless Langfuse init keys), so the FastAPI backend and Next.js frontend can
+# be run as plain local processes against it. Use this when the Aspire CLI's
+# TypeScript AppHost path is unavailable on your machine.
+#
+#   langfuse-web    Langfuse UI + OTLP trace ingest   http://localhost:3001
+#   langfuse-worker async ingestion → ClickHouse
+#   postgres        Langfuse metadata
+#   clickhouse      trace analytics
+#   redis           queue
+#   minio           Langfuse internal blob store       :9090 (console :9091)
+#   storage         contract-document object store     :9092 (console :9093)
+#
+# Langfuse signs in with admin@northgate.local / langfuse-admin; the Contract
+# Triage project is provisioned headlessly with fixed keys
+# (pk-lf-contract-triage / sk-lf-contract-triage) so OTLP auth works immediately.
+
+name: contract-triage-e2e
+
+x-langfuse-core-env: &langfuse-core-env
+  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+  SALT: contract-triage-salt
+  ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+  TELEMETRY_ENABLED: "false"
+  CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:9000
+  CLICKHOUSE_URL: http://clickhouse:8123
+  CLICKHOUSE_USER: clickhouse
+  CLICKHOUSE_PASSWORD: clickhouse
+  CLICKHOUSE_CLUSTER_ENABLED: "false"
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  REDIS_AUTH: langfuse-redis
+  LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+  LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+  LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://minio:9000
+  LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
+  LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: miniosecret
+  LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+  LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+  LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+  LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://localhost:9090
+  LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
+  LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: miniosecret
+  LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - langfuse-postgres:/var/lib/postgresql/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8123/ping || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - langfuse-clickhouse:/var/lib/clickhouse
+
+  redis:
+    image: redis:7
+    command: ["--requirepass", "langfuse-redis", "--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "langfuse-redis", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - langfuse-redis:/data
+
+  minio:
+    image: minio/minio:latest
+    entrypoint: sh
+    command: -c 'mkdir -p /data/langfuse && minio server /data --address ":9000" --console-address ":9001"'
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: miniosecret
+    ports:
+      - "9090:9000"
+      - "9091:9001"
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local || curl -f http://localhost:9000/minio/health/live || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - langfuse-minio:/data
+
+  # App-facing object store for contract intake PDFs (ephemeral — no volume).
+  storage:
+    image: minio/minio:latest
+    entrypoint: sh
+    command: -c 'mkdir -p /data/contracts && minio server /data --address ":9000" --console-address ":9001"'
+    environment:
+      MINIO_ROOT_USER: contract-store
+      MINIO_ROOT_PASSWORD: contract-store-secret
+    ports:
+      - "9092:9000"
+      - "9093:9001"
+
+  langfuse-worker:
+    image: langfuse/langfuse-worker:3
+    depends_on:
+      postgres: { condition: service_healthy }
+      clickhouse: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      minio: { condition: service_started }
+    environment:
+      <<: *langfuse-core-env
+
+  langfuse-web:
+    image: langfuse/langfuse:3
+    depends_on:
+      postgres: { condition: service_healthy }
+      clickhouse: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      minio: { condition: service_started }
+    ports:
+      - "3001:3000"
+    environment:
+      <<: *langfuse-core-env
+      NEXTAUTH_URL: http://localhost:3001
+      NEXTAUTH_SECRET: contract-triage-nextauth
+      # Headless init — provisions the org/project/user and fixed API keys.
+      LANGFUSE_INIT_ORG_ID: northgate
+      LANGFUSE_INIT_ORG_NAME: Northgate
+      LANGFUSE_INIT_PROJECT_ID: contract-triage
+      LANGFUSE_INIT_PROJECT_NAME: Contract Triage
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: pk-lf-contract-triage
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-contract-triage
+      LANGFUSE_INIT_USER_EMAIL: admin@northgate.local
+      LANGFUSE_INIT_USER_NAME: Northgate Admin
+      LANGFUSE_INIT_USER_PASSWORD: langfuse-admin
+
+volumes:
+  langfuse-postgres:
+  langfuse-clickhouse:
+  langfuse-redis:
+  langfuse-minio:

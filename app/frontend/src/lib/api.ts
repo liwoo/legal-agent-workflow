@@ -62,7 +62,11 @@ export function getApiBaseUrl(): string {
 export async function listContracts(): Promise<ContractSummary[]> {
   try {
     const data = await fetchJson<ContractSummary[]>("/api/contracts");
-    return data;
+    // The backend labels the queue with its disposition vocabulary
+    // (approved / quarantined / pending); the console speaks inbox / signed /
+    // review. Derive the console's queue from end_state here so the initial
+    // load matches what create/triage/resolve already compute client-side.
+    return data.map((c) => ({ ...c, queue: queueForContract(c) }));
   } catch {
     return contractsFixture.map(toSummary);
   }
@@ -71,7 +75,7 @@ export async function listContracts(): Promise<ContractSummary[]> {
 export async function getContract(id: string): Promise<ContractDetail | undefined> {
   try {
     const data = await fetchJson<ContractDetail>(`/api/contracts/${encodeURIComponent(id)}`);
-    return data;
+    return { ...data, queue: queueForContract(data) };
   } catch {
     return getContractFixtureById(id);
   }

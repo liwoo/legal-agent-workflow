@@ -168,7 +168,6 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                   </div>
                 </div>
                 <ScoreBadge score={detail.score} size="lg" />
-                <ScoreBadge score={detail.score} size="lg" />
               </div>
             </DialogHeader>
 
