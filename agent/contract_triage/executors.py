@@ -12,7 +12,6 @@ from pydantic import BaseModel
 from typing_extensions import Never
 
 from . import agents, heuristics
-from .data import get_item
 from .models import (
     EndState,
     ForwardObligation,
@@ -87,16 +86,66 @@ def _forward_obligations(state: TriageState) -> None:
 
 
 class Ingest(Executor):
-    """Start node — normalise the request payload into State."""
+    """Start node — assemble State from the intake fields and read the PDF.
+
+    ``id``, ``date_received`` and ``pdf_path`` are always provided; the document
+    is always read. Any intake fact left blank (counterparty, summary, sender's
+    ask) is then derived from the PDF text, so a reviewer can triage from the
+    document alone.
+    """
 
     @handler
     async def run(self, req: TriageRequest, ctx: WorkflowContext[TriageState]) -> None:
-        item = req.item or get_item(req.item_id)
-        if item is None:
-            raise ValueError(f"Unknown inbox item: {req.item_id}")
+        from .data import item_from_metadata
+        from .pdf import derive_intake, read_pdf
+
+        item = item_from_metadata(
+            {
+                "id": req.id or "AD-HOC",
+                "name": req.name,
+                "counterparty": req.counterparty,
+                "summary": req.summary,
+                "senders_ask": req.senders_ask,
+                "received_from": req.received_from,
+                "date_received": req.date_received,
+                "related_contracts": [
+                    s.strip() for s in req.related_contracts.split(",") if s.strip()
+                ],
+            },
+            req.pdf_path or None,
+        )
+
         state = TriageState(item=item)
         state.visit(N_START)
-        state.visit("ingest", "Ingested from inbox", "success")
+
+        extract = read_pdf(item.pdf_path) if item.pdf_path else None
+        if extract and extract.ok:
+            item.document_text = extract.text
+            state.visit(
+                "ingest",
+                f"Read PDF {item.pdf_path} ({extract.pages} page(s), {extract.char_count} chars)",
+                "success",
+            )
+        else:
+            item.document_text = ""
+            reason = extract.error if extract else "no pdf_path provided"
+            state.visit("ingest", f"PDF unreadable: {reason}", "warning")
+
+        # Derive any intake fact the reviewer left blank from the document.
+        derived = derive_intake(item.document_text)
+        filled: list[str] = []
+        if not item.what_arrived and derived.what_arrived:
+            item.what_arrived = derived.what_arrived
+            filled.append("summary")
+        if not item.sender_ask and derived.sender_ask:
+            item.sender_ask = derived.sender_ask
+            filled.append("sender's ask")
+        if item.counterparty.name in ("", "Unknown") and derived.counterparty:
+            item.counterparty.name = derived.counterparty
+            filled.append("counterparty")
+        if filled:
+            state.visit("ingest", f"Derived from PDF: {', '.join(filled)}", "info")
+
         await ctx.send_message(state)
 
 

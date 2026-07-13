@@ -6,17 +6,44 @@ reviewer decision can resume them.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from agent_framework import Workflow
 
 from . import graph_spec
-from .data import get_inbox, get_item
+from .data import get_inbox, get_item, prior_contracts
 from .executors import HumanDecision
 from .models import EndState, InboxItem
 from .observability import workflow_span
 from .state import TriageRequest, TriageState
 from .workflow import build_workflow
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resolve_pdf(item_id: str) -> str:
+    """Best-effort absolute path to an inbox item's source PDF on disk."""
+    for base in (_REPO_ROOT / "test" / item_id, _REPO_ROOT / "contracts" / item_id):
+        if base.is_dir():
+            pdfs = sorted(base.glob("*.pdf"))
+            if pdfs:
+                return str(pdfs[0])
+    return ""
+
+
+def _request_for(item: InboxItem) -> TriageRequest:
+    """Map a known inbox item onto the flat workflow request."""
+    return TriageRequest(
+        id=item.id,
+        date_received=item.received_at.date().isoformat(),
+        pdf_path=_resolve_pdf(item.id),
+        counterparty=item.counterparty.name,
+        summary=item.what_arrived,
+        senders_ask=item.sender_ask,
+        received_from=item.sender_role,
+        related_contracts=",".join(prior_contracts(item.id)),
+    )
 
 _APPROVED = {EndState.SIGNED_NO_EDITS, EndState.SIGNED_DESK_EDITS, EndState.SIGNED_WITH_DEVIATION}
 _QUARANTINED = {EndState.ESCALATED, EndState.BLOCKED, EndState.DECLINED, EndState.BUSINESS_DECISION}
@@ -141,7 +168,7 @@ class TriageService:
             "triage_contract",
             **{"contract.id": item_id, "contract.counterparty": item.counterparty.name},
         ):
-            result = await wf.run(TriageRequest(item_id=item_id))
+            result = await wf.run(_request_for(item))
         reqs = result.get_request_info_events()
         if reqs:
             event = reqs[0]
