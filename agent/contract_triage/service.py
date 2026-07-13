@@ -6,16 +6,45 @@ reviewer decision can resume them.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from agent_framework import Workflow
 
-from . import graph_spec
-from .data import get_inbox, get_item
+from . import db, graph_spec
+from .data import get_inbox, get_item, prior_contracts
 from .executors import HumanDecision
 from .models import EndState, InboxItem
+from .observability import workflow_span
 from .state import TriageRequest, TriageState
+from .storage import store
 from .workflow import build_workflow
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resolve_pdf(item_id: str) -> str:
+    """Best-effort absolute path to an inbox item's source PDF on disk."""
+    for base in (_REPO_ROOT / "test" / item_id, _REPO_ROOT / "contracts" / item_id):
+        if base.is_dir():
+            pdfs = sorted(base.glob("*.pdf"))
+            if pdfs:
+                return str(pdfs[0])
+    return ""
+
+
+def _request_for(item: InboxItem) -> TriageRequest:
+    """Map a known inbox item onto the flat workflow request."""
+    return TriageRequest(
+        id=item.id,
+        date_received=item.received_at.date().isoformat(),
+        pdf_path=_resolve_pdf(item.id),
+        counterparty=item.counterparty.name,
+        summary=item.what_arrived,
+        senders_ask=item.sender_ask,
+        received_from=item.sender_role,
+        related_contracts=",".join(prior_contracts(item.id)),
+    )
 
 _APPROVED = {EndState.SIGNED_NO_EDITS, EndState.SIGNED_DESK_EDITS, EndState.SIGNED_WITH_DEVIATION}
 _QUARANTINED = {EndState.ESCALATED, EndState.BLOCKED, EndState.DECLINED, EndState.BUSINESS_DECISION}
@@ -44,6 +73,14 @@ class _Pending:
 class TriageService:
     results: dict[str, dict] = field(default_factory=dict)  # item_id -> ContractDetail
     pending: dict[str, _Pending] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        # Boot the durable stores and rehydrate any previously-computed results
+        # so the queues are populated the moment the API answers — even before
+        # the eager re-triage in the FastAPI lifespan finishes.
+        db.init_db()
+        store.connect()
+        self.results.update(db.load_results())
 
     # ── serialisation ────────────────────────────────────────────────────────
     def _summary_fields(self, item: InboxItem, state: TriageState | None, ai_status: str) -> dict:
@@ -126,6 +163,7 @@ class TriageService:
                     {"at": _iso(e.at), "label": e.label, "detail": e.detail, "kind": e.kind}
                     for e in state.timeline
                 ],
+                "document_url": store.presigned_url(item.id),
             }
         )
         return detail
@@ -136,7 +174,11 @@ class TriageService:
         if item is None:
             raise KeyError(item_id)
         wf = build_workflow()
-        result = await wf.run(TriageRequest(item_id=item_id))
+        with workflow_span(
+            "triage_contract",
+            **{"contract.id": item_id, "contract.counterparty": item.counterparty.name},
+        ):
+            result = await wf.run(_request_for(item))
         reqs = result.get_request_info_events()
         if reqs:
             event = reqs[0]
@@ -149,6 +191,7 @@ class TriageService:
             self.pending.pop(item_id, None)
             detail = self._detail(item, state)
         self.results[item_id] = detail
+        db.save_result(item_id, detail)
         return detail
 
     async def resolve(self, item_id: str, decision: str, note: str | None = None) -> dict:
@@ -159,14 +202,20 @@ class TriageService:
         if pend is None:
             # nothing paused — treat as a fresh triage
             return await self.triage(item_id)
-        result = await pend.workflow.run(
-            responses={pend.request_id: HumanDecision(decision=decision, note=note)}
-        )
+        with workflow_span(
+            "resolve_contract",
+            **{"contract.id": item_id, "decision": decision},
+        ):
+            result = await pend.workflow.run(
+                responses={pend.request_id: HumanDecision(decision=decision, note=note)}
+            )
         outputs = result.get_outputs()
         state = outputs[0] if outputs else pend.state
         self.pending.pop(item_id, None)
         detail = self._detail(item, state)
         self.results[item_id] = detail
+        db.save_result(item_id, detail)
+        db.save_decision(item_id, decision, note)
         return detail
 
     def get(self, item_id: str) -> dict:
@@ -182,6 +231,7 @@ class TriageService:
                 "classification": None, "gate_checks": [], "redlines": [],
                 "forward_obligations": [], "explanation": None, "recommended_action": None,
                 "interrupt": None, "path_node_ids": [], "timeline": [],
+                "document_url": store.presigned_url(item.id),
             }
         )
         return detail

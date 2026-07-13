@@ -11,6 +11,12 @@ dependencies = [
     "uvicorn[standard]>=0.30",
     "pydantic>=2.7",
     "python-dotenv>=1.0",
+    "pypdf>=4.0",
+    # S3-compatible object storage for contract documents (MinIO container).
+    "minio>=7.2",
+    # OpenTelemetry → Langfuse (HTTP OTLP; Langfuse does not accept gRPC).
+    # agent-framework brings the OTel API/SDK; this adds the HTTP trace exporter.
+    "opentelemetry-exporter-otlp-proto-http>=1.27",
 ]
 
 [project.optional-dependencies]
@@ -29,3 +35,7 @@ packages = ["contract_triage"]
 
 [tool.uv]
 prerelease = "allow"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

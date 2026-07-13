@@ -102,6 +102,8 @@ export interface ContractDetail extends ContractSummary {
   interrupt: Interrupt | null;
   path_node_ids: string[];
   timeline: TimelineEvent[];
+  /** Short-lived presigned URL to the intake PDF in object storage, if present. */
+  document_url?: string | null;
 }
 
 export interface Policy {

@@ -15,10 +15,12 @@ import os
 from agent_framework.devui import serve
 
 from . import agents
+from .observability import setup_observability
 from .workflow import build_workflow
 
 
 def main() -> None:
+    setup_observability()  # ships Agent Framework traces to Langfuse when configured
     workflow = build_workflow()
     entities = [workflow, *agents.build_agents()]
     port = int(os.getenv("DEVUI_PORT", os.getenv("PORT", "8080")))

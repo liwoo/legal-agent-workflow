@@ -284,6 +284,9 @@ class InboxItem(BaseModel):
     counterparty: Counterparty
     what_arrived: str
     sender_ask: str
+    related_contracts: list[str] = Field(default_factory=list)  # prior-file chain from intake metadata
+    pdf_path: str | None = None       # absolute path to the source document, read at ingest
+    document_text: str | None = None  # extracted PDF text (filled by the ingest PDF tool)
     classification: IntakeClassification | None = None  # filled by triage
 
 
