@@ -1,4 +1,4 @@
-"""Graph nodes — one Executor per node in ../../agent-graph.mmd.
+"""Graph nodes — one Executor per node in docs/agent-graph.mmd.
 
 Message flowing between nodes = ``TriageState`` (the shared state). Routers set
 ``state.route`` and forward; switch-case edges (wired in workflow.py) branch on

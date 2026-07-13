@@ -4,7 +4,7 @@ Every inbox item arrives with an intake PDF. Rather than serve those off the
 local filesystem, the API keeps them in a MinIO bucket and hands the browser a
 short-lived *presigned* URL, exactly as a production system would with S3. The
 Aspire AppHost runs an ephemeral (volume-less) MinIO container, so the store is
-seeded fresh from ``../test`` on every boot.
+seeded fresh from ``../../data/test`` on every boot.
 
 Resilient by design (see ``observability.py`` / ``db.py``): if MinIO is not
 configured or the ``minio`` SDK is missing, every call degrades to a no-op and
@@ -17,7 +17,7 @@ Configuration (injected by the Aspire AppHost):
     CONTRACT_STORE_SECRET_KEY=contract-store-secret
     CONTRACT_STORE_BUCKET=contracts
     CONTRACT_STORE_SECURE=false                 # http, not https
-    CONTRACT_STORE_SEED_DIR=../test             # dir of <ITEM_ID>/*.pdf to seed
+    CONTRACT_STORE_SEED_DIR=../../data/test     # dir of <ITEM_ID>/*.pdf to seed
 """
 
 from __future__ import annotations
@@ -91,7 +91,7 @@ class ContractStore:
         objects uploaded this call (0 if already seeded or store unavailable)."""
         if not self.connect():
             return 0
-        seed_dir = Path(os.getenv("CONTRACT_STORE_SEED_DIR", "../test"))
+        seed_dir = Path(os.getenv("CONTRACT_STORE_SEED_DIR", "../../data/test"))
         if not seed_dir.is_dir():
             _log.warning("seed dir %s not found; nothing to seed", seed_dir)
             return 0

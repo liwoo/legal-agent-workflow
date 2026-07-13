@@ -1,4 +1,4 @@
-"""Assemble the triage workflow graph — a 1:1 wiring of ../../agent-graph.mmd.
+"""Assemble the triage workflow graph — a 1:1 wiring of docs/agent-graph.mmd.
 
 Solid edges = deterministic transitions; ``add_switch_case_edge_group`` = the
 diamond routers (branch on ``state.route``); ``add_fan_out_edges`` /

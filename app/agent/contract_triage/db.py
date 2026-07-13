@@ -12,7 +12,7 @@ previous in-memory-only behaviour and logs a warning.
 
 Configuration (injected by the Aspire AppHost):
 
-    TRIAGE_DB_PATH=.data/triage.db   # relative to the API working dir (../agent)
+    TRIAGE_DB_PATH=.data/triage.db   # relative to the API working dir (../app/agent)
 """
 
 from __future__ import annotations

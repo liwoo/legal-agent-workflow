@@ -14,10 +14,10 @@
  *   storage         — contract-document object store        (container)  :9092
  *
  * The API's own data plane: `storage` (an ephemeral, app-facing MinIO holding
- * the contract intake PDFs, re-seeded from ../test on boot) and a SQLite file
- * (TRIAGE_DB_PATH) that persists triage results and reviewer decisions across
- * restarts. Both are injected into the `api` resource; SQLite needs no server,
- * so it also works under the ../scripts/dev.sh fallback.
+ * the contract intake PDFs, re-seeded from ../data/test on boot) and a SQLite
+ * file (TRIAGE_DB_PATH) that persists triage results and reviewer decisions
+ * across restarts. Both are injected into the `api` resource; SQLite needs no
+ * server, so it also works under the ../app/scripts/dev.sh fallback.
  *
  * The agent (devui + api) ships its Microsoft Agent Framework OpenTelemetry
  * traces to langfuse-web's OTLP endpoint, so every triage run — the agent
@@ -33,14 +33,14 @@
  * NB: the TypeScript AppHost is a young, fast-moving surface. If a builder
  * method name differs in your installed Aspire, run `aspire run` once — it
  * regenerates ./.aspire/modules and surfaces the exact API — or use the plain
- * `../scripts/dev.sh` fallback documented in the root README.
+ * `../app/scripts/dev.sh` fallback documented in the root README.
  */
 import { createBuilder } from './.aspire/modules/aspire.mjs';
 
 const builder = await createBuilder();
 
-const AGENT_DIR = '../agent';
-const FRONTEND_DIR = '../frontend';
+const AGENT_DIR = '../app/agent';
+const FRONTEND_DIR = '../app/frontend';
 
 // ── Langfuse configuration ──────────────────────────────────────────────────
 // Demo credentials — fine for local dev. For anything real, move the secrets to
@@ -53,13 +53,13 @@ const MINIO_CONSOLE_PORT = 9091;
 // ── Application data plane (contract documents + triage database) ────────────
 // A second, app-facing MinIO holds the contract intake PDFs, kept separate from
 // Langfuse's internal blob store. It is intentionally *ephemeral* (no volume) —
-// an in-memory-style object store the API re-seeds from ../test on every boot.
+// an in-memory-style object store the API re-seeds from ../data/test on every boot.
 const STORAGE_API_PORT = 9092; // host port — presigned URLs are browser-facing
 const STORAGE_CONSOLE_PORT = 9093;
 const STORAGE_USER = 'contract-store';
 const STORAGE_PASSWORD = 'contract-store-secret';
 const STORAGE_BUCKET = 'contracts';
-// SQLite lives on the API's local disk; the path is relative to its cwd (../agent).
+// SQLite lives on the API's local disk; the path is relative to its cwd (../app/agent).
 const TRIAGE_DB_PATH = '.data/triage.db';
 
 const LF_PUBLIC_KEY = 'pk-lf-contract-triage';
@@ -143,7 +143,7 @@ const dataEnv: [string, string][] = [
   ['CONTRACT_STORE_SECRET_KEY', STORAGE_PASSWORD],
   ['CONTRACT_STORE_BUCKET', STORAGE_BUCKET],
   ['CONTRACT_STORE_SECURE', 'false'],
-  ['CONTRACT_STORE_SEED_DIR', '../test'], // <ITEM_ID>/*.pdf, relative to ../agent
+  ['CONTRACT_STORE_SEED_DIR', '../../data/test'], // <ITEM_ID>/*.pdf, relative to ../app/agent
   ['TRIAGE_DB_PATH', TRIAGE_DB_PATH],
 ];
 

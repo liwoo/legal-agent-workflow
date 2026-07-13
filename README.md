@@ -1,19 +1,29 @@
 # Contract Triage — Agent Framework + Aspire
 
 An end-to-end demo that turns the abstract contract-review decision graph
-([`agent-graph.mmd`](agent-graph.mmd)) into a running application:
+([`docs/agent-graph.mmd`](docs/agent-graph.mmd)) into a running application.
 
-- **`agent/`** — a **Microsoft Agent Framework** workflow that implements the
-  graph (intake → classify → policy-gate fan-out → negotiability → bounded
-  redline loop → approval, with a re-entrant human-in-the-loop interrupt). It
-  exposes a **FastAPI** for the UI and the **Agent Framework DevUI** for
-  interactive debugging.
-- **`frontend/`** — a **Next.js 14** review console (neutral-themed, based on the
-  [triaj](https://github.com/liwoo/triaj) triage app): contract queues, a rich
-  detail modal, and the agent graph with each contract's path highlighted.
-- **`apphost/`** — an **Aspire** AppHost authored in **TypeScript** that
+The repository is organised into four top-level folders:
+
+- **`host/`** — an **Aspire** AppHost authored in **TypeScript** that
   orchestrates the DevUI, the FastAPI backend, and the frontend, wiring service
   discovery between them.
+- **`app/`** — the application components:
+  - **`app/agent/`** — a **Microsoft Agent Framework** workflow that implements
+    the graph (intake → classify → policy-gate fan-out → negotiability → bounded
+    redline loop → approval, with a re-entrant human-in-the-loop interrupt). It
+    exposes a **FastAPI** for the UI and the **Agent Framework DevUI** for
+    interactive debugging.
+  - **`app/frontend/`** — a **Next.js 14** review console (neutral-themed, based
+    on the [triaj](https://github.com/liwoo/triaj) triage app): contract queues,
+    a rich detail modal, and the agent graph with each contract's path highlighted.
+  - **`app/scripts/`** — a plain launcher (`dev.sh`) for running the stack
+    without Aspire.
+- **`data/`** — the domain corpus: the contract registers, the policy library,
+  the reviewed `contracts/` back-catalogue, the `test/` intake fixtures, and the
+  held-out `evals/` set.
+- **`docs/`** — the decision framework, requirements, the `agent-graph.mmd`
+  diagram, the canonical `models.py` domain types, and the design audit.
 
 ```
                 ┌─────────────────────────── Aspire AppHost (TypeScript) ───────────────────────────┐
@@ -25,7 +35,7 @@ An end-to-end demo that turns the abstract contract-review decision graph
 ```
 
 The workflow runs **fully offline** on deterministic, corpus-grounded heuristics
-— no API key required. Add an OpenAI / Azure OpenAI key to `agent/.env` to enable
+— no API key required. Add an OpenAI / Azure OpenAI key to `app/agent/.env` to enable
 LLM refinement and natural-language explanations.
 
 ## Prerequisites
@@ -41,14 +51,14 @@ LLM refinement and natural-language explanations.
 
 ```bash
 # 1. backend deps
-cd agent && uv venv --python 3.12 && source .venv/bin/activate \
-  && uv pip install -e . --prerelease=allow && cd ..
+cd app/agent && uv venv --python 3.12 && source .venv/bin/activate \
+  && uv pip install -e . --prerelease=allow && cd ../..
 
 # 2. frontend deps
-cd frontend && npm install && cd ..
+cd app/frontend && npm install && cd ../..
 
 # 3. orchestrate everything (DevUI + API + frontend + dashboard)
-cd apphost && npm install && aspire run
+cd host && npm install && aspire run
 ```
 
 `aspire run` generates its TypeScript SDK, starts all three resources, and opens
@@ -58,10 +68,10 @@ discovery (`NEXT_PUBLIC_API_BASE_URL`).
 ### Option B — plain scripts (no Aspire)
 
 ```bash
-cd agent && uv venv --python 3.12 && source .venv/bin/activate \
-  && uv pip install -e . --prerelease=allow && cd ..
-cd frontend && npm install && cd ..
-./scripts/dev.sh          # DevUI :8080 · API :8000 · frontend :3000
+cd app/agent && uv venv --python 3.12 && source .venv/bin/activate \
+  && uv pip install -e . --prerelease=allow && cd ../..
+cd app/frontend && npm install && cd ../..
+./app/scripts/dev.sh      # DevUI :8080 · API :8000 · frontend :3000
 ```
 
 ### Endpoints
@@ -89,23 +99,25 @@ responses, token usage and latency per contract.
   setup is needed. Traces land in the **Contract Triage** project.
 - Only meaningful when an LLM is configured (see below) — offline heuristic runs
   still produce the workflow span but no LLM `chat` spans.
-- Credentials are demo defaults in [`apphost/apphost.mts`](apphost/apphost.mts);
+- Credentials are demo defaults in [`host/apphost.mts`](host/apphost.mts);
   `ENABLE_SENSITIVE_DATA=true` captures prompts/responses (dev only). Without
-  Aspire (Option B), point the `OTEL_*` vars in `agent/.env` at your own Langfuse
-  (self-hosted or Cloud) — see [`agent/.env.example`](agent/.env.example).
+  Aspire (Option B), point the `OTEL_*` vars in `app/agent/.env` at your own
+  Langfuse (self-hosted or Cloud) — see
+  [`app/agent/.env.example`](app/agent/.env.example).
 
 ## How the graph maps to code
 
 | agent-graph.mmd | code |
 |---|---|
-| shared `State` | `agent/contract_triage/state.py` — `TriageState` |
-| nodes / routers / validators / HITL | `agent/contract_triage/executors.py` |
-| graph wiring (switch-case, fan-out/in) | `agent/contract_triage/workflow.py` |
-| classification + playbook judgment | `agent/contract_triage/heuristics.py` |
-| the 10 inbox items | `agent/contract_triage/data.py` (mirrors `contract-inbox.md`) |
+| shared `State` | `app/agent/contract_triage/state.py` — `TriageState` |
+| nodes / routers / validators / HITL | `app/agent/contract_triage/executors.py` |
+| graph wiring (switch-case, fan-out/in) | `app/agent/contract_triage/workflow.py` |
+| classification + playbook judgment | `app/agent/contract_triage/heuristics.py` |
+| the 10 inbox items | `app/agent/contract_triage/data.py` (mirrors `data/contract-inbox.md`) |
 
-See [`agent/README.md`](agent/README.md), [`frontend/README.md`](frontend/README.md)
-and [`apphost/apphost.mts`](apphost/apphost.mts) for details.
+See [`app/agent/README.md`](app/agent/README.md),
+[`app/frontend/README.md`](app/frontend/README.md) and
+[`host/apphost.mts`](host/apphost.mts) for details.
 
 > The Aspire TypeScript AppHost is a young, fast-moving surface; if a builder
 > method name differs in your installed Aspire version, `aspire run` regenerates

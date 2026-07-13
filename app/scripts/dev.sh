@@ -2,7 +2,7 @@
 # Fallback launcher — runs the whole stack WITHOUT Aspire (useful if the Aspire
 # TypeScript AppHost SDK isn't available on your machine). Starts:
 #   DevUI    :8080   FastAPI :8000   Next.js :3000
-# Requires: Python venv in ./agent/.venv and `npm install` done in ./frontend.
+# Requires: Python venv in ../agent/.venv and `npm install` done in ../frontend.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
