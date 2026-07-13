@@ -4,6 +4,7 @@ import * as React from "react";
 import { CheckCircle2, XCircle } from "lucide-react";
 
 import { ModeToggle } from "@/src/components/mode-toggle";
+import { SettingsTabs } from "@/src/components/settings-tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
 import { apiEnabled, getApiBaseUrl } from "@/src/lib/api";
@@ -18,12 +19,15 @@ export function SettingsPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="space-y-6">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground">Backend connection, appearance, and about.</p>
+        <p className="text-sm text-muted-foreground">Backend connection, appearance, policies, and about.</p>
       </div>
 
+      <SettingsTabs />
+
+      <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Backend</CardTitle>
@@ -72,6 +76,7 @@ export function SettingsPage() {
           <p className="text-xs">© {orgName} — internal tool.</p>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

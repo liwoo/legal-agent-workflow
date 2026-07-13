@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { ContractsQueuePage } from "@/src/screens/ContractsQueuePage";
 
-export const metadata: Metadata = { title: "Pending" };
+export const metadata: Metadata = { title: "Inbox" };
 
 export default function Page() {
-  return <ContractsQueuePage queue="pending" />;
+  return <ContractsQueuePage queue="inbox" />;
 }

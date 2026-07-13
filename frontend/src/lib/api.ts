@@ -1,13 +1,6 @@
 import { contractsFixture, getContractFixtureById } from "@/src/data/contracts";
 import { policiesFixture } from "@/src/data/policies";
-import { workflowGraphFixture } from "@/src/data/workflow-graph";
-import type {
-  ContractDetail,
-  ContractSummary,
-  Policy,
-  ResolveDecision,
-  WorkflowGraph,
-} from "@/src/types";
+import type { ContractDetail, ContractSummary, Policy, ResolveDecision } from "@/src/types";
 import { queueForContract } from "@/src/lib/utils";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
@@ -134,15 +127,6 @@ export async function resolveContract(
           : null,
     };
     return { ...updated, queue: queueForContract(updated) };
-  }
-}
-
-export async function getWorkflowGraph(): Promise<WorkflowGraph> {
-  try {
-    const data = await fetchJson<WorkflowGraph>("/api/workflow/graph");
-    return data;
-  } catch {
-    return workflowGraphFixture;
   }
 }
 

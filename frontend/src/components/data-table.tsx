@@ -25,6 +25,8 @@ interface DataTableProps<TData> {
   data: TData[];
   onRowClick?: (row: TData) => void;
   emptyMessage?: string;
+  /** Richer empty content (e.g. an <EmptyState/>); falls back to emptyMessage. */
+  emptyState?: React.ReactNode;
 }
 
 /** Thin TanStack-table wrapper with sorting and optional row-click. */
@@ -33,6 +35,7 @@ export function DataTable<TData>({
   data,
   onRowClick,
   emptyMessage = "Nothing here yet.",
+  emptyState,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
@@ -78,8 +81,12 @@ export function DataTable<TData>({
             ))
           ) : (
             <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={columns.length} className="h-28 text-center text-sm text-muted-foreground">
-                {emptyMessage}
+              <TableCell colSpan={columns.length} className="p-0">
+                {emptyState ?? (
+                  <div className="flex h-28 items-center justify-center text-sm text-muted-foreground">
+                    {emptyMessage}
+                  </div>
+                )}
               </TableCell>
             </TableRow>
           )}

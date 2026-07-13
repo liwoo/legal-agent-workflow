@@ -2,21 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FileSignature, type LucideIcon, Inbox, Scale } from "lucide-react";
 
 import { cn } from "@/src/lib/utils";
 
 interface QueueTabsProps {
   counts: {
-    pending: number;
-    approved: number;
-    quarantined: number;
+    inbox: number;
+    review: number;
+    signed: number;
   };
 }
 
-const TABS: { href: string; label: string; key: keyof QueueTabsProps["counts"] }[] = [
-  { href: "/contracts/pending", label: "Pending", key: "pending" },
-  { href: "/contracts/approved", label: "Approved", key: "approved" },
-  { href: "/contracts/quarantined", label: "Quarantined", key: "quarantined" },
+const TABS: { href: string; label: string; key: keyof QueueTabsProps["counts"]; icon: LucideIcon }[] = [
+  { href: "/contracts/inbox", label: "Inbox", key: "inbox", icon: Inbox },
+  { href: "/contracts/review", label: "Review", key: "review", icon: Scale },
+  { href: "/contracts/signed", label: "Signed", key: "signed", icon: FileSignature },
 ];
 
 /**
@@ -31,6 +32,7 @@ export function QueueTabs({ counts }: QueueTabsProps) {
     <nav aria-label="Contract queues" className="flex items-center gap-1 border-b border-border">
       {TABS.map((tab) => {
         const active = pathname?.startsWith(tab.href);
+        const Icon = tab.icon;
         return (
           <Link
             key={tab.href}
@@ -41,6 +43,7 @@ export function QueueTabs({ counts }: QueueTabsProps) {
               active && "text-foreground"
             )}
           >
+            <Icon className="h-4 w-4" />
             {tab.label}
             <span
               className={cn(

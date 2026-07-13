@@ -3,27 +3,32 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * PortSwigger-derived design tokens (see design/portswigger-audit).
+   * Light = white base, ink body text, deep-navy headings, brand-orange CTA.
+   * Brand orange #FF6633 = hsl(15 100% 60%); deep navy #001350 = hsl(226 100% 16%).
+   */
   :root {
     --background: 0 0% 100%;
-    --foreground: 222 20% 12%;
+    --foreground: 60 1% 20%; /* ink #333332 */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 20% 12%;
+    --card-foreground: 60 1% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 20% 12%;
+    --popover-foreground: 60 1% 20%;
 
-    --primary: 217 91% 40%;
+    --primary: 15 100% 60%; /* brand orange #FF6633 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 20% 12%;
+    --secondary: 197 21% 94%; /* pale blue-grey band #EBF0F2 */
+    --secondary-foreground: 226 100% 16%; /* deep navy #001350 */
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 197 21% 94%;
+    --muted-foreground: 60 1% 36%; /* slate-grey text #5C5C5B */
 
-    --accent: 217 91% 96%;
-    --accent-foreground: 217 91% 30%;
+    --accent: 12 100% 97%; /* faint orange tint #FFF7F5 */
+    --accent-foreground: 15 100% 45%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
@@ -31,80 +36,82 @@
     --success: 152 60% 32%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 42%;
+    --warning: 15 100% 60%; /* severity medium = orange */
     --warning-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 40%;
+    --border: 0 0% 92%; /* divider grey #EAEAEA */
+    --input: 0 0% 92%;
+    --ring: 15 100% 60%;
 
-    --radius: 0.625rem;
+    --radius: 0.375rem; /* card radius 6px */
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 20% 12%;
-    --sidebar-primary: 217 91% 40%;
+    --sidebar-background: 226 100% 16%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 15 100% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 96%;
-    --sidebar-accent-foreground: 222 20% 12%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217 91% 40%;
+    --sidebar-accent: 226 60% 24%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 226 50% 26%;
+    --sidebar-ring: 15 100% 60%;
 
-    --chart-1: 217 91% 45%;
-    --chart-2: 38 92% 50%;
-    --chart-3: 152 60% 38%;
-    --chart-4: 199 89% 48%;
-    --chart-5: 220 9% 46%;
+    /* Burp severity ramp: High=red, Medium=orange, Low=blue, Info=grey (+purple accent) */
+    --chart-1: 15 100% 60%;
+    --chart-2: 226 100% 30%;
+    --chart-3: 205 100% 50%;
+    --chart-4: 245 100% 69%;
+    --chart-5: 60 1% 45%;
   }
 
+  /* Dark = PortSwigger navy section-band surfaces (#060738 base, #001350 cards). */
   .dark {
-    --background: 222 24% 7%;
-    --foreground: 210 20% 96%;
+    --background: 239 81% 12%; /* navy-deep #060738 */
+    --foreground: 0 0% 100%;
 
-    --card: 222 22% 10%;
-    --card-foreground: 210 20% 96%;
+    --card: 226 100% 16%; /* deep navy #001350 */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222 22% 10%;
-    --popover-foreground: 210 20% 96%;
+    --popover: 226 100% 16%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 24% 8%;
+    --primary: 15 100% 60%; /* brand orange stays constant */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 18% 15%;
-    --secondary-foreground: 210 20% 96%;
+    --secondary: 226 55% 22%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 222 18% 15%;
-    --muted-foreground: 217 10% 65%;
+    --muted: 226 50% 22%;
+    --muted-foreground: 210 30% 80%;
 
-    --accent: 217 40% 18%;
-    --accent-foreground: 213 94% 78%;
+    --accent: 226 60% 26%;
+    --accent-foreground: 15 100% 66%;
 
     --destructive: 0 63% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 152 55% 42%;
-    --success-foreground: 222 24% 8%;
+    --success: 152 55% 45%;
+    --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 55%;
-    --warning-foreground: 222 24% 8%;
+    --warning: 15 100% 62%;
+    --warning-foreground: 0 0% 100%;
 
-    --border: 222 16% 19%;
-    --input: 222 16% 19%;
-    --ring: 217 91% 60%;
+    --border: 226 45% 26%;
+    --input: 226 45% 26%;
+    --ring: 15 100% 60%;
 
-    --sidebar-background: 222 24% 8%;
-    --sidebar-foreground: 210 20% 96%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 222 24% 8%;
-    --sidebar-accent: 222 18% 15%;
-    --sidebar-accent-foreground: 210 20% 96%;
-    --sidebar-border: 222 16% 19%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-background: 239 81% 12%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 15 100% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 226 55% 22%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 226 45% 26%;
+    --sidebar-ring: 15 100% 60%;
 
-    --chart-1: 217 91% 62%;
-    --chart-2: 38 92% 58%;
-    --chart-3: 152 55% 48%;
-    --chart-4: 199 89% 58%;
-    --chart-5: 217 10% 65%;
+    --chart-1: 15 100% 62%;
+    --chart-2: 205 100% 60%;
+    --chart-3: 197 100% 55%;
+    --chart-4: 245 100% 74%;
+    --chart-5: 210 20% 70%;
   }
 }
 
@@ -114,7 +121,20 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  /*
+   * Type signature: large bold Arial with tight negative tracking.
+   * PortSwigger runs ≈ -0.04em on display/H2/H3; scale the effect down as
+   * headings shrink so small headings stay legible.
+   */
+  h1 {
+    letter-spacing: -0.04em;
+  }
+  h2 {
+    letter-spacing: -0.03em;
+  }
+  h3 {
+    letter-spacing: -0.02em;
   }
 }
 

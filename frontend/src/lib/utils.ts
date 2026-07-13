@@ -11,15 +11,15 @@ export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
-/** End states that land a contract in the "approved" queue. */
-export const APPROVED_END_STATES: readonly EndState[] = [
+/** End states that land a contract in the "signed" queue. */
+export const SIGNED_END_STATES: readonly EndState[] = [
   "signed_no_edits",
   "signed_desk_edits",
   "signed_with_deviation",
 ];
 
-/** End states that land a contract in the "quarantined" queue. */
-export const QUARANTINED_END_STATES: readonly EndState[] = [
+/** End states that hand a contract to a human — the "review" queue. */
+export const REVIEW_END_STATES: readonly EndState[] = [
   "escalated",
   "blocked",
   "declined",
@@ -28,26 +28,23 @@ export const QUARANTINED_END_STATES: readonly EndState[] = [
 
 /**
  * Queue-mapping rule shared across the store, dashboard and queue screens:
- *  - approved: end_state in {signed_no_edits, signed_desk_edits, signed_with_deviation}
- *  - quarantined: end_state in {escalated, blocked, declined, business_decision}
- *  - pending: untriaged, or end_state in {more_info_needed, null}
+ *  - signed: end_state in {signed_no_edits, signed_desk_edits, signed_with_deviation}
+ *  - review: end_state in {escalated, blocked, declined, business_decision}
+ *  - inbox: untriaged, or end_state in {more_info_needed, null}
  */
 export function queueForContract(
   contract: Pick<ContractSummary, "ai_status" | "end_state">
 ): Queue {
   const { ai_status, end_state } = contract;
 
-  if (end_state && APPROVED_END_STATES.includes(end_state)) {
-    return "approved";
+  if (end_state && SIGNED_END_STATES.includes(end_state)) {
+    return "signed";
   }
-  if (end_state && QUARANTINED_END_STATES.includes(end_state)) {
-    return "quarantined";
+  if (end_state && REVIEW_END_STATES.includes(end_state)) {
+    return "review";
   }
   // untriaged, processing, more_info_needed, or null end_state
-  if (ai_status === "untriaged" || end_state === "more_info_needed" || end_state === null) {
-    return "pending";
-  }
-  return "pending";
+  return "inbox";
 }
 
 /** Format an ISO date string as a short, readable date (e.g. "10 Jul 2026"). */
@@ -93,6 +90,15 @@ export function formatRelative(iso: string | null, now: Date = new Date()): stri
   if (diffHr < 24) return `${diffHr}h ago`;
   if (diffDay < 7) return `${diffDay}d ago`;
   return formatDate(iso);
+}
+
+/** Format a duration in minutes compactly, e.g. "45m", "2h 17m", "3h". */
+export function formatMinutes(minutes: number): string {
+  const m = Math.round(minutes);
+  if (m < 60) return `${m}m`;
+  const hours = Math.floor(m / 60);
+  const rest = m % 60;
+  return rest ? `${hours}h ${rest}m` : `${hours}h`;
 }
 
 /** Convert an enum-ish snake_case string into Title Case for display. */
