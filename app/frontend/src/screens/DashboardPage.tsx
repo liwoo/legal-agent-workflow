@@ -8,7 +8,8 @@ import { EmptyState } from "@/src/components/empty-state";
 import { ScoreBadge } from "@/src/components/score-badge";
 import { StateBadge } from "@/src/components/state-badge";
 import { StatCard } from "@/src/components/stat-card";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { InfoHint } from "@/src/components/info-hint";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { useContracts } from "@/src/store/contracts";
 import { cn, formatMinutes, formatRelative, titleCase } from "@/src/lib/utils";
 import type { ContractSummary } from "@/src/types";
@@ -60,11 +61,11 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
+      <div className="flex items-center gap-2">
         <h1 className="text-2xl font-semibold tracking-tight">Contract review</h1>
-        <p className="text-sm text-muted-foreground">
+        <InfoHint>
           New contracts are read and checked automatically, then signed at the desk or passed to a person.
-        </p>
+        </InfoHint>
       </div>
 
       {error ? (
@@ -102,8 +103,10 @@ export function DashboardPage() {
         {/* Family mix */}
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle className="text-base">Contract types</CardTitle>
-            <CardDescription>What&rsquo;s coming in</CardDescription>
+            <CardTitle className="flex items-center gap-1.5 text-base">
+              Contract types
+              <InfoHint>What&rsquo;s coming in</InfoHint>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {familyMix.map(([family, n]) => (
@@ -123,8 +126,10 @@ export function DashboardPage() {
         {/* Recent activity */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">Just arrived</CardTitle>
-            <CardDescription>Newest contracts — click to open</CardDescription>
+            <CardTitle className="flex items-center gap-1.5 text-base">
+              Just arrived
+              <InfoHint>Newest contracts — click to open</InfoHint>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
             {recent.map((c) => (
