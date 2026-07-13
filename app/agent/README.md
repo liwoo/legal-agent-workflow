@@ -14,10 +14,16 @@ It ships two surfaces:
   run, inspect and step through the workflow (and drive the human-gate
   interrupt) at `http://localhost:8080`.
 
-The graph runs **fully offline** on deterministic, corpus-grounded heuristics
-(`heuristics.py`) — no API key required. Add an OpenAI/Azure OpenAI key
-(`.env`) to enable LLM refinement + natural-language explanations and to surface
-the helper agents in DevUI.
+The agent is **fully LLM-first**: the model (`agents.py`) makes every
+substantive judgment the routers branch on — the six-axis classification, the
+POL-* policy gates, the redline→playbook mapping — plus the reviewer
+explanation, and the helper agents are surfaced in DevUI. A chat client
+(OpenAI/Azure OpenAI) is therefore **required** — set `OPENAI_API_KEY` in
+`.env`; without one the decision nodes raise `LLMUnavailableError`. The
+`workflow.py` graph is pure control flow (routers, fan-out/in, the human gate);
+only the judgments inside the nodes are the model's. The test suite swaps in a
+deterministic offline double (`tests/_fake_brain.py`) so the graph is exercised
+without live API calls.
 
 ## Layout
 
@@ -26,8 +32,8 @@ contract_triage/
   models.py       # vendored copy of ../../docs/models.py — the Pydantic domain types
   state.py        # TriageState (the shared message) + request/result envelopes
   data.py         # the 10 inbox items + inherited prior-contract flags
-  heuristics.py   # offline classification, policy gates, redline→playbook ladder
-  agents.py       # optional LLM agents (classifier / redline advisor / explainer)
+  agents.py       # the LLM brain: classification, gates, redlines, explanation (+ DevUI agents)
+  config.py       # loads .env so OPENAI_API_KEY is picked up standalone or under Aspire
   executors.py    # one Executor per node in agent-graph.mmd
   workflow.py     # WorkflowBuilder wiring: switch-case routers, fan-out/in, HITL
   graph_spec.py   # static nodes/edges for GET /api/workflow/graph

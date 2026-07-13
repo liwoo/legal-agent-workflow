@@ -37,9 +37,10 @@ shared `TriageState`:
 1. **Intake** — read the source PDF, fill in any blank intake fact from the
    document, and gate obvious non-starters (missing info, out of scope).
 2. **Classify** — what *kind* of paper is this? NDA, order form, DPA, SOW,
-   amendment; our paper or theirs; what data does it touch; what's it worth.
-   Classification is a pure function of the intake text, which is what makes the
-   whole graph deterministic and testable.
+   amendment; our paper or theirs; what data does it touch; what's it worth. An
+   LLM reads the document and returns this as a structured classification; the
+   graph around it stays deterministic control flow, so the *path* a contract
+   takes is always a pure function of that classification.
 3. **Policy-gate fan-out** — three validators (data protection, information
    security, insurance & liability) run in parallel and are gathered back. These
    fire on *facts about the deal*, not on redlines — a customer-paper DPA gates
@@ -64,10 +65,15 @@ where the reviewer resolves, escalates, or declines it.
 
 ![A contract's detail view — the journey through the graph, the playbook mapping, and the human-gate escalation with resolve / escalate / reject controls](docs/screenshots/contract-detail.png)
 
-It runs **fully offline** by default: every decision is a deterministic,
-corpus-grounded heuristic, no API key required. Drop an OpenAI / Azure OpenAI key
-into `app/agent/.env` and the same graph gains LLM refinement and
-natural-language explanations layered on top of the heuristic spine.
+The agent is **LLM-first**: the model makes every substantive judgment the graph
+routes on — the classification, the policy gates, the redline→playbook mapping —
+plus the plain-English explanation, all as structured calls grounded in the
+corpus and the playbook. A chat client is therefore **required**: drop an OpenAI
+/ Azure OpenAI key into `app/agent/.env` (without one the triage nodes raise
+`LLMUnavailableError`). The `workflow.py` graph is pure control flow — routers,
+fan-out/in, the human gate — so only the judgments *inside* the nodes are the
+model's. The test suite swaps the model for a deterministic, corpus-grounded
+double so the graph is exercised offline with no API calls.
 
 ## Approach (the tech stack)
 
@@ -114,7 +120,7 @@ The graph in `agent-graph.mmd` maps directly onto the code:
 | shared `State` | `app/agent/contract_triage/state.py` — `TriageState` |
 | nodes / routers / validators / HITL | `app/agent/contract_triage/executors.py` |
 | graph wiring (switch-case, fan-out/in) | `app/agent/contract_triage/workflow.py` |
-| classification + playbook judgment | `app/agent/contract_triage/heuristics.py` |
+| classification + playbook judgment (the LLM brain) | `app/agent/contract_triage/agents.py` |
 | the 10 inbox items | `app/agent/contract_triage/data.py` |
 
 And the FastAPI surface the console speaks:
@@ -173,9 +179,9 @@ cd app/frontend && npm install && cd ../..
 
 Langfuse signs in with **`admin@northgate.local` / `langfuse-admin`** — the
 project and API keys are provisioned headlessly, so traces land in the
-**Contract Triage** project with no setup. Traces are only meaningful once an LLM
-is configured; offline heuristic runs still produce the workflow span, just no
-LLM `chat` spans.
+**Contract Triage** project with no setup. Because every triage decision is an
+LLM call, each run's span tree includes the `chat` spans — prompts, responses,
+token usage and latency — under the workflow span.
 
 ## Benchmarks — how we know it's grounded
 
@@ -195,8 +201,10 @@ back to something that actually happens in the corpus." Three things back that u
   [`app/agent/tests/`](app/agent/tests/) exercise the workflow node-by-node.
   Every router branch is pinned at least once, and `test_routing.py` asserts the
   "ends *here*, not *there*" contrasts (fast-path vs. full review, gate
-  short-circuits, the human-gate resume paths). The source PDF is genuinely read
-  off disk on every case; the metadata steers the branch deterministically.
+  short-circuits, the human-gate resume paths). To stay hermetic they swap the
+  LLM brain for a deterministic, corpus-grounded double, so no live calls are
+  made; the source PDF is still genuinely read off disk on every case, and the
+  metadata steers the branch deterministically.
 - **A held-out split for scoring.** [`data/evals/`](data/evals/) holds **20
   reviewed contracts** in two parallel copies — `without-edits/` (the contract as
   it arrived, the input) and `with-edits/` (the same contract after human review,
@@ -206,11 +214,12 @@ back to something that actually happens in the corpus." Three things back that u
 
 ## Caveats
 
-- **It's a demo, and the intelligence is heuristic by default.** Offline, every
-  decision is a deterministic rule grounded in the corpus, not a general model.
-  That's a feature for reproducibility and a limit on generalisation: it's sharp
-  on the patterns it was built from and silent on ones it wasn't. The LLM layer
-  is refinement on top, not the source of truth.
+- **It's a demo, and the intelligence is the LLM.** The model makes every
+  classification, gate and redline call, prompted against the corpus and the
+  playbook — so it generalises beyond fixed rules, but a run now needs a
+  reachable API and a key, and its judgments carry the usual model caveats
+  (variance, the odd wrong call). The deterministic double lives only in the
+  tests, for reproducibility, and is not the runtime source of truth.
 - **The eval split is scaffolding, not an automated scoreboard.** The
   `without-edits` → `with-edits` gold split is in place, but there's no committed
   harness that runs the 20 and prints a score — that comparison is left as the
@@ -218,8 +227,8 @@ back to something that actually happens in the corpus." Three things back that u
 - **The human loop is bounded on purpose.** To guarantee termination, a resumed
   human-gate run routes to `approval` rather than looping back to `classify` as
   the abstract diagram shows. And `loop_control`'s `maxed` branch can't be
-  reached end-to-end by the deterministic engine, so it's pinned at the node
-  level instead.
+  reached end-to-end under the deterministic test double, so it's pinned at the
+  node level instead.
 - **`app/agent/contract_triage/models.py` is a vendored copy** of
   `docs/models.py` so the agent stays a self-contained, deployable package —
   keep the two in sync if the domain types change.

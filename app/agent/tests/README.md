@@ -4,15 +4,22 @@ Node-targeted tests for the contract-triage workflow. Every case is seeded from
 **one** physical fixture — the `data/test/CR-2026-050` intake PDF and its
 `metadata.json` — and steers the graph by overriding the intake metadata text.
 
+The shipped agent is fully LLM-first, so to keep these tests deterministic and
+offline `conftest.py` swaps the model brain for a rule-based double
+(`tests/_fake_brain.py`, the old heuristics) — it monkeypatches
+`agents.classify_llm` / `gate_llm` / `redlines_llm` and disables the chat client.
+The graph, routers, fan-out and human-gate under test are the real product code;
+only the per-node judgments are stubbed.
+
 The split is deliberate:
 
 - **the PDF is always read** — `ingest` reads it from an absolute path via the
   PDF tool (`contract_triage/pdf.py`) and stores the text on the state, so the
   document is genuinely exercised on disk;
-- **the metadata drives the branch** — classification is a pure function of the
-  intake text (`summary` / `senders_ask` / counterparty flags /
-  `related_contracts`), so each node can be targeted deterministically without
-  touching the PDF.
+- **the metadata drives the branch** — the test double's classification is a
+  pure function of the intake text (`summary` / `senders_ask` / counterparty
+  flags / `related_contracts`), so each node can be targeted deterministically
+  without touching the PDF.
 
 ## Entry state
 

@@ -11,11 +11,12 @@ from agent_framework import Executor, WorkflowContext, handler, response_handler
 from pydantic import BaseModel
 from typing_extensions import Never
 
-from . import agents, heuristics
+from . import agents
 from .models import (
     EndState,
     ForwardObligation,
     GateStatus,
+    GateType,
     ObligationType,
     PaperSource,
     PositionTier,
@@ -150,15 +151,24 @@ class Ingest(Executor):
 
 
 class Classify(Executor):
-    """Write the six-axis classification + flags."""
+    """Write the six-axis classification + flags — decided by the LLM."""
 
     @handler
     async def run(self, state: TriageState, ctx: WorkflowContext[TriageState]) -> None:
-        cls, flags = heuristics.classify(state.item)
+        from .data import inherited_flags, prior_contracts
+
+        item = state.item
+        inherited = inherited_flags(item.id, item.related_contracts or None)
+        prior_ids = item.related_contracts or prior_contracts(item.id)
+
+        cls, flags = await agents.classify_llm(item, inherited, prior_ids)
         state.classification = cls
         state.flags = flags
-        state.visit("classify",
-                    f"Classified: {cls.document_family.value} · {cls.paper_source.value} · {cls.direction.value}")
+        state.visit(
+            "classify",
+            f"Classified: {cls.document_family.value} · "
+            f"{cls.paper_source.value} · {cls.direction.value}",
+        )
         await ctx.send_message(state)
 
 
@@ -237,34 +247,32 @@ class FanOut(Executor):
         await ctx.send_message(state)
 
 
+async def _run_gate(state: TriageState, gate: GateType, node: str,
+                    ctx: WorkflowContext[TriageState]) -> None:
+    """Shared validator body: the LLM's verdict for one policy gate."""
+    s = state.model_copy(deep=True)
+    g = await agents.gate_llm(s, gate)
+    s.gate_checks = [g] if g else []
+    s.visit(node)
+    await ctx.send_message(s)
+
+
 class ValidatorDPA(Executor):
     @handler
     async def run(self, state: TriageState, ctx: WorkflowContext[TriageState]) -> None:
-        s = state.model_copy(deep=True)
-        g = heuristics.gate_privacy(s)
-        s.gate_checks = [g] if g else []
-        s.visit("dpa")
-        await ctx.send_message(s)
+        await _run_gate(state, GateType.PRIVACY, "dpa", ctx)
 
 
 class ValidatorStatutory(Executor):
     @handler
     async def run(self, state: TriageState, ctx: WorkflowContext[TriageState]) -> None:
-        s = state.model_copy(deep=True)
-        g = heuristics.gate_statutory(s)
-        s.gate_checks = [g] if g else []
-        s.visit("statutory")
-        await ctx.send_message(s)
+        await _run_gate(state, GateType.STATUTORY, "statutory", ctx)
 
 
 class ValidatorFinance(Executor):
     @handler
     async def run(self, state: TriageState, ctx: WorkflowContext[TriageState]) -> None:
-        s = state.model_copy(deep=True)
-        g = heuristics.gate_finance(s)
-        s.gate_checks = [g] if g else []
-        s.visit("finance")
-        await ctx.send_message(s)
+        await _run_gate(state, GateType.INSURANCE, "finance", ctx)
 
 
 class Gather(Executor):
@@ -338,7 +346,7 @@ class MapRedline(Executor):
     async def run(self, state: TriageState, ctx: WorkflowContext[TriageState]) -> None:
         state.visit("map_redline", "Mapping redlines to the playbook")
         if state.iteration == 0:
-            state.redlines = heuristics.extract_redlines(state)
+            state.redlines = await agents.redlines_llm(state)
         await ctx.send_message(state)
 
 

@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 from contextlib import asynccontextmanager
 
+from . import config  # noqa: F401  — loads .env before anything reads env vars
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse

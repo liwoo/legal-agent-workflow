@@ -11,8 +11,8 @@ semantic conventions. Enabling it here means each run produces:
 plus a `triage_contract` parent span we add around the workflow run.
 
 This is a **no-op unless configured** — with no ``ENABLE_OTEL`` / OTLP endpoint
-the app still runs fully offline on the deterministic heuristics, and importing
-this module never fails even if the OTLP exporter package is missing.
+the app runs untraced, and importing this module never fails even if the OTLP
+exporter package is missing.
 
 Configuration (all injected by the Aspire AppHost; see ``../.env.example``):
 

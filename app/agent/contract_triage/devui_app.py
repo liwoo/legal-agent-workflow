@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import os
 
+from . import config  # noqa: F401  — loads .env before anything reads env vars
 from agent_framework.devui import serve
 
 from . import agents
