@@ -1,51 +1,139 @@
-# Contract Triage — Agent Framework + Aspire
+# Contract Triage
 
-An end-to-end demo that turns the abstract contract-review decision graph
-([`docs/agent-graph.mmd`](docs/agent-graph.mmd)) into a running application.
+An end-to-end demo that turns a legal team's contract-review judgement into a
+running application — an agent workflow that reads what lands in the inbox,
+decides what to do with it, and knows when to stop and ask a human.
 
-The repository is organised into four top-level folders:
+---
 
-- **`host/`** — an **Aspire** AppHost authored in **TypeScript** that
-  orchestrates the DevUI, the FastAPI backend, and the frontend, wiring service
-  discovery between them.
-- **`app/`** — the application components:
-  - **`app/agent/`** — a **Microsoft Agent Framework** workflow that implements
-    the graph (intake → classify → policy-gate fan-out → negotiability → bounded
-    redline loop → approval, with a re-entrant human-in-the-loop interrupt). It
-    exposes a **FastAPI** for the UI and the **Agent Framework DevUI** for
-    interactive debugging.
-  - **`app/frontend/`** — a **Next.js 14** review console (neutral-themed, based
-    on the [triaj](https://github.com/liwoo/triaj) triage app): contract queues,
-    a rich detail modal, and the agent graph with each contract's path highlighted.
-  - **`app/scripts/`** — a plain launcher (`dev.sh`) for running the stack
-    without Aspire.
+## What it is — and the problem it solves
+
+A corporate legal team's inbox is mostly noise dressed up as work. Look at the
+back-catalogue and a hard pattern falls out: of 79 processed contracts, **34%
+were signed with zero edits** and another 25% needed exactly one — our own NDA
+template coming back unchanged, a Standard-tier order form, a statement of work
+under a framework that was already negotiated last quarter. Genuinely bespoke,
+escalation-worthy reviews are **~8%**. Everything in between is the same handful
+of moves made over and over: an uncapped liability clause pulled back to twelve
+months' fees, net-60 payment terms pushed to net-30, an auto-renewal struck out.
+
+So the expensive thing isn't the hard 8%. It's that a qualified reviewer has to
+*open every one* to find out which bucket it's in — and the routine 92% drowns
+the reviews that actually need a lawyer's attention.
+
+This project is the answer to "what if the inbox triaged itself?" It takes the
+contract-review decision graph that a senior reviewer carries in their head
+([`docs/agent-graph.mmd`](docs/agent-graph.mmd)) and runs it as software. Each
+contract is classified, run through the policy gates, checked against the
+playbook, and either **cleared**, **redlined to a known position**, or — when it
+hits something the rules can't settle — **paused and handed to a human**, who
+makes the call and hands it back. The reviewer stops reading everything and
+starts reading only what's been flagged as worth their time.
+
+## How it works
+
+The whole thing is one **decision graph**. A contract enters as a flat set of
+intake facts and flows through a series of nodes, each reading and writing one
+shared `TriageState`:
+
+1. **Intake** — read the source PDF, fill in any blank intake fact from the
+   document, and gate obvious non-starters (missing info, out of scope).
+2. **Classify** — what *kind* of paper is this? NDA, order form, DPA, SOW,
+   amendment; our paper or theirs; what data does it touch; what's it worth.
+   Classification is a pure function of the intake text, which is what makes the
+   whole graph deterministic and testable.
+3. **Policy-gate fan-out** — three validators (data protection, information
+   security, insurance & liability) run in parallel and are gathered back. These
+   fire on *facts about the deal*, not on redlines — a customer-paper DPA gates
+   whether or not anyone asked to change a word.
+4. **Negotiability + bounded redline loop** — for anything negotiable, each
+   problem clause is mapped to a fixed **playbook position**: the standard ask,
+   the fallback, and the line we refuse to cross. The loop is deliberately
+   bounded so it always terminates.
+5. **The human gate** — the one re-entrant interrupt. When the graph reaches
+   something it shouldn't decide alone (an escalation, a business trade-off), it
+   *pauses the run*, drops the contract into the reviewer's queue, and waits.
+   The reviewer's decision — resolve, decline, escalate — resumes the exact same
+   run from where it stopped.
+6. **Approval / disposition** — the contract lands in a terminal state and the
+   queue it belongs to: **approved**, **quarantined**, or still **pending**.
+
+The reviewer sees all of this in a console: the queues, a detail view for each
+contract (its classification, which gates fired, the proposed redlines with
+their legal basis, the forward obligations), and the decision graph itself with
+*this* contract's path lit up.
+
+It runs **fully offline** by default. Every decision is made by deterministic,
+corpus-grounded heuristics — no API key required. Drop an OpenAI / Azure OpenAI
+key into `app/agent/.env` and the same graph gains LLM refinement and
+natural-language explanations layered on top of the heuristic spine.
+
+## Approach (the tech stack)
+
+The repo is four top-level folders, each a clean layer:
+
+- **`host/`** — an **[Aspire](https://aspire.dev)** AppHost written in
+  **TypeScript** that orchestrates everything and wires service discovery
+  between the pieces. One command brings up the whole stack.
+- **`app/`** — the application itself:
+  - **`app/agent/`** — a **[Microsoft Agent Framework](https://github.com/microsoft/agent-framework)**
+    workflow (the decision graph above) exposed two ways: a **FastAPI** REST
+    surface the console consumes, and the **Agent Framework DevUI** for stepping
+    through a run interactively — including driving the human-gate interrupt by
+    hand. Python 3.12, managed with **[uv](https://docs.astral.sh/uv/)**.
+  - **`app/frontend/`** — a **Next.js 14** review console: contract queues, a
+    rich detail modal, and the live agent graph.
+  - **`app/scripts/`** — a plain `dev.sh` launcher for running the stack without
+    Aspire.
 - **`data/`** — the domain corpus: the contract registers, the policy library,
   the reviewed `contracts/` back-catalogue, the `test/` intake fixtures, and the
   held-out `evals/` set.
-- **`docs/`** — the decision framework, requirements, the `agent-graph.mmd`
+- **`docs/`** — the decision framework, the requirements, the `agent-graph.mmd`
   diagram, the canonical `models.py` domain types, and the design audit.
 
+Underneath, **SQLite** persists computed triage results (so the queues are warm
+the instant the API answers), **MinIO** holds the intake PDFs and hands out
+short-lived presigned URLs, and a self-hosted **[Langfuse](https://langfuse.com)**
+stack captures the Agent Framework's **OpenTelemetry** traces — every triage run
+shows up as a span tree with prompts, responses, token usage and latency.
+
 ```
-                ┌─────────────────────────── Aspire AppHost (TypeScript) ───────────────────────────┐
-                │                                                                                    │
-   browser ───► │   frontend (Next.js :3000) ──HTTP──► api (FastAPI :8000) ──► Agent Framework       │
-                │            │                                                    workflow (graph)     │
-                │            └──link──► devui (Agent Framework DevUI :8080) ──────┘                    │
-                └────────────────────────────────────────────────────────────────────────────────────┘
+                ┌─────────────────────── Aspire AppHost (TypeScript) ───────────────────────┐
+                │                                                                            │
+   browser ───► │   frontend (Next.js :3000) ──HTTP──► api (FastAPI :8000) ──► Agent          │
+                │            │                                              Framework workflow │
+                │            └──link──► devui (Agent Framework DevUI :8080) ──┘                │
+                └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-The workflow runs **fully offline** on deterministic, corpus-grounded heuristics
-— no API key required. Add an OpenAI / Azure OpenAI key to `app/agent/.env` to enable
-LLM refinement and natural-language explanations.
+The graph in `agent-graph.mmd` maps directly onto the code:
 
-## Prerequisites
+| agent-graph.mmd | code |
+|---|---|
+| shared `State` | `app/agent/contract_triage/state.py` — `TriageState` |
+| nodes / routers / validators / HITL | `app/agent/contract_triage/executors.py` |
+| graph wiring (switch-case, fan-out/in) | `app/agent/contract_triage/workflow.py` |
+| classification + playbook judgment | `app/agent/contract_triage/heuristics.py` |
+| the 10 inbox items | `app/agent/contract_triage/data.py` |
 
-- **Python 3.10+** and [`uv`](https://docs.astral.sh/uv/)
-- **Node ≥ 20.19** (Next.js 14 and the Aspire TypeScript AppHost both require it)
-- **Aspire CLI** — `curl -sSL https://aspire.dev/install.sh | bash` (or
-  `npm i -g @microsoft/aspire-cli`). Only needed for the one-command path.
+And the FastAPI surface the console speaks:
 
-## Run it
+| Method | Path | Purpose |
+|---|---|---|
+| `GET`  | `/api/health` | liveness |
+| `GET`  | `/api/contracts` | inbox + triage summaries |
+| `GET`  | `/api/contracts/{id}` | full triage detail |
+| `GET`  | `/api/contracts/{id}/document` | redirect to a presigned PDF URL |
+| `POST` | `/api/contracts/{id}/triage` | run the workflow for one contract |
+| `POST` | `/api/contracts/{id}/resolve` | resume a paused human-gate run (`{decision, note}`) |
+| `GET`  | `/api/workflow/graph` | nodes/edges for the graph view |
+| `GET`  | `/api/policies` | the policy register |
+
+## How to run
+
+**Prerequisites:** Python 3.10+ and [`uv`](https://docs.astral.sh/uv/) ·
+Node ≥ 20.19 · the [Aspire CLI](https://aspire.dev) (`curl -sSL https://aspire.dev/install.sh | bash`,
+only for the one-command path) · Docker (only for the Langfuse trace stack).
 
 ### Option A — one command via Aspire (recommended)
 
@@ -61,9 +149,8 @@ cd app/frontend && npm install && cd ../..
 cd host && npm install && aspire run
 ```
 
-`aspire run` generates its TypeScript SDK, starts all three resources, and opens
-the Aspire dashboard. The frontend receives the backend URL via service
-discovery (`NEXT_PUBLIC_API_BASE_URL`).
+`aspire run` generates its TypeScript SDK, starts every resource, and opens the
+Aspire dashboard. The frontend receives the backend URL via service discovery.
 
 ### Option B — plain scripts (no Aspire)
 
@@ -74,7 +161,7 @@ cd app/frontend && npm install && cd ../..
 ./app/scripts/dev.sh      # DevUI :8080 · API :8000 · frontend :3000
 ```
 
-### Endpoints
+### Where things live
 
 | Service | URL |
 |---|---|
@@ -83,42 +170,67 @@ cd app/frontend && npm install && cd ../..
 | Agent Framework DevUI     | http://localhost:8080 |
 | Langfuse (traces)         | http://localhost:3001 |
 
-## Observability (Langfuse)
+Langfuse signs in with **`admin@northgate.local` / `langfuse-admin`** — the
+project and API keys are provisioned headlessly, so traces land in the
+**Contract Triage** project with no setup. Traces are only meaningful once an LLM
+is configured; offline heuristic runs still produce the workflow span, just no
+LLM `chat` spans.
 
-The Aspire AppHost also runs a **self-hosted [Langfuse](https://langfuse.com)**
-stack (Postgres, ClickHouse, Redis, MinIO, plus the Langfuse web + worker) and
-wires the agent's **Microsoft Agent Framework OpenTelemetry** traces to it. Every
-triage run shows up as a trace — the top-level `triage_contract` span, the
-`invoke_agent` call, each LLM `chat`, and each tool call — so you can see prompts,
-responses, token usage and latency per contract.
+## Benchmarks — how we know it's grounded
 
-- Requires **Docker** (the six Langfuse containers). The agent buffers and retries,
-  so the app starts immediately and traces appear once Langfuse is healthy.
-- Open http://localhost:3001 and sign in with **`admin@northgate.local` /
-  `langfuse-admin`** — the project and API keys are provisioned headlessly, so no
-  setup is needed. Traces land in the **Contract Triage** project.
-- Only meaningful when an LLM is configured (see below) — offline heuristic runs
-  still produce the workflow span but no LLM `chat` spans.
-- Credentials are demo defaults in [`host/apphost.mts`](host/apphost.mts);
-  `ENABLE_SENSITIVE_DATA=true` captures prompts/responses (dev only). Without
-  Aspire (Option B), point the `OTEL_*` vars in `app/agent/.env` at your own
-  Langfuse (self-hosted or Cloud) — see
-  [`app/agent/.env.example`](app/agent/.env.example).
+There is no single accuracy number to wave around, because the interesting claim
+isn't "the model is X% accurate" — it's "every decision the graph makes traces
+back to something that actually happens in the corpus." Three things back that up:
 
-## How the graph maps to code
+- **The evidence base.** The decision framework
+  ([`docs/decision-framework.md`](docs/decision-framework.md)) is derived from
+  **79 processed contracts** with full edit logs. The edit distribution (34% /
+  25% / 22% / 19% for 0 / 1 / 2 / 3–4 edits) and the playbook-citation frequency
+  (50 citations across 39 contracts, dominated by a handful of sections —
+  governing law, liability cap, payment terms, renewal) are what shape the
+  branches. No branch exists that the corpus doesn't justify; citations run
+  throughout.
+- **A test suite that pins the graph.** **54 tests** across
+  [`app/agent/tests/`](app/agent/tests/) exercise the workflow node-by-node.
+  Every router branch is pinned at least once, and `test_routing.py` asserts the
+  "ends *here*, not *there*" contrasts (fast-path vs. full review, gate
+  short-circuits, the human-gate resume paths). The source PDF is genuinely read
+  off disk on every case; the metadata steers the branch deterministically.
+- **A held-out split for scoring.** [`data/evals/`](data/evals/) holds **20
+  reviewed contracts** in two parallel copies — `without-edits/` (the contract as
+  it arrived, the input) and `with-edits/` (the same contract after human review,
+  the gold output). A triage run against the first is scored against the second.
+  [`data/test/`](data/test/) is the **10-item live inbox** (`CR-2026-050`…`059`)
+  with no gold output — the set the running app triages.
 
-| agent-graph.mmd | code |
-|---|---|
-| shared `State` | `app/agent/contract_triage/state.py` — `TriageState` |
-| nodes / routers / validators / HITL | `app/agent/contract_triage/executors.py` |
-| graph wiring (switch-case, fan-out/in) | `app/agent/contract_triage/workflow.py` |
-| classification + playbook judgment | `app/agent/contract_triage/heuristics.py` |
-| the 10 inbox items | `app/agent/contract_triage/data.py` (mirrors `data/contract-inbox.md`) |
+## Caveats
+
+- **It's a demo, and the intelligence is heuristic by default.** Offline, every
+  decision is a deterministic rule grounded in the corpus, not a general model.
+  That's a feature for reproducibility and a limit on generalisation: it's sharp
+  on the patterns it was built from and silent on ones it wasn't. The LLM layer
+  is refinement on top, not the source of truth.
+- **The eval split is scaffolding, not an automated scoreboard.** The
+  `without-edits` → `with-edits` gold split is in place, but there's no committed
+  harness that runs the 20 and prints a score — that comparison is left as the
+  next step.
+- **The human loop is bounded on purpose.** To guarantee termination, a resumed
+  human-gate run routes to `approval` rather than looping back to `classify` as
+  the abstract diagram shows. And `loop_control`'s `maxed` branch can't be
+  reached end-to-end by the deterministic engine, so it's pinned at the node
+  level instead.
+- **`app/agent/contract_triage/models.py` is a vendored copy** of
+  `docs/models.py` so the agent stays a self-contained, deployable package —
+  keep the two in sync if the domain types change.
+- **Aspire's TypeScript AppHost is young and fast-moving.** If a builder method
+  name differs in your installed version, `aspire run` regenerates the SDK, or
+  fall back to Option B.
+- **The Langfuse credentials are demo defaults** in
+  [`host/apphost.mts`](host/apphost.mts), and `ENABLE_SENSITIVE_DATA=true`
+  captures prompts and responses — dev only, never point it at anything real.
+
+---
 
 See [`app/agent/README.md`](app/agent/README.md),
-[`app/frontend/README.md`](app/frontend/README.md) and
-[`host/apphost.mts`](host/apphost.mts) for details.
-
-> The Aspire TypeScript AppHost is a young, fast-moving surface; if a builder
-> method name differs in your installed Aspire version, `aspire run` regenerates
-> the SDK, or use Option B.
+[`app/frontend/README.md`](app/frontend/README.md), and
+[`host/apphost.mts`](host/apphost.mts) for the layer-level detail.
