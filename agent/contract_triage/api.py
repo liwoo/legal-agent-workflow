@@ -13,10 +13,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from .observability import setup_observability
 from .service import TriageService
+from .storage import store
 
 setup_observability()  # ships Agent Framework traces to Langfuse when configured
 
@@ -40,6 +42,8 @@ POLICIES = [
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Seed the object store with the intake PDFs (no-op if MinIO isn't wired up).
+    store.seed()
     if os.getenv("TRIAGE_EAGER", "1") == "1":
         await service.triage_all()
     yield
@@ -76,6 +80,15 @@ async def get_contract(item_id: str) -> dict:
         return service.get(item_id)
     except KeyError:
         raise HTTPException(status_code=404, detail=f"Unknown contract {item_id}")
+
+
+@app.get("/api/contracts/{item_id}/document")
+async def get_contract_document(item_id: str) -> RedirectResponse:
+    """Redirect to a short-lived presigned URL for the item's intake PDF."""
+    url = store.presigned_url(item_id)
+    if url is None:
+        raise HTTPException(status_code=404, detail=f"No document for {item_id}")
+    return RedirectResponse(url)
 
 
 @app.post("/api/contracts/{item_id}/triage")

@@ -11,12 +11,13 @@ from typing import Any
 
 from agent_framework import Workflow
 
-from . import graph_spec
+from . import db, graph_spec
 from .data import get_inbox, get_item, prior_contracts
 from .executors import HumanDecision
 from .models import EndState, InboxItem
 from .observability import workflow_span
 from .state import TriageRequest, TriageState
+from .storage import store
 from .workflow import build_workflow
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -72,6 +73,14 @@ class _Pending:
 class TriageService:
     results: dict[str, dict] = field(default_factory=dict)  # item_id -> ContractDetail
     pending: dict[str, _Pending] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        # Boot the durable stores and rehydrate any previously-computed results
+        # so the queues are populated the moment the API answers — even before
+        # the eager re-triage in the FastAPI lifespan finishes.
+        db.init_db()
+        store.connect()
+        self.results.update(db.load_results())
 
     # ── serialisation ────────────────────────────────────────────────────────
     def _summary_fields(self, item: InboxItem, state: TriageState | None, ai_status: str) -> dict:
@@ -154,6 +163,7 @@ class TriageService:
                     {"at": _iso(e.at), "label": e.label, "detail": e.detail, "kind": e.kind}
                     for e in state.timeline
                 ],
+                "document_url": store.presigned_url(item.id),
             }
         )
         return detail
@@ -181,6 +191,7 @@ class TriageService:
             self.pending.pop(item_id, None)
             detail = self._detail(item, state)
         self.results[item_id] = detail
+        db.save_result(item_id, detail)
         return detail
 
     async def resolve(self, item_id: str, decision: str, note: str | None = None) -> dict:
@@ -203,6 +214,8 @@ class TriageService:
         self.pending.pop(item_id, None)
         detail = self._detail(item, state)
         self.results[item_id] = detail
+        db.save_result(item_id, detail)
+        db.save_decision(item_id, decision, note)
         return detail
 
     def get(self, item_id: str) -> dict:
@@ -218,6 +231,7 @@ class TriageService:
                 "classification": None, "gate_checks": [], "redlines": [],
                 "forward_obligations": [], "explanation": None, "recommended_action": None,
                 "interrupt": None, "path_node_ids": [], "timeline": [],
+                "document_url": store.presigned_url(item.id),
             }
         )
         return detail
