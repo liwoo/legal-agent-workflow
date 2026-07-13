@@ -118,6 +118,27 @@ class ContractStore:
             _log.info("Seeded %d contract document(s) into %s", uploaded, self._bucket)
         return uploaded
 
+    # ── ingest (the "New Contract" flow) ─────────────────────────────────────
+    def put_object(self, item_id: str, data: bytes, content_type: str = "application/pdf") -> bool:
+        """Upload a reviewer-supplied document under the item's intake key.
+
+        Returns True on success; a graceful no-op (False) if the store isn't
+        wired up, so the create flow still persists the row + local PDF."""
+        if not self.connect():
+            return False
+        import io
+
+        key = self._key(item_id)
+        try:
+            self._client.put_object(
+                self._bucket, key, io.BytesIO(data), length=len(data), content_type=content_type
+            )
+            _log.info("Stored contract document → %s/%s (%d bytes)", self._bucket, key, len(data))
+            return True
+        except Exception as exc:  # pragma: no cover - defensive
+            _log.warning("put_object(%s) failed: %s", key, exc)
+            return False
+
     # ── access ───────────────────────────────────────────────────────────────
     def presigned_url(self, item_id: str) -> str | None:
         """A short-lived GET URL for an item's intake PDF, or None if absent."""

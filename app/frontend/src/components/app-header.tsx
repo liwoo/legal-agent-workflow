@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { FileSignature, type LucideIcon, Inbox, LayoutDashboard, Scale, Settings, Zap } from "lucide-react";
 
 import { ModeToggle } from "@/src/components/mode-toggle";
+import { NewContractDialog } from "@/src/components/new-contract-dialog";
 import { cn } from "@/src/lib/utils";
 
 const NAV_LINKS: { href: string; label: string; icon: LucideIcon }[] = [
@@ -57,6 +58,7 @@ export function AppHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <NewContractDialog />
           <ModeToggle />
         </div>
       </div>

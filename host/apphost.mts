@@ -15,8 +15,11 @@
  *
  * The API's own data plane: `storage` (an ephemeral, app-facing MinIO holding
  * the contract intake PDFs, re-seeded from ../data/test on boot) and a SQLite
- * file (TRIAGE_DB_PATH) that persists triage results and reviewer decisions
- * across restarts. Both are injected into the `api` resource; SQLite needs no
+ * file (TRIAGE_DB_PATH) that persists the contract register, triage results,
+ * the outcomes the agent's terminal nodes write, and reviewer decisions across
+ * restarts. The "New Contract" flow persists intake to SQLite, stores the PDF
+ * in `storage` (and a local mirror the ingest node reads), then triggers the
+ * agent. Both stores are injected into the `api` resource; SQLite needs no
  * server, so it also works under the ../app/scripts/dev.sh fallback.
  *
  * The agent (devui + api) ships its Microsoft Agent Framework OpenTelemetry
@@ -61,6 +64,9 @@ const STORAGE_PASSWORD = 'contract-store-secret';
 const STORAGE_BUCKET = 'contracts';
 // SQLite lives on the API's local disk; the path is relative to its cwd (../app/agent).
 const TRIAGE_DB_PATH = '.data/triage.db';
+// Reviewer-uploaded intake PDFs (the "New Contract" flow) are kept locally so the
+// ingest node can read them; they are also mirrored into the object store above.
+const CONTRACT_UPLOAD_DIR = '.data/uploads';
 
 const LF_PUBLIC_KEY = 'pk-lf-contract-triage';
 const LF_SECRET_KEY = 'sk-lf-contract-triage';
@@ -145,6 +151,7 @@ const dataEnv: [string, string][] = [
   ['CONTRACT_STORE_SECURE', 'false'],
   ['CONTRACT_STORE_SEED_DIR', '../../data/test'], // <ITEM_ID>/*.pdf, relative to ../app/agent
   ['TRIAGE_DB_PATH', TRIAGE_DB_PATH],
+  ['CONTRACT_UPLOAD_DIR', CONTRACT_UPLOAD_DIR],
 ];
 
 // Env shared by langfuse-web and langfuse-worker (the compose "worker-env" anchor).

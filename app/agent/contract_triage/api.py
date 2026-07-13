@@ -11,8 +11,10 @@ from __future__ import annotations
 import os
 from contextlib import asynccontextmanager
 
+from datetime import date
+
 from . import config  # noqa: F401  — loads .env before anything reads env vars
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
@@ -73,6 +75,47 @@ async def health() -> dict:
 @app.get("/api/contracts")
 async def list_contracts() -> list[dict]:
     return service.list_contracts()
+
+
+@app.post("/api/contracts")
+async def create_contract(
+    counterparty: str = Form(...),
+    name: str = Form(""),
+    sector: str = Form(""),
+    jurisdiction: str = Form(""),
+    is_public_body: bool = Form(False),
+    is_regulated: bool = Form(False),
+    received_from: str = Form(""),
+    summary: str = Form(""),
+    senders_ask: str = Form(""),
+    related_contracts: str = Form(""),
+    date_received: str = Form(""),
+    file: UploadFile | None = File(None),
+) -> dict:
+    """Create a contract: persist intake → store PDF → trigger the agent.
+
+    Accepts a multipart form (so an intake PDF can ride along). The agent runs
+    synchronously and its terminal nodes write the outcome to SQLite; the freshly
+    triaged detail is returned for the console to render."""
+    metadata = {
+        "counterparty": counterparty.strip(),
+        "name": name.strip() or f"{counterparty.strip()}",
+        "sector": sector.strip() or None,
+        "jurisdiction": jurisdiction.strip() or None,
+        "is_public_body": is_public_body,
+        "is_regulated": is_regulated,
+        "received_from": received_from.strip() or "unknown",
+        "summary": summary.strip(),
+        "senders_ask": senders_ask.strip(),
+        "related_contracts": [s.strip() for s in related_contracts.split(",") if s.strip()],
+        "date_received": date_received.strip() or date.today().isoformat(),
+    }
+    pdf_bytes = await file.read() if file is not None else None
+    filename = file.filename if file is not None else None
+    try:
+        return await service.create(metadata, pdf_bytes, filename)
+    except Exception as exc:  # pragma: no cover - defensive
+        raise HTTPException(status_code=500, detail=f"Failed to create contract: {exc}")
 
 
 @app.get("/api/contracts/{item_id}")

@@ -77,6 +77,33 @@ export async function getContract(id: string): Promise<ContractDetail | undefine
   }
 }
 
+/**
+ * Create a contract from the "New Contract" form. Posts a multipart form (so an
+ * intake PDF can ride along); the backend persists the intake to SQLite, stores
+ * the PDF, and runs the agent synchronously, returning the triaged detail.
+ *
+ * Unlike the read paths, this throws on failure — creating a contract requires a
+ * live backend, so the caller surfaces the error rather than falling back.
+ */
+export async function createContract(form: FormData): Promise<ContractDetail> {
+  const res = await fetchWithTimeout(
+    `${API_BASE_URL}/api/contracts`,
+    { method: "POST", body: form },
+    60000 // the agent runs synchronously; give it room
+  );
+  if (!res.ok) {
+    let detail = `status ${res.status}`;
+    try {
+      const body = (await res.json()) as { detail?: string };
+      if (body?.detail) detail = body.detail;
+    } catch {
+      /* non-JSON error body */
+    }
+    throw new Error(`Failed to create contract: ${detail}`);
+  }
+  return (await res.json()) as ContractDetail;
+}
+
 export async function triageContract(id: string): Promise<ContractDetail | undefined> {
   try {
     const data = await fetchJson<ContractDetail>(`/api/contracts/${encodeURIComponent(id)}/triage`, {
