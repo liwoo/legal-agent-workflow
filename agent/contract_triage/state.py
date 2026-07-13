@@ -27,16 +27,27 @@ from .models import (
 
 
 class TriageRequest(BaseModel):
-    """Workflow input. DevUI renders a form from these fields.
+    """Workflow input. DevUI renders one plain text box per field — no JSON.
 
-    Pass just an ``item_id`` (e.g. ``"CR-2026-052"``) to triage a known inbox
-    item, or embed a full ``item`` to triage an ad-hoc arrival.
+    Required: a contract ``id``, the ``date_received``, and the ``pdf_path`` — the
+    document is always read. The remaining intake facts (``counterparty``,
+    ``summary``, ``senders_ask`` …) are optional: leave them blank and the ingest
+    node derives them from the PDF.
     """
 
-    item_id: str = Field(description="Inbox item id, e.g. CR-2026-052")
-    item: InboxItem | None = Field(
-        default=None,
-        description="Optional inline item; if omitted it is loaded from the inbox dataset.",
+    # ── required ─────────────────────────────────────────────────────────────
+    id: str = Field(description="Contract reference, e.g. CR-2026-050")
+    date_received: str = Field(description="Date received, ISO 8601 (YYYY-MM-DD)")
+    pdf_path: str = Field(description="Absolute path to the source PDF, always read at ingest")
+
+    # ── optional — derived from the PDF when left blank ──────────────────────
+    counterparty: str = Field(default="", description="Counterparty name (derived if blank)")
+    summary: str = Field(default="", description="What arrived — the paper and the situation (derived if blank)")
+    senders_ask: str = Field(default="", description="The sender's ask, in their words (derived if blank)")
+    name: str = Field(default="", description="Contract name (optional)")
+    received_from: str = Field(default="", description="Sender role, e.g. 'AE (sales)' (optional)")
+    related_contracts: str = Field(
+        default="", description="Prior contract ids in the chain, comma-separated (optional)"
     )
 
 

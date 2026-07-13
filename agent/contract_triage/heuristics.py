@@ -96,10 +96,20 @@ def _data_flags(item: InboxItem, t: str) -> set[DataFlag]:
         flags.add(DataFlag.REGULATED_COUNTERPARTY)
     if any(k in t for k in ("sync", "into the platform", "systems access")):
         flags.add(DataFlag.SYSTEMS_ACCESS)
-    if "dpia_required_before_order_form" in inherited_flags(item.id):
+    if "dpia_required_before_order_form" in _inherited(item):
         flags.add(DataFlag.HIGH_RISK_DPIA)
         flags.add(DataFlag.PERSONAL_DATA)
     return flags
+
+
+def _inherited(item: InboxItem) -> list[str]:
+    """Flags inherited from the item's prior-contract chain.
+
+    Prefers the chain carried on the item (``related_contracts`` from intake
+    metadata); falls back to the built-in inbox index keyed by id.
+    """
+    prior = item.related_contracts or None
+    return inherited_flags(item.id, prior)
 
 
 _MONEY = re.compile(r"£\s?([\d,]+)\s?(k|m)?", re.I)
@@ -145,12 +155,12 @@ def classify(item: InboxItem) -> tuple[IntakeClassification, list[str]]:
         paper_source=_paper_source(t),
         direction=_direction(t),
         data_flags=_data_flags(item, t),
-        prior_contract_ids=prior_contracts(item.id),
+        prior_contract_ids=item.related_contracts or prior_contracts(item.id),
         signatory_level=_signatory(value),
         value_gbp=value,
         deadline=_deadline(t),
     )
-    flags: list[str] = list(inherited_flags(item.id))
+    flags: list[str] = list(_inherited(item))
     if "no draft" in t or cls.paper_source is PaperSource.NO_DRAFT:
         flags.append("no_draft")
     if "unread" in t or "not yet read" in t:
