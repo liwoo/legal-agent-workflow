@@ -8,32 +8,30 @@ decides what to do with it, and knows when to stop and ask a human.
 
 ## What it is — and the problem it solves
 
-A corporate legal team's inbox is mostly noise dressed up as work. Look at the
-back-catalogue and a hard pattern falls out: of 79 processed contracts, **34%
-were signed with zero edits** and another 25% needed exactly one — our own NDA
-template coming back unchanged, a Standard-tier order form, a statement of work
-under a framework that was already negotiated last quarter. Genuinely bespoke,
-escalation-worthy reviews are **~8%**. Everything in between is the same handful
-of moves made over and over: an uncapped liability clause pulled back to twelve
-months' fees, net-60 payment terms pushed to net-30, an auto-renewal struck out.
+A corporate legal team's inbox is mostly noise dressed up as work. Across **79
+processed contracts**, **34% were signed with zero edits** and another **25%**
+needed exactly one; genuinely bespoke, escalation-worthy reviews are **~8%**.
+The **92%** in between is the same handful of moves on repeat — an uncapped
+liability clause pulled back to twelve months' fees, net-60 payment terms pushed
+to net-30, an auto-renewal struck out. The cost isn't the hard 8%. It's that a
+qualified reviewer must **open every contract to learn which bucket it's in**,
+and the routine majority drowns the reviews that actually need a lawyer.
 
-So the expensive thing isn't the hard 8%. It's that a qualified reviewer has to
-*open every one* to find out which bucket it's in — and the routine 92% drowns
-the reviews that actually need a lawyer's attention.
+**Contract Triage is the answer to "what if the inbox triaged itself?"** It runs
+the review decision graph a senior reviewer carries in their head
+([`docs/agent-graph.mmd`](docs/agent-graph.mmd)) as software: each contract is
+classified, run through the policy gates, checked against the playbook, and then
+**cleared**, **redlined to a known position**, or — when the rules can't settle
+it — **paused and handed to a human**, who decides and hands it back. The
+reviewer stops reading everything and reads only what's been flagged as worth
+their time.
 
-This project is the answer to "what if the inbox triaged itself?" It takes the
-contract-review decision graph that a senior reviewer carries in their head
-([`docs/agent-graph.mmd`](docs/agent-graph.mmd)) and runs it as software. Each
-contract is classified, run through the policy gates, checked against the
-playbook, and either **cleared**, **redlined to a known position**, or — when it
-hits something the rules can't settle — **paused and handed to a human**, who
-makes the call and hands it back. The reviewer stops reading everything and
-starts reading only what's been flagged as worth their time.
+![The review console — queues, contract-type mix, and each incoming contract with its disposition and confidence](docs/screenshots/console-dashboard.png)
 
 ## How it works
 
-The whole thing is one **decision graph**. A contract enters as a flat set of
-intake facts and flows through a series of nodes, each reading and writing one
+The whole system is one **deterministic decision graph**. A contract enters as a
+flat set of intake facts and flows through nodes that each read and write one
 shared `TriageState`:
 
 1. **Intake** — read the source PDF, fill in any blank intake fact from the
@@ -59,13 +57,16 @@ shared `TriageState`:
    queue it belongs to: **approved**, **quarantined**, or still **pending**.
 
 The reviewer sees all of this in a console: the queues, a detail view for each
-contract (its classification, which gates fired, the proposed redlines with
-their legal basis, the forward obligations), and the decision graph itself with
-*this* contract's path lit up.
+contract — its classification, which gates fired, the proposed redlines with
+their legal basis, the forward obligations — and the decision graph with *this*
+contract's path lit up. When a run pauses at the human gate, the same view is
+where the reviewer resolves, escalates, or declines it.
 
-It runs **fully offline** by default. Every decision is made by deterministic,
-corpus-grounded heuristics — no API key required. Drop an OpenAI / Azure OpenAI
-key into `app/agent/.env` and the same graph gains LLM refinement and
+![A contract's detail view — the journey through the graph, the playbook mapping, and the human-gate escalation with resolve / escalate / reject controls](docs/screenshots/contract-detail.png)
+
+It runs **fully offline** by default: every decision is a deterministic,
+corpus-grounded heuristic, no API key required. Drop an OpenAI / Azure OpenAI key
+into `app/agent/.env` and the same graph gains LLM refinement and
 natural-language explanations layered on top of the heuristic spine.
 
 ## Approach (the tech stack)
