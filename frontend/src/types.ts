@@ -4,7 +4,13 @@
  * (fictional, offline-first) backend implements.
  */
 
-export type Queue = "pending" | "approved" | "quarantined";
+/**
+ * Where an item sits in the review lifecycle (see agent-graph.mmd):
+ *  - inbox:  arrivals in the pipeline — untriaged, processing, or awaiting info
+ *  - signed: executed at the desk (END: SIGNED)
+ *  - review: handed to a human — blocked, escalated, declined, or a business decision
+ */
+export type Queue = "inbox" | "signed" | "review";
 
 export type AiStatus = "untriaged" | "processing" | "triaged";
 
@@ -98,33 +104,6 @@ export interface ContractDetail extends ContractSummary {
   timeline: TimelineEvent[];
   /** Short-lived presigned URL to the intake PDF in object storage, if present. */
   document_url?: string | null;
-}
-
-export type WorkflowNodeType =
-  | "terminal"
-  | "node"
-  | "router"
-  | "validator"
-  | "fan"
-  | "reduce"
-  | "hitl";
-
-export interface WorkflowNode {
-  id: string;
-  label: string;
-  type: WorkflowNodeType;
-}
-
-export interface WorkflowEdge {
-  source: string;
-  target: string;
-  label?: string;
-  kind?: "solid" | "dashed";
-}
-
-export interface WorkflowGraph {
-  nodes: WorkflowNode[];
-  edges: WorkflowEdge[];
 }
 
 export interface Policy {

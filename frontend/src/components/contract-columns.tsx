@@ -53,7 +53,7 @@ export const contractColumns: ColumnDef<ContractSummary, unknown>[] = [
   },
   {
     accessorKey: "score",
-    header: sortHeader("Score"),
+    header: sortHeader("Confidence"),
     cell: ({ row }) => <ScoreBadge score={row.original.score} />,
     sortingFn: (a, b) => (a.original.score ?? -1) - (b.original.score ?? -1),
   },

@@ -4,14 +4,13 @@
  * internal commercial SaaS tool for an in-house legal team.
  */
 
-export const siteName = "Northgate Contract Triage";
+export const siteName = "Northgate Contract Review";
 
-export const tagline = "AI triage for standard commercial contracts";
+export const tagline = "Reads and checks incoming contracts automatically";
 
 export const description =
-  "An internal review console for Northgate Systems Ltd's in-house legal team. " +
-  "AI-triaged commercial contracts move through an agent workflow — intake, " +
-  "classification, policy gates, redline mapping — and land in a queue for a " +
-  "human reviewer to approve, reject, or escalate.";
+  "An internal console for Northgate Systems Ltd's in-house legal team. " +
+  "Incoming contracts are read and checked against company policy automatically, " +
+  "then signed at the desk or passed to a person to decide.";
 
 export const orgName = "Northgate Systems Ltd";

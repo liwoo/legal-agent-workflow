@@ -8,46 +8,34 @@ interface ScoreBadgeProps {
 }
 
 /**
- * Displays an AI confidence/triage score (0-100) with color banding:
- * high (>=75) green, medium (45-74) amber, low (<45) red. `null` renders
- * a neutral "not yet scored" state.
+ * How sure the assistant is about its own reading of a contract — NOT a
+ * measure of risk or contract value. We lead with a plain-language band
+ * (High / Medium / Low) and a colour dot rather than a bare "82/100", which
+ * newcomers tend to misread as a score of the contract itself. The raw value
+ * is preserved in the tooltip and still drives table sorting.
  */
 export function ScoreBadge({ score, className, size = "sm" }: ScoreBadgeProps) {
-  if (score === null) {
-    return (
-      <span
-        className={cn(
-          "inline-flex items-center rounded-md border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground",
-          size === "lg" && "px-3 py-1 text-sm",
-          className
-        )}
-      >
-        Not scored
-      </span>
-    );
-  }
-
   const band =
-    score >= 75
-      ? { label: "High confidence", classes: "bg-success/10 text-success border-success/30" }
-      : score >= 45
-        ? { label: "Medium confidence", classes: "bg-warning/10 text-warning border-warning/30" }
-        : { label: "Low confidence", classes: "bg-destructive/10 text-destructive border-destructive/30" };
+    score === null
+      ? { label: "Not yet assessed", dot: "bg-muted-foreground/40", text: "text-muted-foreground" }
+      : score >= 75
+        ? { label: "High confidence", dot: "bg-success", text: "text-foreground" }
+        : score >= 45
+          ? { label: "Medium confidence", dot: "bg-warning", text: "text-foreground" }
+          : { label: "Low confidence", dot: "bg-destructive", text: "text-foreground" };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-semibold tabular-nums",
-        band.classes,
-        size === "lg" && "gap-2 px-3 py-1 text-base",
+        "inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-medium",
+        band.text,
+        size === "lg" && "gap-2 text-sm",
         className
       )}
-      title={band.label}
+      title={score === null ? "The assistant has not read this item yet" : `Assistant confidence: ${score}/100`}
     >
-      {score}
-      <span className={cn("font-normal opacity-70", size === "sm" && "text-[10px]", size === "lg" && "text-xs")}>
-        /100
-      </span>
+      <span className={cn("h-2 w-2 shrink-0 rounded-full", band.dot, size === "lg" && "h-2.5 w-2.5")} aria-hidden="true" />
+      {band.label}
     </span>
   );
 }

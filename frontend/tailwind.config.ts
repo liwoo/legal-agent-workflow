@@ -16,18 +16,29 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
+        // PortSwigger dogfoods a system-native stack: Arial is the workhorse
+        // everywhere, no web-font loading for body text (deliberately fast).
         sans: [
           "var(--font-sans)",
-          "ui-sans-serif",
-          "system-ui",
+          "Arial",
+          "Helvetica",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
           "Roboto",
-          "Helvetica Neue",
-          "Arial",
           "sans-serif",
         ],
+      },
+      letterSpacing: {
+        // Signature tight tracking on large bold Arial (≈ -0.04em on display).
+        display: "-0.04em",
+      },
+      boxShadow: {
+        // Elevation scale reverse-engineered from portswigger.net.
+        sm: "0 0 6px rgba(0, 0, 0, 0.16)",
+        md: "0 4px 6px rgba(0, 0, 0, 0.16)",
+        lg: "0 30px 30px rgba(0, 0, 0, 0.086)",
+        xl: "0 13px 27px -5px rgba(50, 50, 93, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.3)",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -93,6 +104,7 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        pill: "100px", // fully-round modern buttons/pills
       },
       keyframes: {
         "accordion-down": {

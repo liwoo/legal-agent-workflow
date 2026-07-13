@@ -26,7 +26,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 82,
     end_state: "signed_desk_edits",
-    queue: "approved",
+    queue: "signed",
     classification: {
       document_family: "mutual_nda",
       paper_source: "counterparty",
@@ -87,7 +87,7 @@ const rawContracts: ContractDetail[] = [
     ],
   },
 
-  // 2 — CR-2026-051 — SaaS Order Form (redlined) — Wychwood Analytics Ltd — quarantined (escalated)
+  // 2 — CR-2026-051 — SaaS Order Form (redlined) — Wychwood Analytics Ltd — review (escalated)
   {
     id: "CR-2026-051",
     name: "SaaS Order Form (redlined)",
@@ -104,7 +104,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 55,
     end_state: "escalated",
-    queue: "quarantined",
+    queue: "review",
     classification: {
       document_family: "order_form",
       paper_source: "ours_redlined",
@@ -182,7 +182,7 @@ const rawContracts: ContractDetail[] = [
     ],
   },
 
-  // 3 — CR-2026-052 — Order Form + DPA — Ilex Biometrics Ltd — quarantined (blocked)
+  // 3 — CR-2026-052 — Order Form + DPA — Ilex Biometrics Ltd — review (blocked)
   {
     id: "CR-2026-052",
     name: "SaaS Order Form + DPA",
@@ -199,7 +199,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 40,
     end_state: "blocked",
-    queue: "quarantined",
+    queue: "review",
     classification: {
       document_family: "order_form",
       paper_source: "ours_clean",
@@ -273,7 +273,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 60,
     end_state: "more_info_needed",
-    queue: "pending",
+    queue: "inbox",
     classification: {
       document_family: "supplier_renewal",
       paper_source: "counterparty",
@@ -328,7 +328,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 58,
     end_state: "more_info_needed",
-    queue: "pending",
+    queue: "inbox",
     classification: {
       document_family: "mutual_nda",
       paper_source: "counterparty",
@@ -366,7 +366,7 @@ const rawContracts: ContractDetail[] = [
     ],
   },
 
-  // 6 — CR-2026-055 — SOW#4 — Kite & Anchor Creative Ltd — quarantined (escalated)
+  // 6 — CR-2026-055 — SOW#4 — Kite & Anchor Creative Ltd — review (escalated)
   {
     id: "CR-2026-055",
     name: "SOW#4",
@@ -383,7 +383,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 50,
     end_state: "escalated",
-    queue: "quarantined",
+    queue: "review",
     classification: {
       document_family: "sow",
       paper_source: "ours_clean",
@@ -436,7 +436,7 @@ const rawContracts: ContractDetail[] = [
     ],
   },
 
-  // 7 — CR-2026-056 — Supplier Agreement — Loquent AI Ltd — quarantined (blocked)
+  // 7 — CR-2026-056 — Supplier Agreement — Loquent AI Ltd — review (blocked)
   {
     id: "CR-2026-056",
     name: "Supplier Agreement",
@@ -453,7 +453,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 35,
     end_state: "blocked",
-    queue: "quarantined",
+    queue: "review",
     classification: {
       document_family: "supplier_agreement",
       paper_source: "counterparty_fixed",
@@ -520,7 +520,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 88,
     end_state: "signed_desk_edits",
-    queue: "approved",
+    queue: "signed",
     classification: {
       document_family: "order_form_renewal",
       paper_source: "ours_clean",
@@ -574,7 +574,7 @@ const rawContracts: ContractDetail[] = [
     ],
   },
 
-  // 9 — CR-2026-058 — Tender T&Cs — Oakhampton Council — quarantined (business_decision)
+  // 9 — CR-2026-058 — Tender T&Cs — Oakhampton Council — review (business_decision)
   {
     id: "CR-2026-058",
     name: "Tender Terms & Conditions",
@@ -591,7 +591,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 45,
     end_state: "business_decision",
-    queue: "quarantined",
+    queue: "review",
     classification: {
       document_family: "tender_terms",
       paper_source: "counterparty_fixed",
@@ -659,7 +659,7 @@ const rawContracts: ContractDetail[] = [
     ai_status: "triaged",
     score: 30,
     end_state: "more_info_needed",
-    queue: "pending",
+    queue: "inbox",
     classification: {
       document_family: "amendment",
       paper_source: "no_draft",

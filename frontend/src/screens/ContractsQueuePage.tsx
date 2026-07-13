@@ -1,42 +1,48 @@
 "use client";
 
 import * as React from "react";
+import { AlertTriangle, CheckCircle2, FileSignature, Inbox, Scale } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { ContractDetailModal } from "@/src/components/contract-detail-modal";
 import { contractColumns } from "@/src/components/contract-columns";
 import { DataTable } from "@/src/components/data-table";
+import { EmptyState } from "@/src/components/empty-state";
 import { QueueTabs } from "@/src/components/queue-tabs";
 import { useContracts } from "@/src/store/contracts";
 import type { ContractSummary, Queue } from "@/src/types";
 
-const COPY: Record<Queue, { title: string; blurb: string; empty: string }> = {
-  pending: {
-    title: "Pending review",
-    blurb: "Untriaged arrivals and items returned for more information.",
-    empty: "No contracts are waiting for triage.",
+const COPY: Record<Queue, { title: string; blurb: string; empty: string; icon: LucideIcon }> = {
+  inbox: {
+    title: "Inbox",
+    blurb: "New contracts waiting to be read.",
+    empty: "Nothing waiting — you're all caught up.",
+    icon: Inbox,
   },
-  approved: {
-    title: "Approved",
-    blurb: "Signed at the desk — clean, desk-edited, or with a recorded deviation.",
-    empty: "Nothing approved yet.",
+  signed: {
+    title: "Signed",
+    blurb: "Contracts finished and signed at the desk.",
+    empty: "Nothing signed yet.",
+    icon: FileSignature,
   },
-  quarantined: {
-    title: "Quarantined",
-    blurb: "Blocked, escalated, or awaiting a business decision — a human must act.",
-    empty: "Nothing quarantined — the queue is clear.",
+  review: {
+    title: "Review",
+    blurb: "The assistant passed these to a person to decide.",
+    empty: "Nothing needs a person right now.",
+    icon: Scale,
   },
 };
 
 export function ContractsQueuePage({ queue }: { queue: Queue }) {
-  const { byQueue, contracts } = useContracts();
+  const { byQueue, contracts, loading, error } = useContracts();
   const [selected, setSelected] = React.useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
 
   const rows = byQueue(queue);
   const counts = {
-    pending: contracts.filter((c) => c.queue === "pending").length,
-    approved: contracts.filter((c) => c.queue === "approved").length,
-    quarantined: contracts.filter((c) => c.queue === "quarantined").length,
+    inbox: contracts.filter((c) => c.queue === "inbox").length,
+    review: contracts.filter((c) => c.queue === "review").length,
+    signed: contracts.filter((c) => c.queue === "signed").length,
   };
 
   const onRowClick = (row: ContractSummary) => {
@@ -45,6 +51,14 @@ export function ContractsQueuePage({ queue }: { queue: Queue }) {
   };
 
   const copy = COPY[queue];
+
+  const emptyState = error ? (
+    <EmptyState icon={AlertTriangle} title="Couldn't load contracts" description={error} />
+  ) : loading ? (
+    <EmptyState loading title="Loading contracts…" />
+  ) : (
+    <EmptyState icon={queue === "inbox" ? CheckCircle2 : copy.icon} title={copy.empty} />
+  );
 
   return (
     <div className="space-y-6">
@@ -55,7 +69,12 @@ export function ContractsQueuePage({ queue }: { queue: Queue }) {
 
       <QueueTabs counts={counts} />
 
-      <DataTable columns={contractColumns} data={rows} onRowClick={onRowClick} emptyMessage={copy.empty} />
+      <DataTable
+        columns={contractColumns}
+        data={loading || error ? [] : rows}
+        onRowClick={onRowClick}
+        emptyState={emptyState}
+      />
 
       <ContractDetailModal contractId={selected} open={open} onOpenChange={setOpen} />
     </div>
