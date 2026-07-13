@@ -8,7 +8,9 @@ interactive agent/workflow debugging.
 
 from __future__ import annotations
 
+import json
 import os
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from datetime import date
@@ -16,7 +18,7 @@ from datetime import date
 from . import config  # noqa: F401  — loads .env before anything reads env vars
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, StreamingResponse
 from pydantic import BaseModel
 
 from .observability import setup_observability
@@ -67,6 +69,53 @@ class ResolveRequest(BaseModel):
     note: str | None = None
 
 
+# ── server-sent events (streamed triage runs) ────────────────────────────────
+# Headers that keep the stream flowing to the browser un-buffered: no proxy
+# buffering (nginx), no caching, keep the connection open.
+_SSE_HEADERS = {
+    "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+    "X-Accel-Buffering": "no",
+}
+
+
+def _sse(event: str, data: dict) -> str:
+    """Frame one payload as a Server-Sent Event (``event:`` + ``data:`` lines)."""
+    return f"event: {event}\ndata: {json.dumps(data)}\n\n"
+
+
+async def _sse_stream(events: AsyncIterator[dict]) -> AsyncIterator[str]:
+    """Adapt the service's step/done event generator into an SSE byte stream,
+    turning any run failure into a terminal ``error`` event the console can show."""
+    try:
+        async for ev in events:
+            kind = ev.pop("type")
+            yield _sse(kind, ev)
+    except Exception as exc:  # surface the failure in-band, then end the stream
+        yield _sse("error", {"message": str(exc)})
+
+
+def _intake_metadata(
+    counterparty: str, name: str, sector: str, jurisdiction: str,
+    is_public_body: bool, is_regulated: bool, received_from: str,
+    summary: str, senders_ask: str, related_contracts: str, date_received: str,
+) -> dict:
+    """Normalise the "New Contract" form fields into the intake metadata dict."""
+    return {
+        "counterparty": counterparty.strip(),
+        "name": name.strip() or f"{counterparty.strip()}",
+        "sector": sector.strip() or None,
+        "jurisdiction": jurisdiction.strip() or None,
+        "is_public_body": is_public_body,
+        "is_regulated": is_regulated,
+        "received_from": received_from.strip() or "unknown",
+        "summary": summary.strip(),
+        "senders_ask": senders_ask.strip(),
+        "related_contracts": [s.strip() for s in related_contracts.split(",") if s.strip()],
+        "date_received": date_received.strip() or date.today().isoformat(),
+    }
+
+
 @app.get("/api/health")
 async def health() -> dict:
     return {"status": "ok"}
@@ -97,25 +146,48 @@ async def create_contract(
     Accepts a multipart form (so an intake PDF can ride along). The agent runs
     synchronously and its terminal nodes write the outcome to SQLite; the freshly
     triaged detail is returned for the console to render."""
-    metadata = {
-        "counterparty": counterparty.strip(),
-        "name": name.strip() or f"{counterparty.strip()}",
-        "sector": sector.strip() or None,
-        "jurisdiction": jurisdiction.strip() or None,
-        "is_public_body": is_public_body,
-        "is_regulated": is_regulated,
-        "received_from": received_from.strip() or "unknown",
-        "summary": summary.strip(),
-        "senders_ask": senders_ask.strip(),
-        "related_contracts": [s.strip() for s in related_contracts.split(",") if s.strip()],
-        "date_received": date_received.strip() or date.today().isoformat(),
-    }
+    metadata = _intake_metadata(
+        counterparty, name, sector, jurisdiction, is_public_body, is_regulated,
+        received_from, summary, senders_ask, related_contracts, date_received,
+    )
     pdf_bytes = await file.read() if file is not None else None
     filename = file.filename if file is not None else None
     try:
         return await service.create(metadata, pdf_bytes, filename)
     except Exception as exc:  # pragma: no cover - defensive
         raise HTTPException(status_code=500, detail=f"Failed to create contract: {exc}")
+
+
+@app.post("/api/contracts/stream")
+async def create_contract_stream(
+    counterparty: str = Form(...),
+    name: str = Form(""),
+    sector: str = Form(""),
+    jurisdiction: str = Form(""),
+    is_public_body: bool = Form(False),
+    is_regulated: bool = Form(False),
+    received_from: str = Form(""),
+    summary: str = Form(""),
+    senders_ask: str = Form(""),
+    related_contracts: str = Form(""),
+    date_received: str = Form(""),
+    file: UploadFile | None = File(None),
+) -> StreamingResponse:
+    """Streaming twin of ``POST /api/contracts``.
+
+    Same persist → store → triage flow, but streamed as Server-Sent Events so the
+    console can render a live, node-by-node view of the agent run instead of a
+    single opaque spinner. Ends with a ``done`` event carrying the full detail."""
+    metadata = _intake_metadata(
+        counterparty, name, sector, jurisdiction, is_public_body, is_regulated,
+        received_from, summary, senders_ask, related_contracts, date_received,
+    )
+    # Read the upload *before* handing off to the streaming generator — the
+    # request body must be consumed within the handler.
+    pdf_bytes = await file.read() if file is not None else None
+    filename = file.filename if file is not None else None
+    events = service.create_events(metadata, pdf_bytes, filename)
+    return StreamingResponse(_sse_stream(events), media_type="text/event-stream", headers=_SSE_HEADERS)
 
 
 @app.get("/api/contracts/{item_id}")
@@ -141,6 +213,19 @@ async def triage_contract(item_id: str) -> dict:
         return await service.triage(item_id)
     except KeyError:
         raise HTTPException(status_code=404, detail=f"Unknown contract {item_id}")
+
+
+@app.post("/api/contracts/{item_id}/triage/stream")
+async def triage_contract_stream(item_id: str) -> StreamingResponse:
+    """Streaming twin of ``POST /api/contracts/{id}/triage`` — re-runs the agent
+    and streams its node-by-node progress as Server-Sent Events. An unknown id
+    surfaces as a terminal ``error`` event rather than a 404, since the response
+    has already begun streaming."""
+    return StreamingResponse(
+        _sse_stream(service.triage_events(item_id)),
+        media_type="text/event-stream",
+        headers=_SSE_HEADERS,
+    )
 
 
 @app.post("/api/contracts/{item_id}/resolve")

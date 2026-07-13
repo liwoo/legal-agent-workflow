@@ -4,10 +4,13 @@ import * as React from "react";
 
 import {
   createContract,
+  createContractStream,
   getContract,
   listContracts,
   resolveContract,
   triageContract,
+  triageContractStream,
+  type TriageStep,
 } from "@/src/lib/api";
 import type { ContractDetail, ContractSummary, Queue, ResolveDecision } from "@/src/types";
 import { queueForContract } from "@/src/lib/utils";
@@ -18,9 +21,9 @@ interface ContractsContextValue {
   error: string | null;
   byQueue: (queue: Queue) => ContractSummary[];
   getById: (id: string) => ContractSummary | undefined;
-  triage: (id: string) => Promise<ContractDetail | undefined>;
+  triage: (id: string, onStep?: (step: TriageStep) => void) => Promise<ContractDetail | undefined>;
   resolve: (id: string, decision: ResolveDecision, note?: string) => Promise<ContractDetail | undefined>;
-  create: (form: FormData) => Promise<ContractDetail>;
+  create: (form: FormData, onStep?: (step: TriageStep) => void) => Promise<ContractDetail>;
   refresh: () => Promise<void>;
 }
 
@@ -76,10 +79,14 @@ export function ContractsProvider({ children }: { children: React.ReactNode }) {
     [contracts]
   );
 
-  const triage = React.useCallback(async (id: string) => {
+  const triage = React.useCallback(async (id: string, onStep?: (step: TriageStep) => void) => {
     // Optimistic: flip to "processing" immediately.
     setContracts((prev) => prev.map((c) => (c.id === id ? { ...c, ai_status: "processing" } : c)));
-    const result = await triageContract(id);
+    // Stream a live view of the run when the caller wants one; otherwise run to
+    // completion the plain way.
+    const result = onStep
+      ? await triageContractStream(id, onStep)
+      : await triageContract(id);
     if (result) {
       setContracts((prev) =>
         prev.map((c) => (c.id === id ? toSummary({ ...result, queue: queueForContract(result) }) : c))
@@ -109,8 +116,10 @@ export function ContractsProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, []);
 
-  const create = React.useCallback(async (form: FormData) => {
-    const result = await createContract(form);
+  const create = React.useCallback(async (form: FormData, onStep?: (step: TriageStep) => void) => {
+    // Stream the agent run when a step handler is supplied (the New Contract
+    // dialog renders it live); fall back to the plain one-shot create otherwise.
+    const result = onStep ? await createContractStream(form, onStep) : await createContract(form);
     const summary = toSummary({ ...result, queue: queueForContract(result) });
     setContracts((prev) => {
       const idx = prev.findIndex((c) => c.id === summary.id);

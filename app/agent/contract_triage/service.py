@@ -6,7 +6,9 @@ reviewer decision can resume them.
 from __future__ import annotations
 
 import os
+from collections.abc import AsyncIterator, Iterator
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +22,26 @@ from .repository import repo
 from .state import TriageRequest, TriageState
 from .storage import store
 from .workflow import build_workflow
+
+# Friendly per-node labels (node id → display name), mirrored from the graph the
+# console renders — used to narrate an executor entering during a streamed run.
+_NODE_LABELS: dict[str, str] = {n["id"]: n["label"] for n in graph_spec.WORKFLOW_NODES}
+
+
+def _states(data: Any) -> Iterator[TriageState]:
+    """Yield the ``TriageState`` payload(s) carried by a workflow event.
+
+    ``executor_invoked`` events carry the input message (a ``TriageState`` for
+    every node past ingest); ``executor_completed`` events carry a *list* of the
+    messages the node sent / outputs it yielded. Both are the shared state, so we
+    normalise them into a flat stream of states to read the growing timeline off.
+    """
+    if isinstance(data, TriageState):
+        yield data
+    elif isinstance(data, list):
+        for item in data:
+            if isinstance(item, TriageState):
+                yield item
 
 # repo root is three levels up: contract_triage → agent → app → <root>
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -180,16 +202,50 @@ class TriageService:
         return detail
 
     # ── operations ───────────────────────────────────────────────────────────
-    async def triage(self, item_id: str) -> dict:
+    async def triage_events(self, item_id: str) -> AsyncIterator[dict]:
+        """Run the workflow with the Agent Framework's **streaming** API, yielding
+        a live narrative of the run as it happens.
+
+        The Microsoft Agent Framework surfaces per-node lifecycle events
+        (``executor_invoked`` / ``executor_completed``) as the graph executes.
+        We turn each into a ``step`` event — an executor entering becomes a
+        friendly node label, and any new entry the node appends to the shared
+        ``timeline`` becomes a richer, human-readable line. The final ``done``
+        event carries the fully serialised detail, identical to the one the
+        non-streaming path returns.
+        """
         item = repo.get_item(item_id)
         if item is None:
             raise KeyError(item_id)
         wf = build_workflow()
+        emitted = 0  # how many timeline entries we've already surfaced
         with workflow_span(
             "triage_contract",
             **{"contract.id": item_id, "contract.counterparty": item.counterparty.name},
         ):
-            result = await wf.run(_request_for(item))
+            stream = wf.run(_request_for(item), stream=True)
+            async for event in stream:
+                etype = getattr(event, "type", None)
+                node = getattr(event, "executor_id", None)
+                # An executor entering: narrate the node currently running.
+                if etype == "executor_invoked" and node and node != "START":
+                    yield {
+                        "type": "step", "node": node,
+                        "label": _NODE_LABELS.get(node, node),
+                        "detail": None, "kind": "info",
+                        "at": datetime.now().isoformat(),
+                    }
+                # Surface any curated timeline labels the node just appended.
+                for st in _states(getattr(event, "data", None)):
+                    if len(st.timeline) > emitted:
+                        for e in st.timeline[emitted:]:
+                            yield {
+                                "type": "step", "node": node,
+                                "label": e.label, "detail": e.detail,
+                                "kind": e.kind, "at": _iso(e.at),
+                            }
+                        emitted = len(st.timeline)
+            result = await stream.get_final_response()
         reqs = result.get_request_info_events()
         if reqs:
             event = reqs[0]
@@ -204,19 +260,25 @@ class TriageService:
         detail = self._detail(state.item, state)
         self.results[item_id] = detail
         db.save_result(item_id, detail)
+        yield {"type": "done", "detail": detail}
+
+    async def triage(self, item_id: str) -> dict:
+        """Run a triage to completion and return the detail (non-streaming path).
+
+        Shares the single streamed implementation so the two paths can't drift —
+        we just drain the event stream and keep the terminal ``done`` payload.
+        """
+        detail: dict | None = None
+        async for ev in self.triage_events(item_id):
+            if ev["type"] == "done":
+                detail = ev["detail"]
+        assert detail is not None  # the stream always ends with a done event
         return detail
 
-    async def create(
-        self, metadata: dict, pdf_bytes: bytes | None = None, filename: str | None = None
-    ) -> dict:
-        """The "New Contract" flow, end-to-end:
-
-        1. allocate an id and persist the intake row to **SQLite** (repository),
-        2. store the uploaded **PDF** locally (for the ingest node) and mirror it
-           into the **object store** (MinIO) for browser presigned URLs,
-        3. **trigger the agent** — whose terminal nodes write the outcome back to
-           SQLite — and return the resulting detail for the console.
-        """
+    def _persist_intake(
+        self, metadata: dict, pdf_bytes: bytes | None, filename: str | None
+    ) -> str:
+        """Allocate an id, store the intake PDF, and persist the intake row."""
         item_id = metadata.get("id") or repo.next_id()
         metadata = {**metadata, "id": item_id}
 
@@ -229,7 +291,35 @@ class TriageService:
             store.put_object(item_id, pdf_bytes)  # graceful no-op if MinIO is down
 
         repo.create(metadata, pdf_path)  # persist intake → SQLite
-        return await self.triage(item_id)  # run the graph → nodes persist outcome
+        return item_id
+
+    async def create_events(
+        self, metadata: dict, pdf_bytes: bytes | None = None, filename: str | None = None
+    ) -> AsyncIterator[dict]:
+        """The streaming "New Contract" flow: persist intake → store PDF → stream
+        the agent run, yielding the same ``step`` / ``done`` events as
+        :meth:`triage_events`."""
+        item_id = self._persist_intake(metadata, pdf_bytes, filename)
+        async for ev in self.triage_events(item_id):  # run the graph → nodes persist outcome
+            yield ev
+
+    async def create(
+        self, metadata: dict, pdf_bytes: bytes | None = None, filename: str | None = None
+    ) -> dict:
+        """The "New Contract" flow, end-to-end:
+
+        1. allocate an id and persist the intake row to **SQLite** (repository),
+        2. store the uploaded **PDF** locally (for the ingest node) and mirror it
+           into the **object store** (MinIO) for browser presigned URLs,
+        3. **trigger the agent** — whose terminal nodes write the outcome back to
+           SQLite — and return the resulting detail for the console.
+        """
+        detail: dict | None = None
+        async for ev in self.create_events(metadata, pdf_bytes, filename):
+            if ev["type"] == "done":
+                detail = ev["detail"]
+        assert detail is not None
+        return detail
 
     async def resolve(self, item_id: str, decision: str, note: str | None = None) -> dict:
         item = repo.get_item(item_id)
