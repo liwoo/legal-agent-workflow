@@ -108,6 +108,115 @@ export async function createContract(form: FormData): Promise<ContractDetail> {
   return (await res.json()) as ContractDetail;
 }
 
+/**
+ * One line in a streamed triage run — mirrors the backend's `step` SSE payload
+ * (and the shape of a {@link TimelineEvent}), so the console can render the live
+ * loading log with the same colored-dot treatment as the final timeline tab.
+ */
+export interface TriageStep {
+  node?: string;
+  label: string;
+  detail?: string | null;
+  kind?: "info" | "warning" | "critical" | "success";
+  at?: string;
+}
+
+/** Split an SSE frame ("event: …\ndata: …") into its event name and data body. */
+function parseSseFrame(frame: string): { event?: string; data: string } {
+  let event: string | undefined;
+  const dataLines: string[] = [];
+  for (const line of frame.split("\n")) {
+    if (line.startsWith("event:")) event = line.slice(6).trim();
+    else if (line.startsWith("data:")) dataLines.push(line.slice(5).trimStart());
+  }
+  return { event, data: dataLines.join("\n") };
+}
+
+/**
+ * POST to a streaming (Server-Sent Events) triage endpoint, invoking `onStep`
+ * for each `step` event as the agent works, and resolving with the final
+ * `ContractDetail` from the terminal `done` event. Throws on an `error` event or
+ * if the stream ends without a result.
+ *
+ * Uses `fetch` + a `ReadableStream` reader (not `EventSource`) so it can POST a
+ * multipart body and set headers — which `EventSource` can't.
+ */
+async function streamTriageRun(
+  path: string,
+  init: RequestInit,
+  onStep: (step: TriageStep) => void
+): Promise<ContractDetail> {
+  const res = await fetch(`${API_BASE_URL}${path}`, init);
+  if (!res.ok || !res.body) {
+    throw new Error(`Triage stream failed with status ${res.status}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let detail: ContractDetail | undefined;
+  let errorMessage: string | undefined;
+
+  // SSE frames are separated by a blank line; accumulate bytes and split on it.
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const frames = buffer.split("\n\n");
+    buffer = frames.pop() ?? ""; // keep any partial trailing frame
+    for (const frame of frames) {
+      if (!frame.trim()) continue;
+      const { event, data } = parseSseFrame(frame);
+      if (event === "step") {
+        onStep(JSON.parse(data) as TriageStep);
+      } else if (event === "done") {
+        detail = (JSON.parse(data) as { detail: ContractDetail }).detail;
+      } else if (event === "error") {
+        errorMessage = (JSON.parse(data) as { message: string }).message;
+      }
+    }
+  }
+
+  if (errorMessage) throw new Error(errorMessage);
+  if (!detail) throw new Error("Triage stream ended without a result.");
+  return { ...detail, queue: queueForContract(detail) };
+}
+
+/**
+ * Streaming twin of {@link createContract}: posts the "New Contract" form to the
+ * SSE endpoint and reports each step of the agent run via `onStep`. Like
+ * `createContract`, it throws on failure — creating a contract needs a live
+ * backend, so the caller surfaces the error rather than falling back.
+ */
+export async function createContractStream(
+  form: FormData,
+  onStep: (step: TriageStep) => void
+): Promise<ContractDetail> {
+  return streamTriageRun("/api/contracts/stream", { method: "POST", body: form }, onStep);
+}
+
+/**
+ * Streaming twin of {@link triageContract}. On any streaming failure it falls
+ * back to the fixture (mirroring the non-streaming path) so the console stays
+ * usable offline.
+ */
+export async function triageContractStream(
+  id: string,
+  onStep: (step: TriageStep) => void
+): Promise<ContractDetail | undefined> {
+  try {
+    return await streamTriageRun(
+      `/api/contracts/${encodeURIComponent(id)}/triage/stream`,
+      { method: "POST" },
+      onStep
+    );
+  } catch {
+    const fixture = getContractFixtureById(id);
+    if (!fixture) return undefined;
+    return { ...fixture, ai_status: "triaged" };
+  }
+}
+
 export async function triageContract(id: string): Promise<ContractDetail | undefined> {
   try {
     const data = await fetchJson<ContractDetail>(`/api/contracts/${encodeURIComponent(id)}/triage`, {
