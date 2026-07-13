@@ -7,12 +7,12 @@ import { Button } from "@/src/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/src/components/ui/dialog";
+import { InfoHint } from "@/src/components/info-hint";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { useContracts } from "@/src/store/contracts";
@@ -68,11 +68,13 @@ export function NewContractDialog() {
 
       <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>New contract</DialogTitle>
-          <DialogDescription>
-            Capture the intake facts and attach the paper. We&apos;ll store it and run the triage
-            assistant straight away.
-          </DialogDescription>
+          <DialogTitle className="flex items-center gap-1.5">
+            New contract
+            <InfoHint>
+              Capture the intake facts and attach the paper. We&apos;ll store it and run the triage
+              assistant straight away.
+            </InfoHint>
+          </DialogTitle>
         </DialogHeader>
 
         <form ref={formRef} onSubmit={onSubmit} className="grid gap-4">
@@ -137,11 +139,13 @@ export function NewContractDialog() {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="file">Intake PDF</Label>
+            <Label htmlFor="file" className="flex items-center gap-1.5">
+              Intake PDF
+              <InfoHint>
+                Optional — if attached, the assistant reads it and fills in any blanks above.
+              </InfoHint>
+            </Label>
             <Input id="file" name="file" type="file" accept="application/pdf" />
-            <p className="text-xs text-muted-foreground">
-              Optional — if attached, the assistant reads it and fills in any blanks above.
-            </p>
           </div>
 
           {error ? (

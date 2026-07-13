@@ -5,7 +5,8 @@ import { CheckCircle2, XCircle } from "lucide-react";
 
 import { ModeToggle } from "@/src/components/mode-toggle";
 import { SettingsTabs } from "@/src/components/settings-tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { InfoHint } from "@/src/components/info-hint";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
 import { apiEnabled, getApiBaseUrl } from "@/src/lib/api";
 import { description, orgName, siteName } from "@/src/lib/seo";
@@ -20,9 +21,9 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
+      <div className="flex items-center gap-2">
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground">Backend connection, appearance, policies, and about.</p>
+        <InfoHint>Backend connection, appearance, policies, and about.</InfoHint>
       </div>
 
       <SettingsTabs />
@@ -30,8 +31,10 @@ export function SettingsPage() {
       <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Backend</CardTitle>
-          <CardDescription>The Agent Framework FastAPI the console reads from.</CardDescription>
+          <CardTitle className="flex items-center gap-1.5 text-base">
+            Backend
+            <InfoHint>The Agent Framework FastAPI the console reads from.</InfoHint>
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Row label="API base URL">
@@ -56,8 +59,10 @@ export function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Appearance</CardTitle>
-          <CardDescription>Light, dark, or match your system.</CardDescription>
+          <CardTitle className="flex items-center gap-1.5 text-base">
+            Appearance
+            <InfoHint>Light, dark, or match your system.</InfoHint>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Row label="Theme">

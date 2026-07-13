@@ -8,6 +8,7 @@ import { ContractDetailModal } from "@/src/components/contract-detail-modal";
 import { contractColumns } from "@/src/components/contract-columns";
 import { DataTable } from "@/src/components/data-table";
 import { EmptyState } from "@/src/components/empty-state";
+import { InfoHint } from "@/src/components/info-hint";
 import { QueueTabs } from "@/src/components/queue-tabs";
 import { useContracts } from "@/src/store/contracts";
 import type { ContractSummary, Queue } from "@/src/types";
@@ -62,9 +63,9 @@ export function ContractsQueuePage({ queue }: { queue: Queue }) {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
+      <div className="flex items-center gap-2">
         <h1 className="text-2xl font-semibold tracking-tight">{copy.title}</h1>
-        <p className="text-sm text-muted-foreground">{copy.blurb}</p>
+        <InfoHint>{copy.blurb}</InfoHint>
       </div>
 
       <QueueTabs counts={counts} />

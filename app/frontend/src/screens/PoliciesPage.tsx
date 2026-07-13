@@ -5,6 +5,7 @@ import { BookText } from "lucide-react";
 
 import { EmptyState } from "@/src/components/empty-state";
 import { SettingsTabs } from "@/src/components/settings-tabs";
+import { InfoHint } from "@/src/components/info-hint";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { listPolicies } from "@/src/lib/api";
 import type { Policy } from "@/src/types";
@@ -28,11 +29,9 @@ export function PoliciesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
+      <div className="flex items-center gap-2">
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground">
-          The company rules the assistant checks every contract against.
-        </p>
+        <InfoHint>The company rules the assistant checks every contract against.</InfoHint>
       </div>
 
       <SettingsTabs />

@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import { FileSignature, Gauge, Inbox, ListChecks, Scale, ShieldCheck } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { InfoHint } from "@/src/components/info-hint";
 
 /**
  * Plain-language explainer for anyone opening the console without prior
@@ -182,11 +183,9 @@ const SECTIONS: RefSection[] = [
 export function ReferencePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      <div className="space-y-1">
+      <div className="flex items-center gap-2">
         <h1 className="text-2xl font-semibold tracking-tight">How this works</h1>
-        <p className="text-sm text-muted-foreground">
-          A quick plain-language guide to the terms you’ll see around the console.
-        </p>
+        <InfoHint>A quick plain-language guide to the terms you’ll see around the console.</InfoHint>
       </div>
 
       <nav aria-label="On this page" className="flex flex-wrap gap-2">

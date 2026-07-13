@@ -22,6 +22,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import { ContractJourney } from "@/src/components/contract-journey";
+import { InfoHint } from "@/src/components/info-hint";
 import { ScoreBadge } from "@/src/components/score-badge";
 import { StateBadge } from "@/src/components/state-badge";
 import { Badge } from "@/src/components/ui/badge";
@@ -302,11 +303,9 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                     <Section
                       title="Proposed changes"
                       icon={Gavel}
+                      hint="Wording the other side wants to change, graded against our playbook."
                       aside={<LearnMore anchor="redlines">What do the tiers mean?</LearnMore>}
                     >
-                      <p className="text-sm text-muted-foreground">
-                        Wording the other side wants to change, graded against our playbook.
-                      </p>
                       <ul className="space-y-2">
                         {detail.redlines.map((r, i) => (
                           <li key={i} className="space-y-1 rounded-lg border border-border p-3">
@@ -324,8 +323,7 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                   ) : null}
 
                   {detail.forward_obligations.length ? (
-                    <Section title="Follow-ups" icon={Clock}>
-                      <p className="text-sm text-muted-foreground">Things to do after this contract is dealt with.</p>
+                    <Section title="Follow-ups" icon={Clock} hint="Things to do after this contract is dealt with.">
                       <ul className="space-y-2">
                         {detail.forward_obligations.map((o, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm">
@@ -476,11 +474,13 @@ function EmptyTab({
 function Section({
   title,
   icon: Icon,
+  hint,
   aside,
   children,
 }: {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
+  hint?: React.ReactNode;
   aside?: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -490,6 +490,7 @@ function Section({
         <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <Icon className="h-4 w-4 text-muted-foreground" />
           {title}
+          {hint ? <InfoHint>{hint}</InfoHint> : null}
         </h3>
         {aside}
       </div>
