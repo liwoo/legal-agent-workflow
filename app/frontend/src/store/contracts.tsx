@@ -2,7 +2,13 @@
 
 import * as React from "react";
 
-import { getContract, listContracts, resolveContract, triageContract } from "@/src/lib/api";
+import {
+  createContract,
+  getContract,
+  listContracts,
+  resolveContract,
+  triageContract,
+} from "@/src/lib/api";
 import type { ContractDetail, ContractSummary, Queue, ResolveDecision } from "@/src/types";
 import { queueForContract } from "@/src/lib/utils";
 
@@ -14,6 +20,7 @@ interface ContractsContextValue {
   getById: (id: string) => ContractSummary | undefined;
   triage: (id: string) => Promise<ContractDetail | undefined>;
   resolve: (id: string, decision: ResolveDecision, note?: string) => Promise<ContractDetail | undefined>;
+  create: (form: FormData) => Promise<ContractDetail>;
   refresh: () => Promise<void>;
 }
 
@@ -102,9 +109,24 @@ export function ContractsProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, []);
 
+  const create = React.useCallback(async (form: FormData) => {
+    const result = await createContract(form);
+    const summary = toSummary({ ...result, queue: queueForContract(result) });
+    setContracts((prev) => {
+      const idx = prev.findIndex((c) => c.id === summary.id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = summary;
+        return next;
+      }
+      return [summary, ...prev];
+    });
+    return result;
+  }, []);
+
   const value = React.useMemo<ContractsContextValue>(
-    () => ({ contracts, loading, error, byQueue, getById, triage, resolve, refresh }),
-    [contracts, loading, error, byQueue, getById, triage, resolve, refresh]
+    () => ({ contracts, loading, error, byQueue, getById, triage, resolve, create, refresh }),
+    [contracts, loading, error, byQueue, getById, triage, resolve, create, refresh]
   );
 
   return <ContractsContext.Provider value={value}>{children}</ContractsContext.Provider>;

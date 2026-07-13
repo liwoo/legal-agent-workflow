@@ -57,6 +57,16 @@ shared `TriageState`:
 6. **Approval / disposition** — the contract lands in a terminal state and the
    queue it belongs to: **approved**, **quarantined**, or still **pending**.
 
+Contracts reach the graph two ways. The **ten example contracts** are seeded
+into SQLite on boot and triaged eagerly, so the queues are warm the moment the
+console loads. A reviewer can also add one live: the **New Contract** button
+(top-right of the console) opens a modal, and on submit the backend **persists**
+the intake to SQLite, **stores** the uploaded PDF in the object store, and
+**triggers the same graph** — whose terminal nodes write the outcome straight
+back to SQLite. Both routes read and write one register, so a contract created
+in the UI is immediately visible to the graph and vice-versa (see
+[Adding a contract](#adding-a-contract-the-new-contract-flow) below).
+
 The reviewer sees all of this in a console: the queues, a detail view for each
 contract — its classification, which gates fired, the proposed redlines with
 their legal basis, the forward obligations — and the decision graph with *this*
@@ -98,9 +108,12 @@ The repo is four top-level folders, each a clean layer:
 - **`docs/`** — the decision framework, the requirements, the `agent-graph.mmd`
   diagram, the canonical `models.py` domain types, and the design audit.
 
-Underneath, **SQLite** persists computed triage results (so the queues are warm
-the instant the API answers), **MinIO** holds the intake PDFs and hands out
-short-lived presigned URLs, and a self-hosted **[Langfuse](https://langfuse.com)**
+Underneath, **SQLite** is the register of record — the contract intake rows (the
+ten seeded examples plus anything created in the UI), the computed triage results
+(so the queues are warm the instant the API answers), and the outcomes the
+agent's own terminal nodes write — all read back through one **repository** that
+both the API and the workflow share. **MinIO** holds the intake PDFs and hands
+out short-lived presigned URLs, and a self-hosted **[Langfuse](https://langfuse.com)**
 stack captures the Agent Framework's **OpenTelemetry** traces — every triage run
 shows up as a span tree with prompts, responses, token usage and latency.
 
@@ -121,7 +134,9 @@ The graph in `agent-graph.mmd` maps directly onto the code:
 | nodes / routers / validators / HITL | `app/agent/contract_triage/executors.py` |
 | graph wiring (switch-case, fan-out/in) | `app/agent/contract_triage/workflow.py` |
 | classification + playbook judgment (the LLM brain) | `app/agent/contract_triage/agents.py` |
-| the 10 inbox items | `app/agent/contract_triage/data.py` |
+| the 10 inbox items (seeded into SQLite on boot) | `app/agent/contract_triage/data.py` |
+| SQLite register + repository (API & agent share it) | `app/agent/contract_triage/db.py` · `repository.py` |
+| object store — intake PDFs, presigned URLs, uploads | `app/agent/contract_triage/storage.py` |
 
 And the FastAPI surface the console speaks:
 
@@ -129,6 +144,7 @@ And the FastAPI surface the console speaks:
 |---|---|---|
 | `GET`  | `/api/health` | liveness |
 | `GET`  | `/api/contracts` | inbox + triage summaries |
+| `POST` | `/api/contracts` | create a contract (multipart: intake fields + PDF), then triage it |
 | `GET`  | `/api/contracts/{id}` | full triage detail |
 | `GET`  | `/api/contracts/{id}/document` | redirect to a presigned PDF URL |
 | `POST` | `/api/contracts/{id}/triage` | run the workflow for one contract |
@@ -183,6 +199,48 @@ project and API keys are provisioned headlessly, so traces land in the
 LLM call, each run's span tree includes the `chat` spans — prompts, responses,
 token usage and latency — under the workflow span.
 
+## Adding a contract (the "New Contract" flow)
+
+The console isn't read-only. The **New Contract** button (top-right of every
+page) opens a modal to capture the intake facts — counterparty, who it came
+from, what arrived, the sender's ask, related contracts — and attach the intake
+PDF. Submitting it posts a multipart form to `POST /api/contracts`, and the
+backend runs the whole pipeline **in order**:
+
+1. **Persist to SQLite.** The repository (`repository.py`) allocates the next
+   `CR-<year>-NNN` id and writes the intake row to the `contracts` table with
+   `source='user'`, alongside the ten seeded examples. The register is the single
+   source of truth both the API and the workflow read.
+2. **Store the PDF.** The uploaded document is put into the `contracts` MinIO
+   bucket (so the console gets a short-lived presigned URL) and mirrored to a
+   local path the ingest node reads.
+3. **Trigger the agent.** The same graph runs on the new contract. Any intake
+   fact left blank is derived from the PDF at ingest, the LLM classifies it, the
+   gates fire, and it lands in a terminal state.
+4. **The agent writes its outcome back to SQLite.** Every terminal/pause node
+   passes through `executors.finalize`, which records the outcome to the
+   `triage_outcomes` table (`db.save_outcome`) — the graph persists its own
+   result, not just the API layer.
+
+The freshly triaged detail comes straight back to the console, and the new
+contract shows up in its queue. Because everything is persisted, it survives an
+API restart — the queues rehydrate from SQLite with no re-triage.
+
+Need a document to try it with? Generate a sample intake PDF (no dependencies):
+
+```bash
+python app/scripts/make_sample_contract.py sample-contract.pdf
+```
+
+Then either attach it in the modal, or drive the endpoint directly:
+
+```bash
+curl -X POST http://localhost:8000/api/contracts \
+  -F 'counterparty=Meridian Freight Solutions Ltd' \
+  -F 'received_from=AE (sales)' \
+  -F 'file=@sample-contract.pdf;type=application/pdf'
+```
+
 ## Benchmarks — how we know it's grounded
 
 There is no single accuracy number to wave around, because the interesting claim
@@ -197,8 +255,10 @@ back to something that actually happens in the corpus." Three things back that u
   governing law, liability cap, payment terms, renewal) are what shape the
   branches. No branch exists that the corpus doesn't justify; citations run
   throughout.
-- **A test suite that pins the graph.** **54 tests** across
-  [`app/agent/tests/`](app/agent/tests/) exercise the workflow node-by-node.
+- **A test suite that pins the graph.** **57 tests** across
+  [`app/agent/tests/`](app/agent/tests/) exercise the workflow node-by-node —
+  including the SQLite register, the "New Contract" create flow, and the outcome
+  the agent's terminal nodes persist.
   Every router branch is pinned at least once, and `test_routing.py` asserts the
   "ends *here*, not *there*" contrasts (fast-path vs. full review, gate
   short-circuits, the human-gate resume paths). To stay hermetic they swap the

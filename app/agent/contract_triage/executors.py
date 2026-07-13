@@ -55,7 +55,12 @@ _RECOMMENDATION = {
 
 
 async def finalize(state: TriageState) -> None:
-    """Set score, recommended action and the reviewer explanation."""
+    """Set score, recommended action and the reviewer explanation.
+
+    This is the one place every terminal/pause node passes through, so it is
+    also where the agent *itself* records its outcome to SQLite (``db.save_-
+    outcome``) — the graph writes its own result, independent of the API layer.
+    """
     if state.end_state is None:
         state.end_state = EndState.SIGNED_DESK_EDITS
     state.recommended_action = _RECOMMENDATION.get(state.end_state)
@@ -64,6 +69,28 @@ async def finalize(state: TriageState) -> None:
         base -= 8
     state.score = max(0, min(100, base))
     state.explanation = await agents.explain(state)
+    _persist_outcome(state)
+
+
+def _persist_outcome(state: TriageState) -> None:
+    """Write the compact outcome record from within the graph (best-effort)."""
+    from . import db
+
+    db.save_outcome(
+        state.item.id,
+        {
+            "end_state": state.end_state.value if state.end_state else None,
+            "score": state.score,
+            "signer": state.signer.value if state.signer else None,
+            "gate_count": len(state.gate_checks),
+            "blocking": state.has_blocking_gate(),
+            "redline_count": len(state.redlines),
+            "obligation_count": len(state.forward_obligations),
+            "recommended_action": state.recommended_action,
+            "interrupt": state.interrupt.reason if state.interrupt else None,
+            "trace": state.trace,
+        },
+    )
 
 
 def _forward_obligations(state: TriageState) -> None:
