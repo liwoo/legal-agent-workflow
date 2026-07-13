@@ -8,31 +8,42 @@ decides what to do with it, and knows when to stop and ask a human.
 
 ## What it is — and the problem it solves
 
-A corporate legal team's inbox is mostly noise dressed up as work. Across **79
-processed contracts**, **34% were signed with zero edits** and another **25%**
-needed exactly one; genuinely bespoke, escalation-worthy reviews are **~8%**.
-The **92%** in between is the same handful of moves on repeat — an uncapped
-liability clause pulled back to twelve months' fees, net-60 payment terms pushed
-to net-30, an auto-renewal struck out. The cost isn't the hard 8%. It's that a
-qualified reviewer must **open every contract to learn which bucket it's in**,
-and the routine majority drowns the reviews that actually need a lawyer.
+Contract Triage is a working demo of a legal contract-triage solution. Contracts
+are ingested in the UI into an inbox, and from there handed to an **agentic
+workflow** that determines where each one should go — **cleared** and signed
+as-is, **redlined to a known playbook position**, or, when it hits something a
+machine shouldn't decide alone, **paused and escalated to a human** — and drops
+it into the right queue for the reviewer. The reviewer stops reading everything
+and reads only what's been flagged as worth their time.
 
-**Contract Triage is the answer to "what if the inbox triaged itself?"** It runs
-the review decision graph a senior reviewer carries in their head
-([`docs/agent-graph.mmd`](docs/agent-graph.mmd)) as software: each contract is
-classified, run through the policy gates, checked against the playbook, and then
-**cleared**, **redlined to a known position**, or — when the rules can't settle
-it — **paused and handed to a human**, who decides and hands it back. The
-reviewer stops reading everything and reads only what's been flagged as worth
-their time.
+For this demo, we scoured through **79 processed contracts** with full edit logs,
+and the shape of the work is stark. **34%** were signed with zero edits, another
+**25%** needed exactly one, and **22%** needed two — leaving only **~8%** that
+are genuinely bespoke, escalation-worthy reviews. The **92%** in between is the
+same handful of moves on repeat: an uncapped liability clause pulled back to
+twelve months' fees, net-60 payment terms pushed to net-30, an auto-renewal
+struck out. This is what most legal teams actually look like — a small core of
+hard, judgment-heavy work buried under a routine majority — and the expensive
+part isn't the hard 8%. It's that a qualified reviewer has to **open every
+contract just to learn which bucket it's in**. The reviewer's time is the most
+expensive line in the function; auto-clearing the third that needs no edits and
+one-move-redlining the quarter that needs one takes **well over half the manual
+opens off their desk**, and the reviews that genuinely need a lawyer stop waiting
+behind the ones that never did.
 
 ![The review console — queues, contract-type mix, and each incoming contract with its disposition and confidence](docs/screenshots/console-dashboard.png)
 
 ## How it works
 
-The whole system is one **deterministic decision graph**. A contract enters as a
+The system is an **agentic workflow** shaped as a graph. A contract enters as a
 flat set of intake facts and flows through nodes that each read and write one
-shared `TriageState`:
+shared `TriageState`. The judgments the workflow turns on — how to classify the
+paper, which policy gates fire, how each redline maps to the playbook — are made
+by an **LLM** (an **OpenAI** chat model in this demo, but the client is pluggable
+and swaps out for Azure OpenAI or any other provider with a key change). The
+graph is the orchestration *around* those calls — routers, a parallel fan-out,
+the human gate — so the moving pieces are wired predictably while the
+intelligence lives in the model:
 
 1. **Intake** — read the source PDF, fill in any blank intake fact from the
    document, and gate obvious non-starters (missing info, out of scope).
