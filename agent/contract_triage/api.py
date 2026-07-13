@@ -15,7 +15,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from .observability import setup_observability
 from .service import TriageService
+
+setup_observability()  # ships Agent Framework traces to Langfuse when configured
 
 service = TriageService()
 
