@@ -6,6 +6,9 @@ agent/.venv/
 *.pyc
 .env
 
+# Local SQLite database (triage results + reviewer decisions)
+**/.data/
+
 # Node / Next.js
 **/node_modules/
 frontend/.next/

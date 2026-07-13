@@ -11,6 +11,13 @@
  *   clickhouse      — Langfuse trace analytics              (container)
  *   redis           — Langfuse queue                        (container)
  *   minio           — Langfuse S3-compatible blob store     (container)  :9090
+ *   storage         — contract-document object store        (container)  :9092
+ *
+ * The API's own data plane: `storage` (an ephemeral, app-facing MinIO holding
+ * the contract intake PDFs, re-seeded from ../test on boot) and a SQLite file
+ * (TRIAGE_DB_PATH) that persists triage results and reviewer decisions across
+ * restarts. Both are injected into the `api` resource; SQLite needs no server,
+ * so it also works under the ../scripts/dev.sh fallback.
  *
  * The agent (devui + api) ships its Microsoft Agent Framework OpenTelemetry
  * traces to langfuse-web's OTLP endpoint, so every triage run — the agent
@@ -42,6 +49,18 @@ const FRONTEND_DIR = '../frontend';
 const LF_WEB_PORT = 3001; // host port for the Langfuse UI *and* OTLP ingest
 const MINIO_API_PORT = 9090; // host port for MinIO (browser-facing presigned URLs)
 const MINIO_CONSOLE_PORT = 9091;
+
+// ── Application data plane (contract documents + triage database) ────────────
+// A second, app-facing MinIO holds the contract intake PDFs, kept separate from
+// Langfuse's internal blob store. It is intentionally *ephemeral* (no volume) —
+// an in-memory-style object store the API re-seeds from ../test on every boot.
+const STORAGE_API_PORT = 9092; // host port — presigned URLs are browser-facing
+const STORAGE_CONSOLE_PORT = 9093;
+const STORAGE_USER = 'contract-store';
+const STORAGE_PASSWORD = 'contract-store-secret';
+const STORAGE_BUCKET = 'contracts';
+// SQLite lives on the API's local disk; the path is relative to its cwd (../agent).
+const TRIAGE_DB_PATH = '.data/triage.db';
 
 const LF_PUBLIC_KEY = 'pk-lf-contract-triage';
 const LF_SECRET_KEY = 'sk-lf-contract-triage';
@@ -99,6 +118,34 @@ const minio = await builder
   .withHttpEndpoint({ port: MINIO_API_PORT, targetPort: 9000, name: 'api' })
   .withHttpEndpoint({ port: MINIO_CONSOLE_PORT, targetPort: 9001, name: 'console' })
   .withVolume('langfuse-minio', '/data');
+
+// ── Contract document store (app-facing, ephemeral MinIO) ───────────────────
+// Creates the `contracts` bucket up front, then serves S3 (:9000) + console
+// (:9001). No .withVolume — the store is in-memory-style and re-seeded on boot.
+const storage = await builder
+  .addContainer('storage', { Image: 'minio/minio', Tag: 'latest' })
+  .withEntrypoint('sh')
+  .withArgs(
+    '-c',
+    `mkdir -p /data/${STORAGE_BUCKET} && minio server /data --address ":9000" --console-address ":9001"`,
+  )
+  .withEnvironment('MINIO_ROOT_USER', STORAGE_USER)
+  .withEnvironment('MINIO_ROOT_PASSWORD', STORAGE_PASSWORD)
+  .withHttpEndpoint({ port: STORAGE_API_PORT, targetPort: 9000, name: 'api' })
+  .withHttpEndpoint({ port: STORAGE_CONSOLE_PORT, targetPort: 9001, name: 'console' })
+  .withExternalHttpEndpoints();
+
+// Data-plane env injected into the API: the object store (host-facing, so the
+// API signs URLs the browser can open) and the SQLite path.
+const dataEnv: [string, string][] = [
+  ['CONTRACT_STORE_ENDPOINT', `localhost:${STORAGE_API_PORT}`],
+  ['CONTRACT_STORE_ACCESS_KEY', STORAGE_USER],
+  ['CONTRACT_STORE_SECRET_KEY', STORAGE_PASSWORD],
+  ['CONTRACT_STORE_BUCKET', STORAGE_BUCKET],
+  ['CONTRACT_STORE_SECURE', 'false'],
+  ['CONTRACT_STORE_SEED_DIR', '../test'], // <ITEM_ID>/*.pdf, relative to ../agent
+  ['TRIAGE_DB_PATH', TRIAGE_DB_PATH],
+];
 
 // Env shared by langfuse-web and langfuse-worker (the compose "worker-env" anchor).
 const langfuseCoreEnv: [string, string][] = [
@@ -203,8 +250,10 @@ let api = await builder
   .addUvicornApp('api', AGENT_DIR, 'contract_triage.api:app')
   .withVirtualEnvironment(`${AGENT_DIR}/.venv`)
   .withHttpEndpoint({ port: 8000, env: 'PORT' })
-  .withExternalHttpEndpoints();
-for (const [key, value] of otelEnv('contract-triage-api')) {
+  .withExternalHttpEndpoints()
+  // Wait for the object store so the startup seed lands its documents.
+  .waitFor(storage);
+for (const [key, value] of [...otelEnv('contract-triage-api'), ...dataEnv]) {
   api = api.withEnvironment(key, value);
 }
 

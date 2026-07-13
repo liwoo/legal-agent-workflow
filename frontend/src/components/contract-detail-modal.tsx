@@ -20,6 +20,7 @@ import { ScrollArea } from "@/src/components/ui/scroll-area";
 import { Separator } from "@/src/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table";
 import { getContract, useContracts } from "@/src/store/contracts";
+import { getApiBaseUrl } from "@/src/lib/api";
 import { cn, formatDate, formatDateTime, titleCase } from "@/src/lib/utils";
 import type { ContractDetail, GateCheck, ResolveDecision } from "@/src/types";
 
@@ -95,6 +96,19 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                     {detail.id} · {titleCase(detail.document_family)} · {titleCase(detail.paper_source)} ·{" "}
                     {titleCase(detail.direction)}
                   </DialogDescription>
+                  {detail.document_url ? (
+                    // Link to the stable API endpoint, which re-signs a fresh
+                    // presigned URL on each open (the embedded one is short-lived).
+                    <a
+                      href={`${getApiBaseUrl()}/api/contracts/${encodeURIComponent(detail.id)}/document`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                    >
+                      <FileText className="h-3.5 w-3.5" />
+                      View intake PDF
+                    </a>
+                  ) : null}
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <ScoreBadge score={detail.score} size="lg" />
