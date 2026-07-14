@@ -208,16 +208,33 @@ And the FastAPI surface the console speaks:
 
 ## How to run
 
-**Prerequisites:** Python 3.10+ and [`uv`](https://docs.astral.sh/uv/) ·
-Node ≥ 20.19 · Docker (for the Langfuse trace stack + object stores) · an
-`OPENAI_API_KEY` (triage is a real LLM call — put it in `app/agent/.env`).
+### Requirements
+
+| Tool | Version | Why |
+|---|---|---|
+| **Python** | **3.10+** (the venv is pinned to **3.12**) | runs the agent workflow + FastAPI/DevUI |
+| **[`uv`](https://docs.astral.sh/uv/)** | latest | creates the Python venv and installs deps |
+| **Node.js** | **≥ 20.19** | builds and serves the Next.js console |
+| **Docker** + **Docker Compose v2** | Compose **v2** (the `docker compose` plugin) | runs the Langfuse trace stack + MinIO object stores |
+| **OpenAI API key** | — | triage is a real LLM call (**Azure OpenAI** works too) |
+
+### Steps
 
 ```bash
-make install   # one-time: Python venv + frontend deps
-make up         # bring up the whole stack — Ctrl-C to stop
+# 1. Add your OpenAI key — triage won't start without one.
+cp app/agent/.env.example app/agent/.env
+#    then edit app/agent/.env and set:  OPENAI_API_KEY=sk-...
+#    (Azure OpenAI: set AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT instead)
+
+# 2. One-time: create the Python venv + install frontend deps.
+make install
+
+# 3. Bring up the whole stack — Ctrl-C to stop.
+make up
 ```
 
-`make up` starts the Langfuse + MinIO containers (detached), then runs the three
+`make up` runs a preflight that **refuses to boot without a usable key** in
+`app/agent/.env`, then starts the Langfuse + MinIO containers (detached) and runs the three
 app processes — DevUI (:8080), API (:8000) and frontend (:3000) — in the
 foreground. Ctrl-C stops the app processes; the containers keep running, so
 `make up` again restarts fast. `make down` stops the containers (`make clean`

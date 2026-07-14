@@ -11,9 +11,9 @@ interface StateBadgeProps {
 }
 
 const END_STATE_STYLE: Record<NonNullable<EndState>, { label: string; variant: "success" | "warning" | "destructive" | "secondary" }> = {
-  signed_no_edits: { label: "Signed — no edits", variant: "success" },
-  signed_desk_edits: { label: "Signed — desk edits", variant: "success" },
-  signed_with_deviation: { label: "Signed — deviation", variant: "success" },
+  signed_no_edits: { label: "Ready — no edits", variant: "success" },
+  signed_desk_edits: { label: "Ready — desk edits", variant: "success" },
+  signed_with_deviation: { label: "Ready — deviation", variant: "success" },
   escalated: { label: "Escalated", variant: "destructive" },
   blocked: { label: "Blocked", variant: "destructive" },
   more_info_needed: { label: "More info needed", variant: "warning" },

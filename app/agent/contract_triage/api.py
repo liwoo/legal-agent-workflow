@@ -202,6 +202,12 @@ async def create_contract_stream(
     return StreamingResponse(_sse_stream(events), media_type="text/event-stream", headers=_SSE_HEADERS)
 
 
+# Registered before "/api/contracts/{item_id}" so "archived" isn't captured as an id.
+@app.get("/api/contracts/archived")
+async def list_archived_contracts() -> list[dict]:
+    return service.list_archived()
+
+
 @app.get("/api/contracts/{item_id}")
 async def get_contract(item_id: str) -> dict:
     try:
@@ -244,6 +250,24 @@ async def triage_contract_stream(item_id: str) -> StreamingResponse:
 async def resolve_contract(item_id: str, body: ResolveRequest) -> dict:
     try:
         return await service.resolve(item_id, body.decision, body.note)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Unknown contract {item_id}")
+
+
+@app.post("/api/contracts/{item_id}/archive")
+async def archive_contract(item_id: str) -> dict:
+    try:
+        service.archive(item_id)
+        return {"status": "archived", "item_id": item_id}
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Unknown contract {item_id}")
+
+
+@app.post("/api/contracts/{item_id}/unarchive")
+async def unarchive_contract(item_id: str) -> dict:
+    try:
+        service.unarchive(item_id)
+        return {"status": "active", "item_id": item_id}
     except KeyError:
         raise HTTPException(status_code=404, detail=f"Unknown contract {item_id}")
 

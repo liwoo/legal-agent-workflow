@@ -74,6 +74,11 @@ class ContractRepository:
         rows = db.list_contracts()
         return [item_from_metadata(r["metadata"], r["pdf_path"]) for r in rows]
 
+    def list_archived(self) -> list[InboxItem]:
+        """The archived contracts — held out of the queues, shown in Settings."""
+        rows = db.list_contracts(archived=True)
+        return [item_from_metadata(r["metadata"], r["pdf_path"]) for r in rows]
+
     def get_item(self, item_id: str) -> InboxItem | None:
         row = db.get_contract(item_id)
         if row is None:
@@ -91,6 +96,14 @@ class ContractRepository:
         metadata = {**metadata, "id": item_id}
         db.upsert_contract(item_id, metadata, pdf_path=pdf_path, source="user")
         return item_from_metadata(metadata, pdf_path)
+
+    def archive(self, item_id: str) -> bool:
+        """Archive a contract so it leaves every queue. Returns True if changed."""
+        return db.set_archived(item_id, True)
+
+    def unarchive(self, item_id: str) -> bool:
+        """Return an archived contract to its queue. Returns True if changed."""
+        return db.set_archived(item_id, False)
 
     def next_id(self) -> str:
         """Allocate the next free ``CR-<year>-NNN`` id across seed + user rows."""

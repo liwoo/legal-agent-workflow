@@ -367,13 +367,30 @@ class TriageService:
         return detail
 
     def list_contracts(self) -> list[dict]:
+        return self._summaries(repo.list_items())
+
+    def list_archived(self) -> list[dict]:
+        """Summaries for the archived contracts (Settings → Archived)."""
+        return self._summaries(repo.list_archived())
+
+    def _summaries(self, items: list) -> list[dict]:
         out = []
-        for item in repo.list_items():
+        for item in items:
             if item.id in self.results:
                 out.append({k: self.results[item.id][k] for k in _SUMMARY_KEYS})
             else:
                 out.append(self._summary_fields(item, None, "untriaged"))
         return out
+
+    def archive(self, item_id: str) -> None:
+        if repo.get_item(item_id) is None:
+            raise KeyError(item_id)
+        repo.archive(item_id)
+
+    def unarchive(self, item_id: str) -> None:
+        if repo.get_item(item_id) is None:
+            raise KeyError(item_id)
+        repo.unarchive(item_id)
 
     async def triage_all(self) -> None:
         """Eagerly triage the inbox so the dashboard/queues are populated."""

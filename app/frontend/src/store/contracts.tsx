@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import {
+  archiveContract,
   createContract,
   createContractStream,
   getContract,
@@ -10,6 +11,7 @@ import {
   resolveContract,
   triageContract,
   triageContractStream,
+  unarchiveContract,
   type TriageStep,
 } from "@/src/lib/api";
 import type { ContractDetail, ContractSummary, Queue, ResolveDecision } from "@/src/types";
@@ -17,6 +19,8 @@ import { queueForContract } from "@/src/lib/utils";
 
 interface ContractsContextValue {
   contracts: ContractSummary[];
+  /** Contracts the reviewer has archived — surfaced in Settings → Archived. */
+  archived: ContractSummary[];
   loading: boolean;
   error: string | null;
   byQueue: (queue: Queue) => ContractSummary[];
@@ -24,6 +28,10 @@ interface ContractsContextValue {
   triage: (id: string, onStep?: (step: TriageStep) => void) => Promise<ContractDetail | undefined>;
   resolve: (id: string, decision: ResolveDecision, note?: string) => Promise<ContractDetail | undefined>;
   create: (form: FormData, onStep?: (step: TriageStep) => void) => Promise<ContractDetail>;
+  /** Move a contract out of its queue and into the archive. */
+  archive: (id: string) => Promise<void>;
+  /** Return an archived contract to its queue. */
+  restore: (id: string) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -47,15 +55,24 @@ function toSummary(detail: ContractDetail): ContractSummary {
 
 export function ContractsProvider({ children }: { children: React.ReactNode }) {
   const [contracts, setContracts] = React.useState<ContractSummary[]>([]);
+  const [archived, setArchived] = React.useState<ContractSummary[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Archived ids captured in a ref so refresh() can filter them out without
+  // being re-created every time the archive changes (which would re-run the
+  // load-on-mount effect). Archived items are held out of every queue.
+  const archivedIds = React.useRef<Set<string>>(new Set());
+  React.useEffect(() => {
+    archivedIds.current = new Set(archived.map((c) => c.id));
+  }, [archived]);
 
   const refresh = React.useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await listContracts();
-      setContracts(data);
+      setContracts(data.filter((c) => !archivedIds.current.has(c.id)));
     } catch (err) {
       // listContracts() already falls back to fixtures internally, so this
       // branch should be effectively unreachable — kept for defence in depth.
@@ -133,9 +150,35 @@ export function ContractsProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, []);
 
+  const archive = React.useCallback(
+    async (id: string) => {
+      // Pull the row out of the live queues and remember it in the archive.
+      setContracts((prev) => {
+        const item = prev.find((c) => c.id === id);
+        if (item) setArchived((a) => [item, ...a.filter((x) => x.id !== id)]);
+        return prev.filter((c) => c.id !== id);
+      });
+      // Best-effort persistence; the archive is tracked client-side regardless.
+      await archiveContract(id);
+    },
+    []
+  );
+
+  const restore = React.useCallback(
+    async (id: string) => {
+      setArchived((prev) => {
+        const item = prev.find((c) => c.id === id);
+        if (item) setContracts((c) => [item, ...c.filter((x) => x.id !== id)]);
+        return prev.filter((c) => c.id !== id);
+      });
+      await unarchiveContract(id);
+    },
+    []
+  );
+
   const value = React.useMemo<ContractsContextValue>(
-    () => ({ contracts, loading, error, byQueue, getById, triage, resolve, create, refresh }),
-    [contracts, loading, error, byQueue, getById, triage, resolve, create, refresh]
+    () => ({ contracts, archived, loading, error, byQueue, getById, triage, resolve, create, archive, restore, refresh }),
+    [contracts, archived, loading, error, byQueue, getById, triage, resolve, create, archive, restore, refresh]
   );
 
   return <ContractsContext.Provider value={value}>{children}</ContractsContext.Provider>;
