@@ -248,11 +248,11 @@ table(
     ],
 )
 body(
-    "The repo ships an Aspire AppHost (host/apphost.mts) that starts all of this with "
-    "one command (aspire run). If your Aspire CLI build does not support the TypeScript "
-    "AppHost (it may report “Unrecognized app host type”), use the framework-free "
-    "harness in the e2e/ folder instead — it reproduces exactly the same containers, "
-    "ports and Langfuse keys. The rest of this guide uses that harness.",
+    "The repo starts all of this with one command — `make up` from the repo root, "
+    "which brings up the Langfuse + MinIO containers (the e2e/ compose stack) and then "
+    "runs the API, DevUI and frontend against them. This guide drives that same stack; "
+    "for E2E testing you can also start the pieces individually with the e2e/ harness "
+    "scripts (run-api.sh / run-frontend.sh) against the same containers.",
 )
 
 # ── 4. One-time setup ────────────────────────────────────────────────────────
@@ -413,7 +413,7 @@ h1("11.  The e2e/ harness — file map")
 table(
     ["Path", "Purpose"],
     [
-        ["docker-compose.langfuse.yml", "Langfuse stack + object stores (mirrors host/apphost.mts)"],
+        ["docker-compose.langfuse.yml", "Langfuse stack + object stores (started by `make up`)"],
         ["stack.env", "OTEL → Langfuse + object-store env for the API"],
         ["run-api.sh / run-frontend.sh", "launch the API and the console against the stack"],
         ["playwright.config.ts", "Playwright config (base URL, timeouts, artifacts)"],

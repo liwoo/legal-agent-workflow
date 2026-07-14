@@ -14,7 +14,7 @@ This is a **no-op unless configured** — with no ``ENABLE_OTEL`` / OTLP endpoin
 the app runs untraced, and importing this module never fails even if the OTLP
 exporter package is missing.
 
-Configuration (all injected by the Aspire AppHost; see ``../.env.example``):
+Configuration (all injected by ``make up`` via ``e2e/stack.env``):
 
     ENABLE_OTEL=true
     OTEL_SERVICE_NAME=contract-triage-api
