@@ -33,7 +33,7 @@ contract_triage/
   state.py        # TriageState (the shared message) + request/result envelopes
   data.py         # the 10 inbox items + inherited prior-contract flags
   agents.py       # the LLM brain: classification, gates, redlines, explanation (+ DevUI agents)
-  config.py       # loads .env so OPENAI_API_KEY is picked up standalone or under Aspire
+  config.py       # loads .env so OPENAI_API_KEY is picked up standalone or under `make up`
   executors.py    # one Executor per node in agent-graph.mmd
   workflow.py     # WorkflowBuilder wiring: switch-case routers, fan-out/in, HITL
   graph_spec.py   # static nodes/edges for GET /api/workflow/graph
@@ -55,8 +55,8 @@ python -m contract_triage            # or: triage-api
 python -m contract_triage.devui_app  # or: triage-devui
 ```
 
-Normally you run both (plus the frontend) together via the Aspire AppHost in
-[`../../host`](../../host).
+Normally you run both (plus the frontend) together via `make up` from the repo
+root.
 
 ## API
 

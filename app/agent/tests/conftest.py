@@ -26,6 +26,10 @@ from contract_triage import agents  # noqa: E402
 def offline_brain(monkeypatch):
     """Route every agent decision through the deterministic test double."""
 
+    # The app ships an empty inbox by default; the suite exercises the seeded
+    # demo contracts, so opt seeding back on for tests that build a TriageService.
+    monkeypatch.setenv("SEED_EXAMPLES", "1")
+
     async def classify_llm(item, inherited, prior_ids):
         return fake_brain.classify(item)
 

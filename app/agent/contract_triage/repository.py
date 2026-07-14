@@ -2,15 +2,16 @@
 
 The workflow used to read its inbox straight from the hard-coded ``data.INBOX``
 list. This repository makes the ``contracts`` table (see ``db.py``) the single
-source of truth instead: the ten canonical examples are *seeded* into it on
-boot, and reviewer-created contracts (the "New Contract" flow) are *inserted*
-alongside them. Both the FastAPI layer (which the console reads) and the agent
-workflow go through this one repository, so a contract created in the UI is
-immediately visible to the graph and vice-versa.
+source of truth instead. The inbox ships **empty** — reviewers add contracts
+through the "New Contract" flow, which *inserts* them here — unless
+``SEED_EXAMPLES=1`` asks for the ten canonical demo contracts on boot. Both the
+FastAPI layer (which the console reads) and the agent workflow go through this
+one repository, so a contract created in the UI is immediately visible to the
+graph and vice-versa.
 
-Resilient by design (mirrors ``db.py`` / ``storage.py``): if SQLite is
-unavailable, every read falls back to the in-code ``data.INBOX`` seed so the app
-keeps working — it just won't persist user-created contracts across a restart.
+``get_item`` still resolves a known demo id from the in-code ``data`` seed as a
+fallback (used by tests and by-id lookups), but ``list_items`` — what fills the
+inbox — is purely what the register holds.
 """
 
 from __future__ import annotations
@@ -67,10 +68,10 @@ class ContractRepository:
 
     # ── reads ────────────────────────────────────────────────────────────────
     def list_items(self) -> list[InboxItem]:
+        # The register is the single source of truth; an empty register is an
+        # empty inbox. (No fallback to the in-code demo seed — the app ships blank
+        # unless SEED_EXAMPLES=1 populated the table on boot.)
         rows = db.list_contracts()
-        if not rows:
-            # DB empty/unavailable — fall back to the in-code seed.
-            return data.get_inbox()
         return [item_from_metadata(r["metadata"], r["pdf_path"]) for r in rows]
 
     def get_item(self, item_id: str) -> InboxItem | None:

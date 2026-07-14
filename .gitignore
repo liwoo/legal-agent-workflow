@@ -15,5 +15,7 @@ app/frontend/.next/
 app/frontend/out/
 *.tsbuildinfo
 
-# Aspire generated SDK
-host/.aspire/modules/
+# Editor swap/backup files
+*.swp
+*.swo
+*~
