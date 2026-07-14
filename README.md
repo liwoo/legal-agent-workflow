@@ -4,6 +4,31 @@ An end-to-end demo that turns a legal team's contract-review judgement into a
 running application — an agent workflow that reads what lands in the inbox,
 decides what to do with it, and knows when to stop and ask a human.
 
+Paste any one contract into a chat model and you'll get sound edit advice back —
+so the fair question a skeptic should ask is why this is an application and not a
+prompt. Because the edit advice was never the expensive part. Today a qualified
+reviewer opens **all** 79 contracts to find the ~8% that are genuinely hard; the
+other 92% needed the same handful of moves, or none at all. Copy-and-paste doesn't
+change that — a human still opens each one, pastes it, and reads the answer. The
+reviewer's attention, the most expensive line in the function, is spent in full
+*before* the model is any use.
+
+This is the layer that removes the opens. Contracts land in an inbox and sort
+themselves: the third that need no edits clear, the quarter that need one known
+move are redlined to the playbook, and only the hard cases surface — already
+pre-triaged, with the proposed redlines and their legal basis attached. And it
+does it the way a legal function requires and a chat window can't: the **same
+policy applied every time** (not a fresh opinion per prompt), an **audit trail on
+every decision**, and a **hard stop that pauses for a human** on the calls a
+machine shouldn't own. A legal team can't sign a contract because a chatbot said
+it looked fine — that accountability layer, not the extraction, is the product.
+
+> **The one number:** a reviewer used to open all 79 contracts just to find the
+> ~8% that were genuinely hard. Clearing the third that need no edits and
+> one-move-redlining the quarter that need one takes **6 in 10 off the desk before
+> anyone opens a thing** — and the hard reviews stop waiting in line behind the
+> routine ones that never needed a lawyer.
+
 ---
 
 ## What it is — and the problem it solves
@@ -17,9 +42,18 @@ it into the right queue for the reviewer. The reviewer stops reading everything
 and reads only what's been flagged as worth their time.
 
 For this demo, we scoured through **79 processed contracts** with full edit logs,
-and the shape of the work is stark. **34%** were signed with zero edits, another
-**25%** needed exactly one, and **22%** needed two — leaving only **~8%** that
-are genuinely bespoke, escalation-worthy reviews. The **92%** in between is the
+and the shape of the work is stark:
+
+| Edits needed | Share | What it means |
+|---|---|---|
+| **0 edits** | **34%** | signed as-is — auto-clear |
+| **1 edit** | **25%** | one known move — one-tap redline |
+| **2 edits** | **22%** | two known moves — redline |
+| **3+ edits** | **~19%** | of which only **~8%** are genuinely bespoke |
+
+**34%** were signed with zero edits, another **25%** needed exactly one, and
+**22%** needed two — leaving only **~8%** that are genuinely bespoke,
+escalation-worthy reviews. The **92%** in between is the
 same handful of moves on repeat: an uncapped liability clause pulled back to
 twelve months' fees, net-60 payment terms pushed to net-30, an auto-renewal
 struck out. This is what most legal teams actually look like — a small core of
@@ -30,6 +64,15 @@ expensive line in the function; auto-clearing the third that needs no edits and
 one-move-redlining the quarter that needs one takes **well over half the manual
 opens off their desk**, and the reviews that genuinely need a lawyer stop waiting
 behind the ones that never did.
+
+This is a modest problem on the surface — 80% boilerplate NDAs — so the fair
+challenge is whether the register of record, the traces, the bounded loops, the
+held-out eval split and the human gate are over-built for it. They aren't: the
+moment a legal team acts on a disposition, every one of those stops being
+gold-plating and becomes the thing that makes the disposition safe to act on. The
+easy 20% is the extraction; the reason for the other 80% of the engineering is
+that consistency, traceability, and termination are what a review function can
+defend — and a chat window can't produce.
 
 ![The review console — queues, contract-type mix, and each incoming contract with its disposition and confidence](docs/screenshots/console-dashboard.png)
 
