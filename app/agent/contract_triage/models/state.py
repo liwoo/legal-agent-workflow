@@ -14,7 +14,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from .models import (
+from .domain import (
     DataFlag,
     EndState,
     ForwardObligation,
@@ -112,11 +112,11 @@ class TriageState(BaseModel):
         return self.classification.data_flags if self.classification else set()
 
     def has_blocking_gate(self) -> bool:
-        from .models import GateStatus
+        from .domain import GateStatus
 
         return any(g.status is GateStatus.BLOCKED for g in self.gate_checks)
 
     def has_action_required(self) -> bool:
-        from .models import GateStatus
+        from .domain import GateStatus
 
         return any(g.status is GateStatus.ACTION_REQUIRED for g in self.gate_checks)

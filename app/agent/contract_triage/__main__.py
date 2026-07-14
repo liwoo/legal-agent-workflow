@@ -14,7 +14,7 @@ def run_api() -> None:
 
     port = int(os.getenv("PORT", "8000"))
     host = os.getenv("HOST", "0.0.0.0")
-    uvicorn.run("contract_triage.api:app", host=host, port=port, reload=False)
+    uvicorn.run("contract_triage.io.api:app", host=host, port=port, reload=False)
 
 
 if __name__ == "__main__":

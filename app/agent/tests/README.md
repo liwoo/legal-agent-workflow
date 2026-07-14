@@ -14,7 +14,7 @@ only the per-node judgments are stubbed.
 The split is deliberate:
 
 - **the PDF is always read** — `ingest` reads it from an absolute path via the
-  PDF tool (`contract_triage/pdf.py`) and stores the text on the state, so the
+  PDF tool (`contract_triage/io/pdf.py`) and stores the text on the state, so the
   document is genuinely exercised on disk;
 - **the metadata drives the branch** — the test double's classification is a
   pure function of the intake text (`summary` / `senders_ask` / counterparty

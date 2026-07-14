@@ -9,12 +9,17 @@ decision and resumes on their response.
 
 It ships two surfaces:
 
-- **FastAPI** (`contract_triage.api`) — the REST the Next.js console consumes.
+- **FastAPI** (`contract_triage.io.api`) — the REST the Next.js console consumes.
 - **DevUI** (`contract_triage.devui_app`) — the Agent Framework developer UI to
   run, inspect and step through the workflow (and drive the human-gate
   interrupt) at `http://localhost:8080`.
 
-The agent is **fully LLM-first**: the model (`agents.py`) makes every
+> **New to the code (or to the Agent Framework)?** Start with the guided,
+> top-to-bottom reading tour in
+> [`contract_triage/agents/README.md`](contract_triage/agents/README.md) — it
+> explains every framework concept in reading order, with links to the MAF docs.
+
+The agent is **fully LLM-first**: the model (`agents/`) makes every
 substantive judgment the routers branch on — the six-axis classification, the
 POL-* policy gates, the redline→playbook mapping — plus the reviewer
 explanation, and the helper agents are surfaced in DevUI. A chat client
@@ -27,19 +32,49 @@ without live API calls.
 
 ## Layout
 
+The package groups by concern: the thin launchers sit at the root, the graph is
+split into its **nodes** (`executors/`) and its **wiring** (`edges/`), the
+**brain** (LLM calls + prompts) lives under `agents/`, the **types** under
+`models/`, and everything that touches the HTTP boundary or a store is under `io/`.
+
 ```
 contract_triage/
-  models.py       # vendored copy of ../../docs/models.py — the Pydantic domain types
-  state.py        # TriageState (the shared message) + request/result envelopes
-  data.py         # the 10 inbox items + inherited prior-contract flags
-  agents.py       # the LLM brain: classification, gates, redlines, explanation (+ DevUI agents)
-  config.py       # loads .env so OPENAI_API_KEY is picked up standalone or under `make up`
-  executors.py    # one Executor per node in agent-graph.mmd
-  workflow.py     # WorkflowBuilder wiring: switch-case routers, fan-out/in, HITL
-  graph_spec.py   # static nodes/edges for GET /api/workflow/graph
-  service.py      # runs the workflow, serialises to the API contract, HITL registry
-  api.py          # FastAPI app
-  devui_app.py    # DevUI serve() entrypoint
+  devui_app.py      # DevUI serve() entrypoint (root entry point)
+  __main__.py       # `python -m contract_triage` → uvicorn (serves io.api:app)
+  service.py        # runs the workflow, serialises to the API contract, HITL registry
+  config.py         # loads .env so OPENAI_API_KEY is picked up standalone or under `make up`
+
+  agents/           # the LLM brain: classification, gates, redlines, explanation (+ DevUI agents)
+    __init__.py     #   the model calls + structured-output schemas
+    prompts/        #   one *.md file per system prompt (edit the prompts here)
+    README.md       #   ← guided, top-to-bottom reading tour of this codebase (start here)
+
+  models/           # the types the whole app speaks
+    domain.py       # vendored copy of ../../docs/models.py — the Pydantic domain types
+    state.py        # TriageState (the shared message) + request/interrupt envelopes
+
+  executors/        # graph nodes — one Executor per node in agent-graph.mmd, grouped by stage
+    intake.py       #   ingest, classify, intake gate, fast-path guard
+    gates.py        #   the policy-validator fan-out → gather → outcome
+    negotiability.py#   non-negotiable fork / gap analysis
+    redline.py      #   the bounded redline loop
+    approval.py     #   set signer, sign, terminal SIGNED side-effects
+    human_gate.py   #   the re-entrant human interrupt + DECLINED / ESCALATED
+    finalize.py     #   shared scoring / explanation / persistence helpers
+
+  edges/            # graph wiring
+    workflow.py     #   WorkflowBuilder: switch-case routers, fan-out/in, HITL
+    graph_spec.py   #   static nodes/edges for GET /api/workflow/graph
+
+  io/               # HTTP boundary + persistence & external systems (resilient — a missing store is a no-op)
+    api.py          #   FastAPI app — the REST surface (ASGI target: contract_triage.io.api:app)
+    db.py           #   SQLite results/decisions
+    repository.py   #   the contracts register
+    storage.py      #   S3/MinIO documents
+    playbook.py     #   the grounded negotiating positions
+    pdf.py          #   intake PDF ingestion
+    data.py         #   the 10 inbox items + inherited prior-contract flags
+    observability.py#   OpenTelemetry → Langfuse
 ```
 
 ## Run
@@ -72,7 +107,7 @@ root.
 
 ## Notes
 
-- `models.py` is a copy of `../../docs/models.py` so the agent is a
+- `models/domain.py` is a copy of `../../docs/models.py` so the agent is a
   self-contained, deployable package; keep them in sync if the domain types change.
 - The human gate is a genuine Agent Framework `request_info` interrupt. In the
   app flow a paused run lands the contract in the reviewer's queue; `/resolve`

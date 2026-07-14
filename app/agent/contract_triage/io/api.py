@@ -15,7 +15,7 @@ from contextlib import asynccontextmanager
 
 from datetime import date
 
-from . import config  # noqa: F401  — loads .env before anything reads env vars
+from .. import config  # noqa: F401  — loads .env before anything reads env vars
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, StreamingResponse
@@ -23,8 +23,8 @@ from pydantic import BaseModel
 
 from .observability import setup_observability
 from .playbook import playbook_repo
-from .service import TriageService
 from .storage import store
+from ..service import TriageService
 
 setup_observability()  # ships Agent Framework traces to Langfuse when configured
 

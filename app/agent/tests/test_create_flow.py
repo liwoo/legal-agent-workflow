@@ -14,8 +14,8 @@ from pathlib import Path
 
 import pytest
 
-from contract_triage import db
-from contract_triage.repository import ContractRepository
+from contract_triage.io import db
+from contract_triage.io.repository import ContractRepository
 from contract_triage.service import TriageService
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
