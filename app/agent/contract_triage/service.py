@@ -18,6 +18,7 @@ from . import db, graph_spec
 from .executors import HumanDecision
 from .models import EndState, InboxItem
 from .observability import workflow_span
+from .playbook import playbook_repo
 from .repository import repo
 from .state import TriageRequest, TriageState
 from .storage import store
@@ -114,6 +115,7 @@ class TriageService:
         store.connect()
         if os.getenv("SEED_EXAMPLES", "0") == "1":
             repo.seed_examples()
+        playbook_repo.seed_from_json()  # ground the redline node in the desk's positions
         self.results.update(db.load_results())
 
     # ── serialisation ────────────────────────────────────────────────────────

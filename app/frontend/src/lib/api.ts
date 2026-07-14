@@ -1,6 +1,13 @@
 import { contractsFixture, getContractFixtureById } from "@/src/data/contracts";
 import { policiesFixture } from "@/src/data/policies";
-import type { ContractDetail, ContractSummary, Policy, ResolveDecision } from "@/src/types";
+import type {
+  ContractDetail,
+  ContractSummary,
+  PlaybookSection,
+  PlaybookSectionUpdate,
+  Policy,
+  ResolveDecision,
+} from "@/src/types";
 import { queueForContract } from "@/src/lib/utils";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
@@ -277,6 +284,33 @@ export async function listPolicies(): Promise<Policy[]> {
   } catch {
     return policiesFixture;
   }
+}
+
+/**
+ * The desk's playbook sections — the negotiating positions the redline agent
+ * maps against. Returns [] if the backend is unreachable (editing the playbook
+ * inherently needs a live API), so the screen shows an empty/notice state.
+ */
+export async function listPlaybook(): Promise<PlaybookSection[]> {
+  try {
+    return await fetchJson<PlaybookSection[]>("/api/playbook");
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Save a reviewer's edit to one playbook section. Throws on failure — persisting
+ * a playbook change requires a live backend, so the caller surfaces the error.
+ */
+export async function updatePlaybookSection(
+  section: string,
+  update: PlaybookSectionUpdate
+): Promise<PlaybookSection> {
+  return fetchJson<PlaybookSection>(
+    `/api/playbook/sections/${encodeURIComponent(section)}`,
+    { method: "PUT", body: JSON.stringify(update) }
+  );
 }
 
 function toSummary(detail: ContractDetail): ContractSummary {

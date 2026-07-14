@@ -112,6 +112,27 @@ export interface Policy {
   summary: string;
 }
 
+/**
+ * One negotiating position from the desk's playbook — the sections the redline
+ * agent maps each counterparty change against. Editable from Settings; an edit
+ * is reflected on the next contract the agent triages.
+ */
+export interface PlaybookSection {
+  section: string; // "3.1"
+  chapter: number;
+  title: string;
+  guidance: string;
+  source: "seed" | "user"; // "user" once a reviewer has edited it
+  updated_at: string | null;
+  updated_by: string | null;
+}
+
+export interface PlaybookSectionUpdate {
+  title: string;
+  guidance: string;
+  updated_by?: string;
+}
+
 export type ResolveDecision = "resolved" | "declined" | "escalated";
 
 export interface ResolveRequest {

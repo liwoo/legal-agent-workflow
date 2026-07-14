@@ -22,6 +22,7 @@ from fastapi.responses import RedirectResponse, StreamingResponse
 from pydantic import BaseModel
 
 from .observability import setup_observability
+from .playbook import playbook_repo
 from .service import TriageService
 from .storage import store
 
@@ -70,6 +71,14 @@ app.add_middleware(
 class ResolveRequest(BaseModel):
     decision: str = "resolved"  # resolved | declined | escalated
     note: str | None = None
+
+
+class PlaybookSectionUpdate(BaseModel):
+    """A reviewer edit to one negotiating position (the editable Settings surface)."""
+
+    title: str
+    guidance: str
+    updated_by: str | None = None
 
 
 # ── server-sent events (streamed triage runs) ────────────────────────────────
@@ -247,3 +256,24 @@ async def workflow_graph() -> dict:
 @app.get("/api/policies")
 async def list_policies() -> list[dict]:
     return POLICIES
+
+
+@app.get("/api/playbook")
+async def list_playbook() -> list[dict]:
+    """The desk's negotiating positions — the sections the redline node maps against."""
+    return playbook_repo.list_sections()
+
+
+@app.put("/api/playbook/sections/{section}")
+async def update_playbook_section(section: str, body: PlaybookSectionUpdate) -> dict:
+    """Edit one section. Takes effect on the next contract the redline node maps —
+    the position is pulled fresh from here on every run."""
+    updated = playbook_repo.update_section(
+        section, body.title, body.guidance, body.updated_by
+    )
+    if not updated:
+        raise HTTPException(status_code=404, detail=f"Unknown playbook section {section}")
+    result = playbook_repo.get_section(section)
+    if result is None:  # pragma: no cover - defensive
+        raise HTTPException(status_code=404, detail=f"Unknown playbook section {section}")
+    return result
