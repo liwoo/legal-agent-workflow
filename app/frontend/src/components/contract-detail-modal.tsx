@@ -133,14 +133,14 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] max-w-4xl gap-0 overflow-hidden p-0">
+      <DialogContent className="flex max-h-[92vh] max-w-4xl flex-col gap-0 overflow-hidden p-0">
         {loading || !detail ? (
           <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
             {loading ? "Loading contract…" : "Contract not found."}
           </div>
         ) : (
           <>
-            <DialogHeader className="border-b border-border p-6 pb-5">
+            <DialogHeader className="shrink-0 border-b border-border p-6 pb-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -173,12 +173,12 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
             </DialogHeader>
 
             {/* The contract's journey — instant, wordless status */}
-            <div className="border-b border-border px-8 py-4">
+            <div className="shrink-0 border-b border-border px-8 py-4">
               <ContractJourney aiStatus={detail.ai_status} endState={detail.end_state} />
             </div>
 
-            <Tabs defaultValue="summary">
-              <TabsList className={TABS_LIST_CLASS}>
+            <Tabs defaultValue="summary" className="flex min-h-0 flex-1 flex-col">
+              <TabsList className={cn(TABS_LIST_CLASS, "shrink-0")}>
                 <TabsTrigger value="summary" className={TAB_TRIGGER_CLASS}>
                   <Sparkles className="h-4 w-4" />
                   Summary
@@ -197,7 +197,7 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                 </TabsTrigger>
               </TabsList>
 
-              <ScrollArea className="max-h-[calc(92vh-21rem)]">
+              <ScrollArea className="min-h-0 flex-1">
                 {/* a) Summary — what this contract is about, in a nutshell */}
                 <TabsContent value="summary" className="mt-0 space-y-5 p-6">
                   <div className="space-y-2 rounded-lg border border-border bg-muted/40 p-4 text-sm">
@@ -410,8 +410,8 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
               </ScrollArea>
             </Tabs>
 
-            <Separator />
-            <DialogFooter className="gap-2 p-4 sm:justify-between">
+            <Separator className="shrink-0" />
+            <DialogFooter className="shrink-0 gap-2 p-4 sm:justify-between">
               <span className="hidden text-xs text-muted-foreground sm:block">
                 <span className="font-mono">{detail.id}</span> · from {detail.sender_role}
               </span>
