@@ -10,9 +10,9 @@ interface ScoreBadgeProps {
 /**
  * How sure the assistant is about its own reading of a contract — NOT a
  * measure of risk or contract value. We lead with a plain-language band
- * (High / Medium / Low) and a colour dot rather than a bare "82/100", which
- * newcomers tend to misread as a score of the contract itself. The raw value
- * is preserved in the tooltip and still drives table sorting.
+ * (High / Medium / Low) and a colour dot rather than a bare "82%", which
+ * newcomers tend to misread as a score of the contract itself. The raw
+ * percentage is preserved in the tooltip and still drives table sorting.
  */
 export function ScoreBadge({ score, className, size = "sm" }: ScoreBadgeProps) {
   const band =
@@ -32,7 +32,7 @@ export function ScoreBadge({ score, className, size = "sm" }: ScoreBadgeProps) {
         size === "lg" && "gap-2 text-sm",
         className
       )}
-      title={score === null ? "The assistant has not read this item yet" : `Assistant confidence: ${score}/100`}
+      title={score === null ? "The assistant has not read this item yet" : `Assistant confidence: ${score}%`}
     >
       <span className={cn("h-2 w-2 shrink-0 rounded-full", band.dot, size === "lg" && "h-2.5 w-2.5")} aria-hidden="true" />
       {band.label}

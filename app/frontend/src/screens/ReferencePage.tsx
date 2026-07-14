@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { FileSignature, Gauge, Inbox, ListChecks, Scale, ShieldCheck } from "lucide-react";
+import { Gauge, Handshake, Inbox, ListChecks, Scale, ShieldCheck } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { InfoHint } from "@/src/components/info-hint";
@@ -27,21 +27,23 @@ const SECTIONS: RefSection[] = [
     body: (
       <>
         <p>
-          Confidence is <strong>how sure the assistant is about its own reading</strong> of a contract — not a
-          score of the contract itself, its risk, or its value.
+          Confidence is a <strong>percentage</strong> — <strong>how sure the assistant is about its own reading</strong>{" "}
+          of a contract, not a score of the contract itself, its risk, or its value. The assistant reads every contract
+          from scratch in plain language rather than matching it to a fixed template, so the figure reflects how clearly
+          the wording lined up with our playbook and how much of it the model could account for.
         </p>
         <ul className="ml-4 list-disc space-y-1">
           <li>
-            <span className="font-medium text-success">High</span> — the paper matched a known template and playbook
-            cleanly, so the assistant is confident in what it found.
+            <span className="font-medium text-success">High (75% or above)</span> — the wording was clear and lined up
+            with positions the assistant recognises, so it is confident in what it found.
           </li>
           <li>
-            <span className="font-medium text-warning">Medium</span> — mostly recognisable, but with wording the
+            <span className="font-medium text-warning">Medium (45–74%)</span> — mostly clear, but with wording the
             assistant is less certain about. Worth a glance.
           </li>
           <li>
-            <span className="font-medium text-destructive">Low</span> — unusual paper the assistant couldn’t map
-            confidently. Read it yourself before trusting the summary.
+            <span className="font-medium text-destructive">Low (below 45%)</span> — unusual or ambiguous wording the
+            assistant couldn’t read confidently. Read it yourself before trusting the summary.
           </li>
         </ul>
         <p className="text-muted-foreground">
@@ -122,7 +124,11 @@ const SECTIONS: RefSection[] = [
       <>
         <p>
           A redline is a change the other side wants to make to the contract wording. The assistant grades each one
-          against our playbook:
+          against our playbook, then works through it (see{" "}
+          <Link href="#negotiation" className="text-primary underline-offset-2 hover:underline">
+            how it negotiates
+          </Link>
+          ):
         </p>
         <ul className="ml-4 list-disc space-y-1">
           <li>
@@ -141,6 +147,50 @@ const SECTIONS: RefSection[] = [
             position, so a person has to decide.
           </li>
         </ul>
+      </>
+    ),
+  },
+  {
+    id: "negotiation",
+    title: "How it negotiates",
+    icon: Handshake,
+    body: (
+      <>
+        <p>
+          When a contract is on the other side’s paper and open to change, the assistant doesn’t just flag the redlines —
+          it works through them. For each proposed change it takes the desk’s standing position from the playbook and:
+        </p>
+        <ul className="ml-4 list-disc space-y-1">
+          <li>
+            <span className="font-medium text-foreground">Holds the line</span> — keeps our standard wording where the
+            change isn’t one we give ground on.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Applies a fallback</span> — swaps in an approved compromise
+            when the change is on our list of acceptable fallbacks.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Strikes and substitutes</span> — removes wording we won’t
+            accept and puts our own clause back.
+          </li>
+        </ul>
+        <p>
+          It loops through every open point this way until the contract is either fully resolved — and moves on to
+          sign-off — or it reaches a{" "}
+          <Link href="#redlines" className="text-primary underline-offset-2 hover:underline">
+            refusal point
+          </Link>{" "}
+          or runs out of road, at which point it stops and hands the contract to a person.
+        </p>
+        <p className="text-muted-foreground">
+          Some paper can’t be negotiated at all — a tender pack, online terms, a regulated annex. There’s no lever to
+          pull, so instead of redlining the assistant checks it against our playbook and, if it finds a term we’d
+          normally refuse, raises it as a{" "}
+          <Link href="#outcomes" className="text-primary underline-offset-2 hover:underline">
+            business decision
+          </Link>
+          : accept the risk or decline.
+        </p>
       </>
     ),
   },
