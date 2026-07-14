@@ -61,6 +61,15 @@ CREATE TABLE IF NOT EXISTS reviewer_decisions (
     note       TEXT,
     decided_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS playbook_sections (
+    section    TEXT PRIMARY KEY,   -- "3.1" — matches the PlaybookSection enum
+    chapter    INTEGER NOT NULL,
+    title      TEXT NOT NULL,
+    guidance   TEXT NOT NULL,      -- authoritative position text; injected into the redline prompt
+    source     TEXT NOT NULL DEFAULT 'seed',  -- seed | user (a reviewer edit flips it to 'user')
+    updated_at TEXT NOT NULL,
+    updated_by TEXT
+);
 """
 
 
@@ -280,3 +289,70 @@ def list_decisions(item_id: str | None = None) -> list[dict]:
     except Exception as exc:  # pragma: no cover - defensive
         _log.warning("list_decisions failed: %s", exc)
         return []
+
+
+# ── playbook sections (the negotiating positions the redline node is grounded in) ──
+def seed_playbook_section(section: str, chapter: int, title: str, guidance: str) -> None:
+    """Write a seed section from PLAYBOOK.json. Idempotent, and *non-destructive*:
+    the ``WHERE source = 'seed'`` guard refreshes seed rows on boot (so edits to
+    PLAYBOOK.json flow through) but never clobbers a row a reviewer has edited."""
+    try:
+        with _lock, _connect() as conn:
+            conn.execute(
+                "INSERT INTO playbook_sections (section, chapter, title, guidance, source, updated_at) "
+                "VALUES (?, ?, ?, ?, 'seed', ?) "
+                "ON CONFLICT(section) DO UPDATE SET "
+                "chapter = excluded.chapter, title = excluded.title, "
+                "guidance = excluded.guidance, updated_at = excluded.updated_at "
+                "WHERE playbook_sections.source = 'seed'",
+                (section, chapter, title, guidance, _now()),
+            )
+    except Exception as exc:  # pragma: no cover - defensive
+        _log.warning("seed_playbook_section(%s) failed: %s", section, exc)
+
+
+def update_playbook_section(
+    section: str, title: str, guidance: str, updated_by: str | None = None
+) -> bool:
+    """Apply a reviewer edit to one section, flipping it to ``source='user'`` so a
+    later re-seed leaves it alone. Returns True if a row was updated."""
+    try:
+        with _lock, _connect() as conn:
+            cur = conn.execute(
+                "UPDATE playbook_sections "
+                "SET title = ?, guidance = ?, source = 'user', updated_by = ?, updated_at = ? "
+                "WHERE section = ?",
+                (title, guidance, updated_by, _now(), section),
+            )
+            return cur.rowcount > 0
+    except Exception as exc:  # pragma: no cover - defensive
+        _log.warning("update_playbook_section(%s) failed: %s", section, exc)
+        return False
+
+
+def list_playbook() -> list[dict]:
+    """Return every playbook section in chapter/section order (empty if unavailable)."""
+    try:
+        with _connect() as conn:
+            rows = conn.execute(
+                "SELECT section, chapter, title, guidance, source, updated_at, updated_by "
+                "FROM playbook_sections ORDER BY chapter, section"
+            ).fetchall()
+        return [dict(row) for row in rows]
+    except Exception as exc:  # pragma: no cover - defensive
+        _log.warning("list_playbook failed: %s", exc)
+        return []
+
+
+def get_playbook_section(section: str) -> dict | None:
+    try:
+        with _connect() as conn:
+            row = conn.execute(
+                "SELECT section, chapter, title, guidance, source, updated_at, updated_by "
+                "FROM playbook_sections WHERE section = ?",
+                (section,),
+            ).fetchone()
+        return dict(row) if row else None
+    except Exception as exc:  # pragma: no cover - defensive
+        _log.warning("get_playbook_section(%s) failed: %s", section, exc)
+        return None

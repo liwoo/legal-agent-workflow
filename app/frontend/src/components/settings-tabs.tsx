@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookText, type LucideIcon, SlidersHorizontal } from "lucide-react";
+import { BookText, type LucideIcon, Scale, SlidersHorizontal } from "lucide-react";
 
 import { cn } from "@/src/lib/utils";
 
 const TABS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/settings", label: "General", icon: SlidersHorizontal },
   { href: "/settings/policies", label: "Policies", icon: BookText },
+  { href: "/settings/playbook", label: "Playbook", icon: Scale },
 ];
 
 /**

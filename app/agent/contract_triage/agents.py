@@ -354,10 +354,21 @@ def _gate_state_suffix(state) -> str:
 
 
 async def redlines_llm(state) -> list[Redline]:
-    """LLM redline→playbook mapping."""
+    """LLM redline→playbook mapping, grounded in the desk's live playbook.
+
+    The playbook sections are pulled fresh from the repository on every call and
+    injected into the instructions, so a runtime edit to a position is reflected
+    on the very next contract — the redline advisor maps against the desk's
+    *actual* standard/fallback/refusal ladders, not the model's prior."""
+    from .playbook import playbook_repo
+
     inherited = list(state.flags or [])
     prompt = _item_context(state.item, inherited) + _gate_state_suffix(state)
-    result = await _structured(REDLINE_INSTRUCTIONS, prompt, RedlinesLLM)
+    playbook = playbook_repo.render_for_prompt()
+    instructions = (
+        f"{REDLINE_INSTRUCTIONS}\n\n{playbook}" if playbook else REDLINE_INSTRUCTIONS
+    )
+    result = await _structured(instructions, prompt, RedlinesLLM)
     assert isinstance(result, RedlinesLLM)
     return [
         Redline(
