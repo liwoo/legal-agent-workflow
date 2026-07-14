@@ -17,7 +17,7 @@ interface QueueTabsProps {
 const TABS: { href: string; label: string; key: keyof QueueTabsProps["counts"]; icon: LucideIcon }[] = [
   { href: "/contracts/inbox", label: "Inbox", key: "inbox", icon: Inbox },
   { href: "/contracts/review", label: "Review", key: "review", icon: Scale },
-  { href: "/contracts/signed", label: "Signed", key: "signed", icon: FileSignature },
+  { href: "/contracts/signed", label: "Ready to sign", key: "signed", icon: FileSignature },
 ];
 
 /**

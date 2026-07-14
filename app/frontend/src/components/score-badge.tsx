@@ -9,20 +9,23 @@ interface ScoreBadgeProps {
 
 /**
  * How sure the assistant is about its own reading of a contract — NOT a
- * measure of risk or contract value. We lead with a plain-language band
- * (High / Medium / Low) and a colour dot rather than a bare "82%", which
- * newcomers tend to misread as a score of the contract itself. The raw
- * percentage is preserved in the tooltip and still drives table sorting.
+ * measure of risk or contract value. We show the raw percentage with a
+ * colour dot banding it (green / amber / red) so the confidence level still
+ * reads at a glance. The larger modal variant spells out "confidence"; the
+ * tooltip disambiguates it from a score of the contract itself.
  */
 export function ScoreBadge({ score, className, size = "sm" }: ScoreBadgeProps) {
   const band =
     score === null
-      ? { label: "Not yet assessed", dot: "bg-muted-foreground/40", text: "text-muted-foreground" }
+      ? { dot: "bg-muted-foreground/40", text: "text-muted-foreground" }
       : score >= 75
-        ? { label: "High confidence", dot: "bg-success", text: "text-foreground" }
+        ? { dot: "bg-success", text: "text-foreground" }
         : score >= 45
-          ? { label: "Medium confidence", dot: "bg-warning", text: "text-foreground" }
-          : { label: "Low confidence", dot: "bg-destructive", text: "text-foreground" };
+          ? { dot: "bg-warning", text: "text-foreground" }
+          : { dot: "bg-destructive", text: "text-foreground" };
+
+  const label =
+    score === null ? "Not yet assessed" : size === "lg" ? `${score}% confidence` : `${score}%`;
 
   return (
     <span
@@ -35,7 +38,7 @@ export function ScoreBadge({ score, className, size = "sm" }: ScoreBadgeProps) {
       title={score === null ? "The assistant has not read this item yet" : `Assistant confidence: ${score}%`}
     >
       <span className={cn("h-2 w-2 shrink-0 rounded-full", band.dot, size === "lg" && "h-2.5 w-2.5")} aria-hidden="true" />
-      {band.label}
+      {label}
     </span>
   );
 }

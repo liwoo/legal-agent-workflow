@@ -277,6 +277,38 @@ export async function resolveContract(
   }
 }
 
+/**
+ * Archive a contract so it drops out of every queue. Best-effort: if the
+ * backend doesn't support it (or is unreachable), the store still tracks the
+ * archive client-side, so this resolves quietly rather than throwing.
+ */
+export async function archiveContract(id: string): Promise<void> {
+  try {
+    await fetchJson(`/api/contracts/${encodeURIComponent(id)}/archive`, { method: "POST" });
+  } catch {
+    /* offline / not wired — archive is tracked client-side by the store */
+  }
+}
+
+/** Return an archived contract to its queue. Best-effort, mirrors archive. */
+export async function unarchiveContract(id: string): Promise<void> {
+  try {
+    await fetchJson(`/api/contracts/${encodeURIComponent(id)}/unarchive`, { method: "POST" });
+  } catch {
+    /* offline / not wired — handled client-side by the store */
+  }
+}
+
+/** The archived contracts, for Settings → Archived. Empty when unreachable. */
+export async function listArchivedContracts(): Promise<ContractSummary[]> {
+  try {
+    const data = await fetchJson<ContractSummary[]>("/api/contracts/archived");
+    return data.map((c) => ({ ...c, queue: queueForContract(c) }));
+  } catch {
+    return [];
+  }
+}
+
 export async function listPolicies(): Promise<Policy[]> {
   try {
     const data = await fetchJson<Policy[]>("/api/policies");

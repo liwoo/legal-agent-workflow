@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import {
   AlertTriangle,
+  Archive,
   ArrowUpRight,
   Ban,
   Banknote,
@@ -13,11 +14,11 @@ import {
   FileText,
   Gavel,
   History,
-  ListChecks,
+  Mail,
   PenLine,
+  RefreshCw,
   ShieldCheck,
   Sparkles,
-  XCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -35,19 +36,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
-import { ScrollArea } from "@/src/components/ui/scroll-area";
 import { Separator } from "@/src/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { getApiBaseUrl } from "@/src/lib/api";
 import { getContract, useContracts } from "@/src/store/contracts";
 import { cn, formatDate, formatDateTime, formatGbp, formatRelative, titleCase } from "@/src/lib/utils";
-import type { ContractDetail, GateCheck, ResolveDecision } from "@/src/types";
+import type { ContractDetail, GateCheck } from "@/src/types";
 
 interface ContractDetailModalProps {
   contractId: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+// The in-flight footer action, so every button disables while one runs.
+type ActionId = "reevaluate" | "send" | "approve" | "archive";
 
 // Traffic-light UI for each check status — one icon + colour, read at a glance.
 const GATE_STATUS_UI: Record<GateCheck["status"], { icon: LucideIcon; label: string; tile: string; text: string }> = {
@@ -91,16 +94,117 @@ const TIER_LABEL: Record<string, string> = {
 const gateLabel = (gate: string) => GATE_LABEL[gate] ?? titleCase(gate);
 const tierLabel = (tier: string) => TIER_LABEL[tier] ?? titleCase(tier);
 
+// The desk's move on each redline, phrased as a verb for the one-line proposal.
+const ACTION_VERB: Record<string, string> = {
+  escalated: "escalate",
+  struck: "strike",
+  substitute_offered: "offer a substitute for",
+  fallback_applied: "apply a fallback to",
+  held: "hold",
+};
+// Most-serious-first, so the proposal leads with escalations and holds land last.
+const ACTION_ORDER = ["escalated", "struck", "substitute_offered", "fallback_applied", "held"];
+
+// A plain-English predicate for the Summary "Proposal is to …" line, built from
+// what the desk did with each redline (escalate / strike / fallback / hold),
+// grouped by action so the reviewer reads the shape of the ask in one sentence
+// — e.g. "escalate 4 clauses and hold 3". Returns null when nothing was proposed.
+function proposalSummary(redlines: ContractDetail["redlines"]): string | null {
+  if (!redlines.length) return null;
+  const counts = new Map<string, number>();
+  for (const r of redlines) counts.set(r.action, (counts.get(r.action) ?? 0) + 1);
+  const rank = (a: string) => ACTION_ORDER.indexOf(a) + 1 || 99;
+  const segments = [...counts.keys()]
+    .sort((a, b) => rank(a) - rank(b))
+    .map((action, i) => {
+      const n = counts.get(action)!;
+      const verb = ACTION_VERB[action] ?? "review";
+      // Name the noun once, on the first segment, so it isn't repeated.
+      const noun = i === 0 ? (n === 1 ? " clause" : " clauses") : "";
+      return `${verb} ${n}${noun}`;
+    });
+  // segments is non-empty here (redlines was non-empty), so the indexes are safe.
+  if (segments.length === 1) return segments[0]!;
+  return `${segments.slice(0, -1).join(", ")} and ${segments[segments.length - 1]!}`;
+}
+
+// Compose a mailto: draft to the counterparty that reads sensibly for THIS
+// case, rather than always claiming to "propose changes". Three situations:
+//   • propose  — sending our redlines to the other side for review
+//   • approve, with changes — ready to sign subject to desk edits we've made
+//   • approve, no changes   — happy to proceed as drafted, ready to countersign
+// The recipient is left blank — the reviewer fills in the other side's address.
+function contractEmail(detail: ContractDetail, intent: "propose" | "approve"): string {
+  const changes = detail.redlines.map((r, i) => {
+    const ref = r.clause_ref ?? "Clause";
+    return `${i + 1}. ${ref} — ${tierLabel(r.tier)}\n   ${r.description}`;
+  });
+  const who = `${detail.counterparty} (${detail.id})`;
+
+  let subject: string;
+  let lines: string[];
+  if (intent === "propose") {
+    subject = `Proposed changes — ${who}`;
+    lines = [
+      "Hi,",
+      "",
+      `Following our review of ${who}, we'd like to propose the following changes:`,
+      "",
+      ...changes,
+      "",
+      "Happy to talk these through.",
+    ];
+  } else if (changes.length > 0) {
+    subject = `Ready to sign, subject to changes — ${who}`;
+    lines = [
+      "Hi,",
+      "",
+      `We've completed our review of ${who} and are happy to proceed, subject to the following:`,
+      "",
+      ...changes,
+      "",
+      "With these in place we're ready to countersign — let us know if anything needs discussing.",
+    ];
+  } else {
+    subject = `Ready to sign — ${who}`;
+    lines = [
+      "Hi,",
+      "",
+      `We've completed our review of ${who} and are happy to proceed as drafted — no changes needed on our side.`,
+      "",
+      "We're ready to countersign; please let us know the best way to complete signature.",
+    ];
+  }
+  const body = [...lines, "", "Best regards,"].join("\n");
+  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+// Fold a resolve/approve response into the current detail WITHOUT dropping the
+// proposed changes (or checks / follow-ups): a decision changes the outcome, not
+// the analysis, so we keep whatever the server returned but never let it blank
+// out lists the reviewer is still looking at.
+function keepAnalysis(prev: ContractDetail | null, updated: ContractDetail): ContractDetail {
+  if (!prev) return updated;
+  return {
+    ...updated,
+    redlines: updated.redlines.length ? updated.redlines : prev.redlines,
+    gate_checks: updated.gate_checks.length ? updated.gate_checks : prev.gate_checks,
+    forward_obligations: updated.forward_obligations.length
+      ? updated.forward_obligations
+      : prev.forward_obligations,
+  };
+}
+
 // Underline tab strip — matches the QueueTabs / SettingsTabs design language.
 const TABS_LIST_CLASS = "h-auto w-full justify-start gap-1 rounded-none border-b border-border bg-transparent px-6 py-0";
 const TAB_TRIGGER_CLASS =
   "relative -mb-px gap-1.5 rounded-none border-b-2 border-transparent px-3 py-2.5 text-sm font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none";
 
 export function ContractDetailModal({ contractId, open, onOpenChange }: ContractDetailModalProps) {
-  const { resolve } = useContracts();
+  const { resolve, triage, archive } = useContracts();
   const [detail, setDetail] = React.useState<ContractDetail | null>(null);
   const [loading, setLoading] = React.useState(false);
-  const [busy, setBusy] = React.useState<ResolveDecision | null>(null);
+  const [busy, setBusy] = React.useState<ActionId | null>(null);
 
   React.useEffect(() => {
     if (!open || !contractId) return;
@@ -118,18 +222,48 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
     };
   }, [open, contractId]);
 
-  const onDecision = async (decision: ResolveDecision) => {
+  // Approve = resolve as "resolved", keeping the proposed changes on screen
+  // (a decision changes the outcome, not the analysis — see keepAnalysis).
+  const applyApproval = async () => {
     if (!contractId) return;
-    setBusy(decision);
-    const updated = await resolve(contractId, decision);
+    const updated = await resolve(contractId, "resolved");
+    if (updated) setDetail((prev) => keepAnalysis(prev, updated));
+  };
+
+  // Re-evaluate = a fresh AI run that *replaces* everything (classification,
+  // gates, proposed changes, outcome, score) — the one action that deliberately
+  // discards the current analysis, so no keepAnalysis here.
+  const onReevaluate = async () => {
+    if (!contractId) return;
+    setBusy("reevaluate");
+    const updated = await triage(contractId);
     if (updated) setDetail(updated);
     setBusy(null);
   };
 
-  const canAct = detail?.interrupt != null || detail?.queue !== "signed";
-  const hasDetails = Boolean(
-    detail && (detail.gate_checks.length || detail.redlines.length || detail.forward_obligations.length)
-  );
+  // Open a pre-filled email to the counterparty proposing our changes.
+  const onSendSuggestions = () => {
+    if (detail) window.location.href = contractEmail(detail, "propose");
+  };
+
+  // Ready-to-sign: approve, then open an email that reads correctly for the case
+  // (ready to countersign as-drafted when there are no changes to send).
+  const onApproveSuggestions = async () => {
+    setBusy("approve");
+    if (detail) window.location.href = contractEmail(detail, "approve");
+    await applyApproval();
+    setBusy(null);
+  };
+
+  const onArchive = async () => {
+    if (!contractId) return;
+    setBusy("archive");
+    await archive(contractId);
+    setBusy(null);
+    onOpenChange(false);
+  };
+
+  const proposal = detail ? proposalSummary(detail.redlines) : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -183,9 +317,13 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                   <Sparkles className="h-4 w-4" />
                   Summary
                 </TabsTrigger>
-                <TabsTrigger value="details" className={TAB_TRIGGER_CLASS}>
-                  <ListChecks className="h-4 w-4" />
-                  Details
+                <TabsTrigger value="checks" className={TAB_TRIGGER_CLASS}>
+                  <ShieldCheck className="h-4 w-4" />
+                  Policy checks
+                </TabsTrigger>
+                <TabsTrigger value="changes" className={TAB_TRIGGER_CLASS}>
+                  <PenLine className="h-4 w-4" />
+                  Proposed changes
                 </TabsTrigger>
                 <TabsTrigger value="decision" className={TAB_TRIGGER_CLASS}>
                   <Gavel className="h-4 w-4" />
@@ -197,7 +335,10 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                 </TabsTrigger>
               </TabsList>
 
-              <ScrollArea className="min-h-0 flex-1">
+              {/* Native overflow container: reliably bounded by the flex column
+                  so the body scrolls while the header, tab strip and footer stay
+                  pinned. */}
+              <div className="min-h-0 flex-1 overflow-y-auto">
                 {/* a) Summary — what this contract is about, in a nutshell */}
                 <TabsContent value="summary" className="mt-0 space-y-5 p-6">
                   <div className="space-y-2 rounded-lg border border-border bg-muted/40 p-4 text-sm">
@@ -210,13 +351,23 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                     </p>
                   </div>
 
-                  {detail.explanation ? (
+                  {detail.explanation || proposal ? (
                     <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
                       <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
                         <Sparkles className="h-3.5 w-3.5" />
                         In a nutshell
                       </div>
-                      <p className="text-sm leading-relaxed text-foreground">{detail.explanation}</p>
+                      {detail.explanation ? (
+                        <p className="text-sm leading-relaxed text-foreground">{detail.explanation}</p>
+                      ) : null}
+                      {proposal ? (
+                        <p className="mt-2 flex items-start gap-1.5 text-sm text-foreground">
+                          <PenLine className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                          <span>
+                            <span className="font-medium">Proposal is to</span> {proposal}.
+                          </span>
+                        </p>
+                      ) : null}
                       {detail.recommended_action ? (
                         <p className="mt-2 text-sm font-medium text-primary">→ {detail.recommended_action}</p>
                       ) : null}
@@ -256,8 +407,8 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                   </p>
                 </TabsContent>
 
-                {/* b) Details — the checks and changes, in plain terms */}
-                <TabsContent value="details" className="mt-0 space-y-6 p-6">
+                {/* b) Policy checks — the standing gates, in plain terms */}
+                <TabsContent value="checks" className="mt-0 space-y-6 p-6">
                   {detail.gate_checks.length ? (
                     <Section
                       title="Policy checks"
@@ -297,12 +448,17 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                           </div>
                         ))}
                     </Section>
-                  ) : null}
+                  ) : (
+                    <EmptyTab icon={ShieldCheck} message="No policy checks were recorded for this item." />
+                  )}
+                </TabsContent>
 
+                {/* c) Proposed changes — the redlines, graded against our playbook */}
+                <TabsContent value="changes" className="mt-0 space-y-6 p-6">
                   {detail.redlines.length ? (
                     <Section
                       title="Proposed changes"
-                      icon={Gavel}
+                      icon={PenLine}
                       hint="Wording the other side wants to change, graded against our playbook."
                       aside={<LearnMore anchor="redlines">What do the tiers mean?</LearnMore>}
                     >
@@ -320,30 +476,12 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                         ))}
                       </ul>
                     </Section>
-                  ) : null}
-
-                  {detail.forward_obligations.length ? (
-                    <Section title="Follow-ups" icon={Clock} hint="Things to do after this contract is dealt with.">
-                      <ul className="space-y-2">
-                        {detail.forward_obligations.map((o, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm">
-                            <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                            <span>
-                              {o.note}
-                              {o.due ? <span className="text-muted-foreground"> (due {formatDate(o.due)})</span> : null}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </Section>
-                  ) : null}
-
-                  {!hasDetails ? (
-                    <EmptyTab icon={ListChecks} message="No checks, changes, or follow-ups were recorded for this item." />
-                  ) : null}
+                  ) : (
+                    <EmptyTab icon={PenLine} message="No changes to the counterparty's wording were proposed." />
+                  )}
                 </TabsContent>
 
-                {/* c) Decision — what was decided and what happens next */}
+                {/* d) Decision — what was decided and what happens next */}
                 <TabsContent value="decision" className="mt-0 space-y-6 p-6">
                   <div className="space-y-3 rounded-lg border border-border p-4">
                     <div className="flex items-center justify-between gap-4">
@@ -374,9 +512,25 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                       </div>
                     ) : null}
                   </div>
+
+                  {detail.forward_obligations.length ? (
+                    <Section title="Follow-ups" icon={Clock} hint="Things to do after this contract is dealt with.">
+                      <ul className="space-y-2">
+                        {detail.forward_obligations.map((o, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                            <span>
+                              {o.note}
+                              {o.due ? <span className="text-muted-foreground"> (due {formatDate(o.due)})</span> : null}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </Section>
+                  ) : null}
                 </TabsContent>
 
-                {/* d) Timeline & logs — the chronological record */}
+                {/* e) Timeline & logs — the chronological record */}
                 <TabsContent value="timeline" className="mt-0 space-y-6 p-6">
                   {detail.timeline.length ? (
                     <Section title="Timeline & logs" icon={History}>
@@ -407,7 +561,7 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                     <EmptyTab icon={History} message="No timeline events have been logged for this item yet." />
                   )}
                 </TabsContent>
-              </ScrollArea>
+              </div>
             </Tabs>
 
             <Separator className="shrink-0" />
@@ -415,28 +569,45 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
               <span className="hidden text-xs text-muted-foreground sm:block">
                 <span className="font-mono">{detail.id}</span> · from {detail.sender_role}
               </span>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                {/* Archive — icon only, available in every state */}
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
-                  disabled={!canAct || busy !== null}
-                  onClick={() => onDecision("declined")}
+                  className="text-muted-foreground"
+                  disabled={busy !== null}
+                  onClick={onArchive}
+                  aria-label="Archive this contract"
+                  title="Archive this contract"
                 >
-                  <XCircle className="mr-1.5 h-4 w-4" />
-                  Reject
+                  <Archive className="h-4 w-4" />
                 </Button>
+
+                {/* Send the proposed changes to the other side — states that still have changes to send */}
+                {detail.redlines.length > 0 && detail.queue !== "signed" ? (
+                  <Button variant="outline" size="sm" disabled={busy !== null} onClick={onSendSuggestions}>
+                    <Mail className="mr-1.5 h-4 w-4" />
+                    Send suggestions for review
+                  </Button>
+                ) : null}
+
+                {/* Approve — ready-to-sign only; also opens an email that fits the case */}
+                {detail.queue === "signed" ? (
+                  <Button size="sm" disabled={busy !== null} onClick={onApproveSuggestions}>
+                    <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                    {detail.redlines.length > 0 ? "Approve suggestions" : "Approve — ready to sign"}
+                  </Button>
+                ) : null}
+
+                {/* Re-evaluate — fresh AI run that replaces the analysis; every state */}
                 <Button
-                  variant="outline"
+                  variant={detail.queue === "signed" ? "outline" : "default"}
                   size="sm"
-                  disabled={!canAct || busy !== null}
-                  onClick={() => onDecision("escalated")}
+                  disabled={busy !== null}
+                  onClick={onReevaluate}
                 >
-                  <AlertTriangle className="mr-1.5 h-4 w-4" />
-                  Escalate
-                </Button>
-                <Button size="sm" disabled={!canAct || busy !== null} onClick={() => onDecision("resolved")}>
-                  <CheckCircle2 className="mr-1.5 h-4 w-4" />
-                  Approve
+                  <RefreshCw className={cn("mr-1.5 h-4 w-4", busy === "reevaluate" && "animate-spin")} />
+                  Re-evaluate
                 </Button>
               </div>
             </DialogFooter>

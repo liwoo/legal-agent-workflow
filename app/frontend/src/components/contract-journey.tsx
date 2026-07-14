@@ -26,7 +26,7 @@ function outcomeStep(endState: EndState): { label: string; icon: LucideIcon; ton
     case "signed_no_edits":
     case "signed_desk_edits":
     case "signed_with_deviation":
-      return { label: "Signed", icon: FileSignature, tone: "success" };
+      return { label: "Ready to sign", icon: FileSignature, tone: "success" };
     case "escalated":
       return { label: "Escalated", icon: AlertTriangle, tone: "danger" };
     case "blocked":

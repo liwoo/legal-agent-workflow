@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS contracts (
     metadata_json TEXT NOT NULL,   -- the intake payload (item_from_metadata schema)
     pdf_path      TEXT,            -- absolute local path the ingest node reads
     source        TEXT NOT NULL DEFAULT 'seed',  -- seed | user
+    archived      INTEGER NOT NULL DEFAULT 0,     -- reviewer archived it → out of every queue
     created_at    TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS triage_results (
@@ -97,6 +98,12 @@ def init_db() -> bool:
     try:
         with _lock, _connect() as conn:
             conn.executescript(_SCHEMA)
+            # Databases created before the archive feature won't have the column;
+            # add it idempotently (a fresh DB already has it from _SCHEMA).
+            try:
+                conn.execute("ALTER TABLE contracts ADD COLUMN archived INTEGER NOT NULL DEFAULT 0")
+            except sqlite3.OperationalError:
+                pass  # column already exists
         _log.info("SQLite ready → %s", _db_path())
         return True
     except Exception as exc:  # pragma: no cover - defensive
@@ -163,12 +170,18 @@ def get_contract(item_id: str) -> dict | None:
         return None
 
 
-def list_contracts() -> list[dict]:
-    """Return every contract's ``{metadata, pdf_path, source}``, insertion order."""
+def list_contracts(archived: bool = False) -> list[dict]:
+    """Return contracts' ``{metadata, pdf_path, source}`` in insertion order.
+
+    Excludes archived contracts by default so they drop out of every queue; pass
+    ``archived=True`` for the archive view. ``COALESCE`` keeps this safe even if
+    the ``archived`` column somehow predates the migration."""
     try:
         with _connect() as conn:
             rows = conn.execute(
-                "SELECT metadata_json, pdf_path, source FROM contracts ORDER BY created_at, item_id"
+                "SELECT metadata_json, pdf_path, source FROM contracts "
+                "WHERE COALESCE(archived, 0) = ? ORDER BY created_at, item_id",
+                (1 if archived else 0,),
             ).fetchall()
         return [
             {
@@ -181,6 +194,20 @@ def list_contracts() -> list[dict]:
     except Exception as exc:  # pragma: no cover - defensive
         _log.warning("list_contracts failed: %s", exc)
         return []
+
+
+def set_archived(item_id: str, archived: bool) -> bool:
+    """Flag/unflag a contract as archived. Returns True if a row changed."""
+    try:
+        with _lock, _connect() as conn:
+            cur = conn.execute(
+                "UPDATE contracts SET archived = ? WHERE item_id = ?",
+                (1 if archived else 0, item_id),
+            )
+            return cur.rowcount > 0
+    except Exception as exc:  # pragma: no cover - defensive
+        _log.warning("set_archived(%s) failed: %s", item_id, exc)
+        return False
 
 
 # ── triage outcomes (written by the agent's terminal nodes) ──────────────────

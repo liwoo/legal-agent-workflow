@@ -23,9 +23,9 @@ const COPY: Record<Queue, { title: string; blurb: string; empty: string; icon: L
     icon: Inbox,
   },
   signed: {
-    title: "Signed",
-    blurb: "Contracts finished and signed at the desk.",
-    empty: "Nothing signed yet.",
+    title: "Ready to sign",
+    blurb: "Cleared by the assistant — a person still signs them off before they're executed.",
+    empty: "Nothing ready to sign yet.",
     icon: FileSignature,
   },
   review: {
