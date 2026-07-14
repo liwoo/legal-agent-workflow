@@ -1,8 +1,8 @@
 """Northgate contract-triage agent — a Microsoft Agent Framework workflow that
 implements the abstract agent-graph (docs/agent-graph.mmd)."""
 
-from .state import TriageRequest, TriageState
-from .workflow import build_workflow
+from .edges.workflow import build_workflow
+from .models.state import TriageRequest, TriageState
 
 # Module-level entity so DevUI's directory discovery (`devui ./contract_triage`)
 # can find the workflow — it looks for a top-level `workflow` (or `agent`) object.

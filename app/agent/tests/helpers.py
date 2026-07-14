@@ -16,11 +16,11 @@ from pathlib import Path
 from typing import Any
 
 import _fake_brain as fake_brain
-from contract_triage.data import item_from_metadata
+from contract_triage.io.data import item_from_metadata
 from contract_triage.executors import HumanDecision
 from contract_triage.models import InboxItem
-from contract_triage.state import TriageRequest, TriageState
-from contract_triage.workflow import build_workflow
+from contract_triage.models.state import TriageRequest, TriageState
+from contract_triage.edges.workflow import build_workflow
 
 # The single shared fixture (see data/test/README.md).
 _TEST_DIR = Path(__file__).resolve().parents[3] / "data" / "test" / "CR-2026-050"

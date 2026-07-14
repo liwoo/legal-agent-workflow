@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 
 from . import data, db
 from .data import item_from_metadata
-from .models import InboxItem
+from ..models import InboxItem
 
 _log = logging.getLogger(__name__)
 

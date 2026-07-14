@@ -184,13 +184,13 @@ The graph in `agent-graph.mmd` maps directly onto the code:
 
 | agent-graph.mmd | code |
 |---|---|
-| shared `State` | `app/agent/contract_triage/state.py` — `TriageState` |
-| nodes / routers / validators / HITL | `app/agent/contract_triage/executors.py` |
-| graph wiring (switch-case, fan-out/in) | `app/agent/contract_triage/workflow.py` |
-| classification + playbook judgment (the LLM brain) | `app/agent/contract_triage/agents.py` |
-| the 10 demo inbox items (opt-in seed via `SEED_EXAMPLES=1`) | `app/agent/contract_triage/data.py` |
-| SQLite register + repository (API & agent share it) | `app/agent/contract_triage/db.py` · `repository.py` |
-| object store — intake PDFs, presigned URLs, uploads | `app/agent/contract_triage/storage.py` |
+| shared `State` | `app/agent/contract_triage/models/state.py` — `TriageState` |
+| nodes / routers / validators / HITL | `app/agent/contract_triage/executors/` (one file per graph stage) |
+| graph wiring (switch-case, fan-out/in) | `app/agent/contract_triage/edges/workflow.py` |
+| classification + playbook judgment (the LLM brain) | `app/agent/contract_triage/agents/` (prompts in `agents/prompts/`) |
+| the 10 demo inbox items (opt-in seed via `SEED_EXAMPLES=1`) | `app/agent/contract_triage/io/data.py` |
+| SQLite register + repository (API & agent share it) | `app/agent/contract_triage/io/db.py` · `io/repository.py` |
+| object store — intake PDFs, presigned URLs, uploads | `app/agent/contract_triage/io/storage.py` |
 
 And the FastAPI surface the console speaks:
 
@@ -345,7 +345,7 @@ back to something that actually happens in the corpus." Three things back that u
   the abstract diagram shows. And `loop_control`'s `maxed` branch can't be
   reached end-to-end under the deterministic test double, so it's pinned at the
   node level instead.
-- **`app/agent/contract_triage/models.py` is a vendored copy** of
+- **`app/agent/contract_triage/models/domain.py` is a vendored copy** of
   `docs/models.py` so the agent stays a self-contained, deployable package —
   keep the two in sync if the domain types change.
 - **The Langfuse credentials are demo defaults** in

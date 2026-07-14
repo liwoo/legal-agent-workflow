@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from contract_triage.pdf import read_pdf, read_pdf_tool
+from contract_triage.io.pdf import read_pdf, read_pdf_tool
 
 from helpers import SHARED_PDF
 

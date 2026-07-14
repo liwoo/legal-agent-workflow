@@ -16,8 +16,8 @@ from . import config  # noqa: F401  — loads .env before anything reads env var
 from agent_framework.devui import serve
 
 from . import agents
-from .observability import setup_observability
-from .workflow import build_workflow
+from .edges.workflow import build_workflow
+from .io.observability import setup_observability
 
 
 def main() -> None:

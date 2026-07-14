@@ -26,12 +26,12 @@ from functools import lru_cache
 from pathlib import Path
 
 from . import db
-from .models import PlaybookSection
+from ..models import PlaybookSection
 
 _log = logging.getLogger(__name__)
 
-# contract_triage → agent → app → <repo root>
-_REPO_ROOT = Path(__file__).resolve().parents[3]
+# io → contract_triage → agent → app → <repo root>
+_REPO_ROOT = Path(__file__).resolve().parents[4]
 _PLAYBOOK_JSON = _REPO_ROOT / "data" / "policies" / "PLAYBOOK.json"
 
 # The negotiable section numbers we ground on = the enum, so the DB rows line up

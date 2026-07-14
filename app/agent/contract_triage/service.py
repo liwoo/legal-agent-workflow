@@ -14,15 +14,16 @@ from typing import Any
 
 from agent_framework import Workflow
 
-from . import db, graph_spec
+from .edges import graph_spec
+from .edges.workflow import build_workflow
 from .executors import HumanDecision
+from .io import db
+from .io.observability import workflow_span
+from .io.playbook import playbook_repo
+from .io.repository import repo
+from .io.storage import store
 from .models import EndState, InboxItem
-from .observability import workflow_span
-from .playbook import playbook_repo
-from .repository import repo
-from .state import TriageRequest, TriageState
-from .storage import store
-from .workflow import build_workflow
+from .models.state import TriageRequest, TriageState
 
 # Friendly per-node labels (node id → display name), mirrored from the graph the
 # console renders — used to narrate an executor entering during a streamed run.

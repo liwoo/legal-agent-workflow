@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from agent_framework import Case, Default, Workflow, WorkflowBuilder
 
-from . import executors as X
+from .. import executors as X
 
 
 def build_workflow() -> Workflow:

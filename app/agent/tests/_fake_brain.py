@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import re
 
-from contract_triage.data import inherited_flags, prior_contracts
+from contract_triage.io.data import inherited_flags, prior_contracts
 from contract_triage.models import (
     DataFlag,
     Direction,

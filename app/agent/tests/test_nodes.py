@@ -21,7 +21,7 @@ from contract_triage.models import (
     Redline,
     ResolutionAction,
 )
-from contract_triage.state import TriageState
+from contract_triage.models.state import TriageState
 
 from helpers import classified, emitted, make_item, run_node
 

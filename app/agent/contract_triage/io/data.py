@@ -11,7 +11,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from .models import Counterparty, InboxItem
+from ..models import Counterparty, InboxItem
 
 # Inherited flags keyed by prior contract id — consulted when a new item names a
 # prior_contract in its chain (the "prior_file? blocking flag?" intake router).

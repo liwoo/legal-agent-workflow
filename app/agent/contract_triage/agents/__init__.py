@@ -6,6 +6,10 @@ redline→playbook mapping and the reviewer explanation — via structured LLM
 calls. A chat client (OpenAI or Azure OpenAI) is therefore required; the
 decision functions raise if one is not configured. The helper agents are also
 registered standalone in DevUI.
+
+The system prompts live as individual files under :mod:`.prompts`; this module
+only wires them to the model and converts the structured responses into the
+domain types in :mod:`contract_triage.models`.
 """
 
 from __future__ import annotations
@@ -17,7 +21,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from .models import (
+from ..models import (
     DataFlag,
     Direction,
     DocumentFamily,
@@ -33,6 +37,7 @@ from .models import (
     ResolutionAction,
     SignatoryLevel,
 )
+from . import prompts
 
 try:  # keep import-safe even if the openai extra is missing
     from agent_framework.openai import OpenAIChatClient
@@ -140,70 +145,17 @@ class RedlinesLLM(BaseModel):
     redlines: list[RedlineLLM]
 
 
-# ── System instructions ──────────────────────────────────────────────────────
+# ── System instructions (loaded from prompts/*.md) ───────────────────────────
 
-CLASSIFIER_INSTRUCTIONS = (
-    "You are the intake-triage brain for Northgate Systems Ltd's in-house legal team. "
-    "Read the inbound contract (intake note + document text) and classify it on six "
-    "axes: document family, whose paper it is (ours clean, ours redlined, counterparty, "
-    "counterparty-fixed such as a tender/online ToS/regulated annex, or no draft), the "
-    "direction (are we the vendor selling or the customer buying), the data-protection "
-    "profile, the POL-LGL-002 signatory level for its value band, the contract value in "
-    "GBP if stated, and any hard deadline. Also raise the controlled intake flags that "
-    "apply. Ground every call in what the document actually says; do not invent facts.\n"
-    "Additionally, always read two intake facts straight from the document: the "
-    "counterparty (the other side's name) and the sender's ask — what they want us to do "
-    "with this paper, in one plain sentence. If the intake note already states a sender's "
-    "ask, VALIDATE it against the document: set ask_supported=true when it matches, or "
-    "ask_supported=false with an ask_note describing what the document actually supports "
-    "when the stated ask is wrong, overreaches, or is unsupported. Always fill senders_ask "
-    "with your best document-grounded version of the ask."
-)
-
-REDLINE_INSTRUCTIONS = (
-    "You are Northgate's contract negotiation advisor, working strictly from Northgate's "
-    "Playbook v4 and acting to protect Northgate's interests. Read the counterparty's paper "
-    "and single out EVERY clause that is unfair, one-sided, or worse for Northgate than our "
-    "playbook position — even when the counterparty has not tracked it as a change. A first "
-    "draft on their paper is still negotiable: do not wave a term through just because it is "
-    "their standard wording. Look in particular for one-sided or uncapped liability and "
-    "indemnities, auto-renewal and one-sided termination, unilateral variation, excessive "
-    "deposits / fees / penalties or disproportionate remedies, missing mutuality, onerous "
-    "audit, exit or notice terms, and unreasonable governing-law or jurisdiction demands. "
-    "For each, map it to a playbook section and decide the tier (standard position we hold, "
-    "an approved fallback we can apply, a banned clause to strike, a refusal point, or an "
-    "off-playbook novel term) and the resolution action. In the description, name the problem "
-    "and state the specific better term to negotiate for — our opening ask AND the fallback we "
-    "can live with. Cite the playbook section and the legal basis (e.g. UCTA 1977 for "
-    "unreasonable terms). Escalate off-playbook or refusal-point items. Return an empty list "
-    "only when the paper is our own clean template with no changes."
-)
-
-ESCALATION_INSTRUCTIONS = (
-    "You summarise an escalation for the Legal Director in two sentences: what is being "
-    "asked, why it is off-playbook, and the recommended position. Neutral and factual."
-)
+CLASSIFIER_INSTRUCTIONS = prompts.CLASSIFIER
+REDLINE_INSTRUCTIONS = prompts.REDLINE
+ESCALATION_INSTRUCTIONS = prompts.ESCALATION
+EXPLAINER_INSTRUCTIONS = prompts.EXPLAINER
 
 _GATE_BRIEF: dict[GateType, str] = {
-    GateType.PRIVACY: (
-        "You are the POL-PRIV-001 privacy validator. Decide whether UK GDPR processor "
-        "terms apply and whether the deal is PASSED, ACTION_REQUIRED (e.g. no DPA "
-        "attached, special-category data) or BLOCKED (DPIA outstanding for high-risk "
-        "processing, or a cross-border US transfer with no SCC/IDTA safeguard). Cite the "
-        "UK GDPR articles. If no personal data is in scope, set applies=false."
-    ),
-    GateType.STATUTORY: (
-        "You are the statutory-checklist validator. It applies only to counterparty "
-        "paper. Confirm anti-bribery, anti-slavery, tax-evasion, third-party (C(RTP)A) "
-        "and UCTA reasonableness clauses. On counterparty paper set applies=true, status "
-        "ACTION_REQUIRED and list the statutes; otherwise set applies=false."
-    ),
-    GateType.INSURANCE: (
-        "You are the POL-FIN-007 insurance validator. Flag ACTION_REQUIRED when the "
-        "liability ask (uncapped/unlimited liability, broad indemnities, a cap at or "
-        "above ~£100k, or a high contract value) may exceed insured cover and needs "
-        "Finance sign-off. Otherwise set applies=false."
-    ),
+    GateType.PRIVACY: prompts.GATE_PRIVACY,
+    GateType.STATUTORY: prompts.GATE_STATUTORY,
+    GateType.INSURANCE: prompts.GATE_INSURANCE,
 }
 
 
@@ -403,7 +355,7 @@ async def redlines_llm(state) -> list[Redline]:
     injected into the instructions, so a runtime edit to a position is reflected
     on the very next contract — the redline advisor maps against the desk's
     *actual* standard/fallback/refusal ladders, not the model's prior."""
-    from .playbook import playbook_repo
+    from ..io.playbook import playbook_repo
 
     inherited = list(state.flags or [])
     prompt = _item_context(state.item, inherited) + _gate_state_suffix(state)
@@ -437,13 +389,7 @@ async def explain(state) -> str:
         return templated
     try:
         agent = client.as_agent(
-            id="explainer",
-            name="Triage Explainer",
-            instructions=(
-                "You explain a contract triage decision to a busy in-house lawyer in 2-3 "
-                "plain sentences: the classification, the key gate/redline findings, and "
-                "the recommended next action. Do not invent facts beyond what is given."
-            ),
+            id="explainer", name="Triage Explainer", instructions=EXPLAINER_INSTRUCTIONS
         )
         resp = await agent.run(templated)
         text = getattr(resp, "text", None) or str(resp)
