@@ -68,8 +68,34 @@ async def finalize(state: TriageState) -> None:
     if state.has_action_required() and base > 60:
         base -= 8
     state.score = max(0, min(100, base))
+    # A "signed" outcome with policy checks still flagged is NOT a clean approve:
+    # the flagged actions are preconditions to signature, so say so instead of
+    # recommending signature outright.
+    if state.end_state.value.startswith("signed") and state.has_action_required():
+        state.recommended_action = (
+            "Do not sign yet — clear the flagged policy checks first "
+            f"({_flagged_gate_labels(state)}). Complete the required actions, then approve."
+        )
     state.explanation = await agents.explain(state)
     _persist_outcome(state)
+
+
+_GATE_LABEL = {
+    GateType.PRIVACY: "data protection",
+    GateType.STATUTORY: "statutory checks",
+    GateType.INSURANCE: "insurance & cover",
+    GateType.SECURITY: "information security",
+}
+
+
+def _flagged_gate_labels(state: TriageState) -> str:
+    """Human names of the gates that still need action, for the recommendation."""
+    labels = [
+        _GATE_LABEL.get(g.gate, g.gate.value.replace("_", " "))
+        for g in state.gate_checks
+        if g.status is GateStatus.ACTION_REQUIRED
+    ]
+    return ", ".join(dict.fromkeys(labels)) or "policy checks"
 
 
 def _persist_outcome(state: TriageState) -> None:
@@ -108,6 +134,43 @@ def _forward_obligations(state: TriageState) -> None:
             ForwardObligation(type=ObligationType.DIARISE_RENEWAL_NOTICE,
                               note="Diarise the renewal-notice window (Playbook §6.1).")
         )
+
+
+def _apply_intake_review(state: TriageState, review: "agents.IntakeReview") -> None:
+    """Fill or validate the sender's ask (and counterparty) from the document.
+
+    The sender's ask is derived from the paper when the reviewer left it blank,
+    and validated against the paper when they supplied one: an unsupported ask is
+    corrected to what the document actually says and the discrepancy is logged, so
+    a wrong or overreaching intake note never rides through unchecked.
+    """
+    item = state.item
+
+    if review.counterparty_name and item.counterparty.name in ("", "Unknown"):
+        item.counterparty.name = review.counterparty_name
+
+    provided = (item.sender_ask or "").strip()
+    derived = (review.senders_ask or "").strip()
+
+    if not provided:
+        if derived:
+            item.sender_ask = derived
+            state.visit("classify", f"Derived the sender's ask from the document: “{derived}”", "info")
+        return
+
+    # An ask was supplied (by the reviewer or the ingest reader) — validate it.
+    if review.ask_supported:
+        state.visit("classify", "Validated the sender's ask against the document.", "info")
+        return
+    note = review.ask_note or "the document does not support the stated ask"
+    if derived:
+        item.sender_ask = derived
+    state.notes.append(f"ask_validation: {note}")
+    state.visit(
+        "classify",
+        f"Sender's ask did not match the document — corrected. {note}",
+        "warning",
+    )
 
 
 # ── intake & classification ─────────────────────────────────────────────────
@@ -188,9 +251,10 @@ class Classify(Executor):
         inherited = inherited_flags(item.id, item.related_contracts or None)
         prior_ids = item.related_contracts or prior_contracts(item.id)
 
-        cls, flags = await agents.classify_llm(item, inherited, prior_ids)
+        cls, flags, review = await agents.classify_llm(item, inherited, prior_ids)
         state.classification = cls
         state.flags = flags
+        _apply_intake_review(state, review)
         state.visit(
             "classify",
             f"Classified: {cls.document_family.value} · "

@@ -1,10 +1,9 @@
-# Langfuse trace stack + object stores for the contract-triage E2E harness.
+# Langfuse trace stack + object stores for the contract-triage stack.
 #
-# This is a faithful, framework-free translation of host/apphost.mts — it brings
-# up exactly the containers the Aspire AppHost would (same images, ports, env,
-# headless Langfuse init keys), so the FastAPI backend and Next.js frontend can
-# be run as plain local processes against it. Use this when the Aspire CLI's
-# TypeScript AppHost path is unavailable on your machine.
+# Brings up the containers the app depends on (Langfuse trace ingest + both MinIO
+# object stores), so the FastAPI backend and Next.js frontend can run as plain
+# local processes against them. `make up` (repo root) starts this compose file
+# and then those processes; the E2E harness reuses the same containers.
 #
 #   langfuse-web    Langfuse UI + OTLP trace ingest   http://localhost:3001
 #   langfuse-worker async ingestion → ClickHouse

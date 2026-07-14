@@ -68,13 +68,14 @@ intelligence lives in the model:
 6. **Approval / disposition** — the contract lands in a terminal state and the
    queue it belongs to: **approved**, **quarantined**, or still **pending**.
 
-Contracts reach the graph two ways. The **ten example contracts** are seeded
-into SQLite on boot and triaged eagerly, so the queues are warm the moment the
-console loads. A reviewer can also add one live: the **New Contract** button
-(top-right of the console) opens a modal, and on submit the backend **persists**
-the intake to SQLite, **stores** the uploaded PDF in the object store, and
-**triggers the same graph** — whose terminal nodes write the outcome straight
-back to SQLite. Both routes read and write one register, so a contract created
+The console **ships with an empty inbox** — the reviewer adds the first contract.
+The **New Contract** button (top-right, and the empty-inbox call-to-action) opens
+a modal, and on submit the backend **persists** the intake to SQLite, **stores**
+the uploaded PDF in the object store, and **triggers the graph** — whose terminal
+nodes write the outcome straight back to SQLite. (Prefer a pre-populated demo?
+Set `SEED_EXAMPLES=1` to load the ten canonical example contracts on boot and
+triage them eagerly, so the queues open warm.) Both routes read and write one
+register, so a contract created
 in the UI is immediately visible to the graph and vice-versa (see
 [Adding a contract](#adding-a-contract-the-new-contract-flow) below).
 
@@ -98,11 +99,10 @@ double so the graph is exercised offline with no API calls.
 
 ## Approach (the tech stack)
 
-The repo is four top-level folders, each a clean layer:
+The repo is three top-level folders, each a clean layer, with a root
+**`Makefile`** as the entry point — `make up` brings up the whole stack (the
+Langfuse + MinIO containers plus the three app processes) in one command.
 
-- **`host/`** — an **[Aspire](https://aspire.dev)** AppHost written in
-  **TypeScript** that orchestrates everything and wires service discovery
-  between the pieces. One command brings up the whole stack.
 - **`app/`** — the application itself:
   - **`app/agent/`** — a **[Microsoft Agent Framework](https://github.com/microsoft/agent-framework)**
     workflow (the decision graph above) exposed two ways: a **FastAPI** REST
@@ -111,17 +111,17 @@ The repo is four top-level folders, each a clean layer:
     hand. Python 3.12, managed with **[uv](https://docs.astral.sh/uv/)**.
   - **`app/frontend/`** — a **Next.js 14** review console: contract queues, a
     rich detail modal, and the live agent graph.
-  - **`app/scripts/`** — a plain `dev.sh` launcher for running the stack without
-    Aspire.
+  - **`app/scripts/`** — small helper utilities (e.g. `make_sample_contract.py`).
 - **`data/`** — the domain corpus: the contract registers, the policy library,
   the reviewed `contracts/` back-catalogue, the `test/` intake fixtures, and the
   held-out `evals/` set.
 - **`docs/`** — the decision framework, the requirements, the `agent-graph.mmd`
   diagram, the canonical `models.py` domain types, and the design audit.
 
-Underneath, **SQLite** is the register of record — the contract intake rows (the
-ten seeded examples plus anything created in the UI), the computed triage results
-(so the queues are warm the instant the API answers), and the outcomes the
+Underneath, **SQLite** is the register of record — the contract intake rows
+(whatever the reviewer creates, plus the ten demo examples when `SEED_EXAMPLES=1`),
+the computed triage results (so the queues are warm the instant the API answers),
+and the outcomes the
 agent's own terminal nodes write — all read back through one **repository** that
 both the API and the workflow share. **MinIO** holds the intake PDFs and hands
 out short-lived presigned URLs, and a self-hosted **[Langfuse](https://langfuse.com)**
@@ -129,7 +129,7 @@ stack captures the Agent Framework's **OpenTelemetry** traces — every triage r
 shows up as a span tree with prompts, responses, token usage and latency.
 
 ```
-                ┌─────────────────────── Aspire AppHost (TypeScript) ───────────────────────┐
+                ┌───────────────────────── local stack (make up) ───────────────────────────┐
                 │                                                                            │
    browser ───► │   frontend (Next.js :3000) ──HTTP──► api (FastAPI :8000) ──► Agent          │
                 │            │                                              Framework workflow │
@@ -145,7 +145,7 @@ The graph in `agent-graph.mmd` maps directly onto the code:
 | nodes / routers / validators / HITL | `app/agent/contract_triage/executors.py` |
 | graph wiring (switch-case, fan-out/in) | `app/agent/contract_triage/workflow.py` |
 | classification + playbook judgment (the LLM brain) | `app/agent/contract_triage/agents.py` |
-| the 10 inbox items (seeded into SQLite on boot) | `app/agent/contract_triage/data.py` |
+| the 10 demo inbox items (opt-in seed via `SEED_EXAMPLES=1`) | `app/agent/contract_triage/data.py` |
 | SQLite register + repository (API & agent share it) | `app/agent/contract_triage/db.py` · `repository.py` |
 | object store — intake PDFs, presigned URLs, uploads | `app/agent/contract_triage/storage.py` |
 
@@ -166,34 +166,19 @@ And the FastAPI surface the console speaks:
 ## How to run
 
 **Prerequisites:** Python 3.10+ and [`uv`](https://docs.astral.sh/uv/) ·
-Node ≥ 20.19 · the [Aspire CLI](https://aspire.dev) (`curl -sSL https://aspire.dev/install.sh | bash`,
-only for the one-command path) · Docker (only for the Langfuse trace stack).
-
-### Option A — one command via Aspire (recommended)
+Node ≥ 20.19 · Docker (for the Langfuse trace stack + object stores) · an
+`OPENAI_API_KEY` (triage is a real LLM call — put it in `app/agent/.env`).
 
 ```bash
-# 1. backend deps
-cd app/agent && uv venv --python 3.12 && source .venv/bin/activate \
-  && uv pip install -e . --prerelease=allow && cd ../..
-
-# 2. frontend deps
-cd app/frontend && npm install && cd ../..
-
-# 3. orchestrate everything (DevUI + API + frontend + dashboard)
-cd host && npm install && aspire run
+make install   # one-time: Python venv + frontend deps
+make up         # bring up the whole stack — Ctrl-C to stop
 ```
 
-`aspire run` generates its TypeScript SDK, starts every resource, and opens the
-Aspire dashboard. The frontend receives the backend URL via service discovery.
-
-### Option B — plain scripts (no Aspire)
-
-```bash
-cd app/agent && uv venv --python 3.12 && source .venv/bin/activate \
-  && uv pip install -e . --prerelease=allow && cd ../..
-cd app/frontend && npm install && cd ../..
-./app/scripts/dev.sh      # DevUI :8080 · API :8000 · frontend :3000
-```
+`make up` starts the Langfuse + MinIO containers (detached), then runs the three
+app processes — DevUI (:8080), API (:8000) and frontend (:3000) — in the
+foreground. Ctrl-C stops the app processes; the containers keep running, so
+`make up` again restarts fast. `make down` stops the containers (`make clean`
+also wipes their volumes). Run `make` with no target to list every command.
 
 ### Where things live
 
@@ -220,8 +205,8 @@ backend runs the whole pipeline **in order**:
 
 1. **Persist to SQLite.** The repository (`repository.py`) allocates the next
    `CR-<year>-NNN` id and writes the intake row to the `contracts` table with
-   `source='user'`, alongside the ten seeded examples. The register is the single
-   source of truth both the API and the workflow read.
+   `source='user'` (alongside the demo examples if `SEED_EXAMPLES=1`). The register
+   is the single source of truth both the API and the workflow read.
 2. **Store the PDF.** The uploaded document is put into the `contracts` MinIO
    bucket (so the console gets a short-lived presigned URL) and mirrored to a
    local path the ingest node reads.
@@ -303,15 +288,12 @@ back to something that actually happens in the corpus." Three things back that u
 - **`app/agent/contract_triage/models.py` is a vendored copy** of
   `docs/models.py` so the agent stays a self-contained, deployable package —
   keep the two in sync if the domain types change.
-- **Aspire's TypeScript AppHost is young and fast-moving.** If a builder method
-  name differs in your installed version, `aspire run` regenerates the SDK, or
-  fall back to Option B.
 - **The Langfuse credentials are demo defaults** in
-  [`host/apphost.mts`](host/apphost.mts), and `ENABLE_SENSITIVE_DATA=true`
-  captures prompts and responses — dev only, never point it at anything real.
+  [`e2e/docker-compose.langfuse.yml`](e2e/docker-compose.langfuse.yml) and
+  [`e2e/stack.env`](e2e/stack.env), and `ENABLE_SENSITIVE_DATA=true` captures
+  prompts and responses — dev only, never point it at anything real.
 
 ---
 
-See [`app/agent/README.md`](app/agent/README.md),
-[`app/frontend/README.md`](app/frontend/README.md), and
-[`host/apphost.mts`](host/apphost.mts) for the layer-level detail.
+See [`app/agent/README.md`](app/agent/README.md) and
+[`app/frontend/README.md`](app/frontend/README.md) for the layer-level detail.

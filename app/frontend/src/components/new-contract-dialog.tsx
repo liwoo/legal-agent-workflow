@@ -27,7 +27,7 @@ const textareaClass =
  * PDF, posts them to the backend (persist → store PDF → trigger the agent), and
  * folds the freshly triaged contract into the queue on success.
  */
-export function NewContractDialog() {
+export function NewContractDialog({ trigger }: { trigger?: React.ReactNode } = {}) {
   const { create } = useContracts();
   const [open, setOpen] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
@@ -64,14 +64,16 @@ export function NewContractDialog() {
   return (
     <Dialog open={open} onOpenChange={(next) => !submitting && setOpen(next)}>
       <DialogTrigger asChild>
-        <Button size="sm" className="gap-1.5">
-          <FilePlus2 className="h-4 w-4" />
-          <span className="hidden sm:inline">New Contract</span>
-          <span className="sm:hidden">New</span>
-        </Button>
+        {trigger ?? (
+          <Button size="sm" className="gap-1.5">
+            <FilePlus2 className="h-4 w-4" />
+            <span className="hidden sm:inline">New Contract</span>
+            <span className="sm:hidden">New</span>
+          </Button>
+        )}
       </DialogTrigger>
 
-      <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto">
+      <DialogContent className="max-h-[92vh] w-[98vw] max-w-none overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-1.5">
             New contract
@@ -82,27 +84,70 @@ export function NewContractDialog() {
           </DialogTitle>
         </DialogHeader>
 
-        <form ref={formRef} onSubmit={onSubmit} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="counterparty">
+        <form ref={formRef} onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-2 md:col-span-2">
+            <Label htmlFor="counterparty" className="flex items-center gap-1.5">
               Counterparty <span className="text-primary">*</span>
+              <InfoHint>
+                The other party on the paper — the company you&apos;re contracting with.{" "}
+                <span className="font-semibold text-foreground">Required.</span>
+              </InfoHint>
             </Label>
             <Input id="counterparty" name="counterparty" required placeholder="Meridian Freight Solutions Ltd" />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <Label htmlFor="received_from">Received from</Label>
-              <Input id="received_from" name="received_from" placeholder="AE (sales)" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="date_received">Date received</Label>
-              <Input id="date_received" name="date_received" type="date" />
-            </div>
+          <div className="grid gap-2">
+            <Label htmlFor="received_from" className="flex items-center gap-1.5">
+              Received from
+              <InfoHint>
+                Who forwarded it internally — e.g. the account exec or a mailbox.{" "}
+                <span className="font-semibold text-foreground">Optional.</span>
+              </InfoHint>
+            </Label>
+            <Input id="received_from" name="received_from" placeholder="AE (sales)" />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="date_received" className="flex items-center gap-1.5">
+              Date received
+              <InfoHint>
+                When it landed in the inbox. Defaults to today if left blank.{" "}
+                <span className="font-semibold text-foreground">Optional.</span>
+              </InfoHint>
+            </Label>
+            <Input id="date_received" name="date_received" type="date" />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="summary">What arrived</Label>
+            <Label htmlFor="sector" className="flex items-center gap-1.5">
+              Sector
+              <InfoHint>
+                The counterparty&apos;s industry — helps the classifier judge risk.{" "}
+                <span className="font-semibold text-foreground">Optional.</span>
+              </InfoHint>
+            </Label>
+            <Input id="sector" name="sector" placeholder="logistics" />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="related_contracts" className="flex items-center gap-1.5">
+              Related contracts
+              <InfoHint>
+                Comma-separated ids of prior contracts in this chain — e.g. an MSA this order
+                form sits under.{" "}
+                <span className="font-semibold text-foreground">Optional.</span>
+              </InfoHint>
+            </Label>
+            <Input id="related_contracts" name="related_contracts" placeholder="CR-2026-046, CR-2025-011" />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="summary" className="flex items-center gap-1.5">
+              What arrived
+              <InfoHint>
+                A one-line description of the document and its state — type, length, signed or
+                not. Read from the PDF if left blank.{" "}
+                <span className="font-semibold text-foreground">Optional.</span>
+              </InfoHint>
+            </Label>
             <textarea
               id="summary"
               name="summary"
@@ -112,7 +157,13 @@ export function NewContractDialog() {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="senders_ask">Sender&apos;s ask</Label>
+            <Label htmlFor="senders_ask" className="flex items-center gap-1.5">
+              Sender&apos;s ask
+              <InfoHint>
+                What the sender wants done, in their words — the request driving the triage.{" "}
+                <span className="font-semibold text-foreground">Optional.</span>
+              </InfoHint>
+            </Label>
             <textarea
               id="senders_ask"
               name="senders_ask"
@@ -121,47 +172,54 @@ export function NewContractDialog() {
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-2">
-              <Label htmlFor="sector">Sector</Label>
-              <Input id="sector" name="sector" placeholder="logistics" />
+          <div className="flex flex-wrap gap-6 md:col-span-2">
+            <div className="flex items-center gap-1.5">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <input type="checkbox" name="is_public_body" className="h-4 w-4 accent-primary" />
+                Public body
+              </label>
+              <InfoHint>
+                Tick if the counterparty is a government or public-sector body.{" "}
+                <span className="font-semibold text-foreground">Optional.</span>
+              </InfoHint>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="related_contracts">Related contracts</Label>
-              <Input id="related_contracts" name="related_contracts" placeholder="CR-2026-046, CR-2025-011" />
+            <div className="flex items-center gap-1.5">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <input type="checkbox" name="is_regulated" className="h-4 w-4 accent-primary" />
+                Regulated counterparty
+              </label>
+              <InfoHint>
+                Tick if the counterparty operates in a regulated industry — finance, health, etc.{" "}
+                <span className="font-semibold text-foreground">Optional.</span>
+              </InfoHint>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-6">
-            <label className="flex items-center gap-2 text-sm font-medium">
-              <input type="checkbox" name="is_public_body" className="h-4 w-4 accent-primary" />
-              Public body
-            </label>
-            <label className="flex items-center gap-2 text-sm font-medium">
-              <input type="checkbox" name="is_regulated" className="h-4 w-4 accent-primary" />
-              Regulated counterparty
-            </label>
-          </div>
-
-          <div className="grid gap-2">
+          <div className="grid gap-2 md:col-span-2">
             <Label htmlFor="file" className="flex items-center gap-1.5">
               Intake PDF
               <InfoHint>
-                Optional — if attached, the assistant reads it and fills in any blanks above.
+                The contract paper itself. If attached, the assistant reads it and fills in any
+                blanks above.{" "}
+                <span className="font-semibold text-foreground">Optional.</span>
               </InfoHint>
             </Label>
             <Input id="file" name="file" type="file" accept="application/pdf" />
           </div>
 
-          {submitting || steps.length ? <TriageRunLog steps={steps} running={submitting} /> : null}
+          {submitting || steps.length ? (
+            <div className="md:col-span-2">
+              <TriageRunLog steps={steps} running={submitting} />
+            </div>
+          ) : null}
 
           {error ? (
-            <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive md:col-span-2">
               {error}
             </p>
           ) : null}
 
-          <DialogFooter>
+          <DialogFooter className="md:col-span-2">
             <Button
               type="button"
               variant="outline"

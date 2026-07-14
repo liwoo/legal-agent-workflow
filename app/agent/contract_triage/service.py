@@ -107,13 +107,14 @@ class TriageService:
     pending: dict[str, _Pending] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        # Boot the durable stores, seed the example contracts into SQLite, and
-        # rehydrate any previously-computed results so the queues are populated
-        # the moment the API answers — even before the eager re-triage in the
-        # FastAPI lifespan finishes.
+        # Boot the durable stores and rehydrate any previously-computed results so
+        # the queues are populated the moment the API answers. The inbox ships
+        # empty — reviewers add contracts through the "New Contract" flow — unless
+        # SEED_EXAMPLES=1 asks for the ten canonical demo contracts.
         db.init_db()
         store.connect()
-        repo.seed_examples()
+        if os.getenv("SEED_EXAMPLES", "0") == "1":
+            repo.seed_examples()
         playbook_repo.seed_from_json()  # ground the redline node in the desk's positions
         self.results.update(db.load_results())
 

@@ -36,9 +36,9 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000 npm run dev   # http://localhost:
 Set `NEXT_PUBLIC_API_BASE_URL` to the FastAPI backend (see `../agent`). With no
 backend reachable the app still renders from the fixtures in `src/data/`.
 
-Normally you run the frontend together with the backend + DevUI via the Aspire
-AppHost in [`../apphost`](../apphost), which injects `NEXT_PUBLIC_API_BASE_URL`
-and `NEXT_PUBLIC_DEVUI_URL` automatically.
+Normally you run the frontend together with the backend + DevUI via `make up`
+from the repo root, which sets `NEXT_PUBLIC_API_BASE_URL` and
+`NEXT_PUBLIC_DEVUI_URL` automatically.
 
 ## Environment
 

@@ -99,7 +99,22 @@ class ClassificationLLM(BaseModel):
     value_gbp: float | None
     deadline: str | None  # ISO date (YYYY-MM-DD) or null
     flags: list[TriageFlag]
+    # Intake facts read straight from the document, so a bare PDF still triages
+    # and a reviewer-supplied ask is validated rather than trusted blindly.
+    counterparty_name: str | None = None  # the other side's name, from the document
+    senders_ask: str | None = None        # what the sender is asking for, in one sentence
+    ask_supported: bool = True            # is any provided sender's ask consistent with the document?
+    ask_note: str | None = None           # when ask_supported is false, what the document actually supports
     rationale: str
+
+
+class IntakeReview(BaseModel):
+    """Derived / validated intake facts the classifier read from the document."""
+
+    counterparty_name: str | None = None
+    senders_ask: str | None = None
+    ask_supported: bool = True
+    ask_note: str | None = None
 
 
 class GateLLM(BaseModel):
@@ -135,17 +150,33 @@ CLASSIFIER_INSTRUCTIONS = (
     "direction (are we the vendor selling or the customer buying), the data-protection "
     "profile, the POL-LGL-002 signatory level for its value band, the contract value in "
     "GBP if stated, and any hard deadline. Also raise the controlled intake flags that "
-    "apply. Ground every call in what the document actually says; do not invent facts."
+    "apply. Ground every call in what the document actually says; do not invent facts.\n"
+    "Additionally, always read two intake facts straight from the document: the "
+    "counterparty (the other side's name) and the sender's ask — what they want us to do "
+    "with this paper, in one plain sentence. If the intake note already states a sender's "
+    "ask, VALIDATE it against the document: set ask_supported=true when it matches, or "
+    "ask_supported=false with an ask_note describing what the document actually supports "
+    "when the stated ask is wrong, overreaches, or is unsupported. Always fill senders_ask "
+    "with your best document-grounded version of the ask."
 )
 
 REDLINE_INSTRUCTIONS = (
-    "You are a contract redline advisor working strictly from Northgate's Playbook v4. "
-    "For each counterparty change, map it to a playbook section and decide the tier "
-    "(standard position we hold, an approved fallback we can apply, a banned clause to "
-    "strike, a refusal point, or an off-playbook novel term) and the resolution action. "
-    "Escalate off-playbook or refusal-point items. Cite the playbook section and the "
-    "legal basis. Only list genuine counterparty deviations; return an empty list if the "
-    "paper is our own clean template with no changes."
+    "You are Northgate's contract negotiation advisor, working strictly from Northgate's "
+    "Playbook v4 and acting to protect Northgate's interests. Read the counterparty's paper "
+    "and single out EVERY clause that is unfair, one-sided, or worse for Northgate than our "
+    "playbook position — even when the counterparty has not tracked it as a change. A first "
+    "draft on their paper is still negotiable: do not wave a term through just because it is "
+    "their standard wording. Look in particular for one-sided or uncapped liability and "
+    "indemnities, auto-renewal and one-sided termination, unilateral variation, excessive "
+    "deposits / fees / penalties or disproportionate remedies, missing mutuality, onerous "
+    "audit, exit or notice terms, and unreasonable governing-law or jurisdiction demands. "
+    "For each, map it to a playbook section and decide the tier (standard position we hold, "
+    "an approved fallback we can apply, a banned clause to strike, a refusal point, or an "
+    "off-playbook novel term) and the resolution action. In the description, name the problem "
+    "and state the specific better term to negotiate for — our opening ask AND the fallback we "
+    "can live with. Cite the playbook section and the legal basis (e.g. UCTA 1977 for "
+    "unreasonable terms). Escalate off-playbook or refusal-point items. Return an empty list "
+    "only when the paper is our own clean template with no changes."
 )
 
 ESCALATION_INSTRUCTIONS = (
@@ -285,8 +316,14 @@ def _parse_date(value: str | None):
 
 async def classify_llm(
     item: InboxItem, inherited: list[str], prior_ids: list[str]
-) -> tuple[IntakeClassification, list[str]]:
-    """LLM classification, merged with ground-truth inherited flags."""
+) -> tuple[IntakeClassification, list[str], IntakeReview]:
+    """LLM classification, merged with ground-truth inherited flags.
+
+    Also returns the document-grounded intake review — the counterparty name and
+    the sender's ask the model read from the paper, plus whether any ask supplied
+    at intake stands up to the document. The ``classify`` node applies these so a
+    bare-PDF contract still triages and a provided ask is validated, not trusted.
+    """
     result = await _structured(
         CLASSIFIER_INSTRUCTIONS, _item_context(item, inherited), ClassificationLLM
     )
@@ -319,7 +356,13 @@ async def classify_llm(
         value_gbp=result.value_gbp,
         deadline=_parse_date(result.deadline),
     )
-    return cls, flags
+    review = IntakeReview(
+        counterparty_name=(result.counterparty_name or "").strip() or None,
+        senders_ask=(result.senders_ask or "").strip() or None,
+        ask_supported=result.ask_supported,
+        ask_note=(result.ask_note or "").strip() or None,
+    )
+    return cls, flags, review
 
 
 async def gate_llm(state, gate: GateType) -> GateCheck | None:

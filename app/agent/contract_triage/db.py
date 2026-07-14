@@ -10,7 +10,7 @@ Like ``observability.py``, this is **resilient by design**: every call is wrappe
 so a missing/locked database never takes the API down — it degrades to the
 previous in-memory-only behaviour and logs a warning.
 
-Configuration (injected by the Aspire AppHost):
+Configuration (injected by ``make up`` via ``e2e/stack.env``):
 
     TRIAGE_DB_PATH=.data/triage.db   # relative to the API working dir (../app/agent)
 """

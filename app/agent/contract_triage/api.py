@@ -48,10 +48,13 @@ POLICIES = [
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Seed the object store with the intake PDFs (no-op if MinIO isn't wired up).
-    store.seed()
-    if os.getenv("TRIAGE_EAGER", "1") == "1":
-        await service.triage_all()
+    # The inbox ships empty — reviewers add contracts via the "New Contract" flow.
+    # Only when SEED_EXAMPLES=1 do we seed the demo contracts' PDFs and (unless
+    # disabled) eagerly triage them so the queues open warm.
+    if os.getenv("SEED_EXAMPLES", "0") == "1":
+        store.seed()
+        if os.getenv("TRIAGE_EAGER", "1") == "1":
+            await service.triage_all()
     yield
 
 

@@ -3,14 +3,14 @@
 Every inbox item arrives with an intake PDF. Rather than serve those off the
 local filesystem, the API keeps them in a MinIO bucket and hands the browser a
 short-lived *presigned* URL, exactly as a production system would with S3. The
-Aspire AppHost runs an ephemeral (volume-less) MinIO container, so the store is
+compose stack runs an ephemeral (volume-less) MinIO container, so the store is
 seeded fresh from ``../../data/test`` on every boot.
 
 Resilient by design (see ``observability.py`` / ``db.py``): if MinIO is not
 configured or the ``minio`` SDK is missing, every call degrades to a no-op and
 the console simply shows no document link — the rest of the API is unaffected.
 
-Configuration (injected by the Aspire AppHost):
+Configuration (injected by ``make up`` via ``e2e/stack.env``):
 
     CONTRACT_STORE_ENDPOINT=localhost:9092      # host:port, no scheme
     CONTRACT_STORE_ACCESS_KEY=contract-store
