@@ -30,15 +30,21 @@ def offline_brain(monkeypatch):
     # demo contracts, so opt seeding back on for tests that build a TriageService.
     monkeypatch.setenv("SEED_EXAMPLES", "1")
 
+    # Deterministic confidence for the offline brain — real runs get the value
+    # from the model's structured output; the test double just picks a plausible
+    # mid-high number so ``finalize`` still averages a real score.
+    _confidence = lambda stage: agents.ConfidenceScore(stage=stage, score=8)
+
     async def classify_llm(item, inherited, prior_ids):
         cls, flags = fake_brain.classify(item)
-        return cls, flags, agents.IntakeReview()
+        return cls, flags, agents.IntakeReview(), _confidence("classify")
 
     async def gate_llm(state, gate):
-        return fake_brain.gate_for(state, gate)
+        check = fake_brain.gate_for(state, gate)
+        return check, (_confidence(f"gate_{gate.value}") if check else None)
 
     async def redlines_llm(state):
-        return fake_brain.extract_redlines(state)
+        return fake_brain.extract_redlines(state), _confidence("redlines")
 
     monkeypatch.setattr(agents, "classify_llm", classify_llm)
     monkeypatch.setattr(agents, "gate_llm", gate_llm)

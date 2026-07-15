@@ -17,7 +17,8 @@ class MapRedline(Executor):
     async def run(self, state: TriageState, ctx: WorkflowContext[TriageState]) -> None:
         state.visit("map_redline", "Mapping redlines to the playbook")
         if state.iteration == 0:
-            state.redlines = await agents.redlines_llm(state)
+            state.redlines, confidence = await agents.redlines_llm(state)
+            state.confidence_scores.append(confidence)
         await ctx.send_message(state)
 
 

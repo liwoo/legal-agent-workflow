@@ -15,6 +15,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from .domain import (
+    ConfidenceScore,
     DataFlag,
     EndState,
     ForwardObligation,
@@ -93,6 +94,15 @@ class TriageState(BaseModel):
     score: int | None = None
     explanation: str | None = None
     recommended_action: str | None = None
+    # Per-decision self-reported confidence, populated by each LLM node as it
+    # runs. ``finalize`` averages these into ``score``.
+    confidence_scores: list[ConfidenceScore] = Field(default_factory=list)
+    # Transient carrier for the policy-gate branches: each fan-out branch runs
+    # on its own deep copy of the state, so it can't append to the shared
+    # ``confidence_scores`` directly. Each branch drops its gate's confidence
+    # here (single item), and ``Gather`` folds all branches' entries back into
+    # ``confidence_scores`` and clears this list.
+    gate_confidences: list[ConfidenceScore] = Field(default_factory=list)
 
     # Bookkeeping:
     route: str | None = None  # transient branch signal read by switch-case edges

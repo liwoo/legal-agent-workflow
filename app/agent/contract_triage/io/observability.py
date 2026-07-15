@@ -110,3 +110,28 @@ def workflow_span(name: str, **attributes: Any) -> Iterator[Any]:
             if value is not None:
                 span.set_attribute(key, value)
         yield span
+
+
+def record_workflow_attribute(name: str, value: Any) -> None:
+    """Attach a numeric / string attribute to the currently active OTEL span.
+
+    Used by ``finalize`` to emit the model's confidence in the terminal decision
+    as trace-level metadata — the value lands on the ``triage_contract`` span
+    (or whatever span is active), so Langfuse's OTEL bridge surfaces it in the
+    trace attributes view. Configure a "Score from Metadata" derivation in the
+    Langfuse UI if you want it promoted to a first-class Score.
+    """
+    if not _configured or value is None:
+        return
+    try:
+        from opentelemetry.trace import get_current_span
+
+        span = get_current_span()
+    except Exception:  # pragma: no cover
+        return
+    if span is None:
+        return
+    try:
+        span.set_attribute(name, value)
+    except Exception:  # pragma: no cover — set_attribute rejects unusual types
+        pass

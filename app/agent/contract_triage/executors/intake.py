@@ -88,9 +88,10 @@ class Classify(Executor):
         inherited = inherited_flags(item.id, item.related_contracts or None)
         prior_ids = item.related_contracts or prior_contracts(item.id)
 
-        cls, flags, review = await agents.classify_llm(item, inherited, prior_ids)
+        cls, flags, review, confidence = await agents.classify_llm(item, inherited, prior_ids)
         state.classification = cls
         state.flags = flags
+        state.confidence_scores.append(confidence)
         _apply_intake_review(state, review)
         state.visit(
             "classify",
