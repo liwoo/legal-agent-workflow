@@ -251,6 +251,22 @@ class ForwardObligation(BaseModel):
     applies_to_counterparty: bool = True  # carries forward along the related-contracts chain
 
 
+class ConfidenceScore(BaseModel):
+    """One decision LLM's self-reported confidence on the call it just made.
+
+    Each decision agent (classifier, each policy gate, redline advisor) fills in
+    a 0-10 rating alongside its structured output — captured here so
+    :func:`finalize` can average them into the run-level confidence displayed to
+    the reviewer. Self-reported ratings are known to be poorly calibrated in
+    isolation; averaging across ~5 independent decisions per run smooths the
+    signal.
+    """
+
+    stage: str  # e.g. "classify", "gate_privacy", "redlines"
+    score: int  # 0 (no idea) → 10 (certain)
+    note: str | None = None  # optional one-line reason, when the model volunteers one
+
+
 # ── Intake, outcome, register record ──────────────────────────────────────
 
 

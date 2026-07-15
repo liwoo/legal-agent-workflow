@@ -26,6 +26,7 @@ import { ContractJourney } from "@/src/components/contract-journey";
 import { InfoHint } from "@/src/components/info-hint";
 import { ScoreBadge } from "@/src/components/score-badge";
 import { StateBadge } from "@/src/components/state-badge";
+import { TriageRunLog } from "@/src/components/triage-run-log";
 import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import {
@@ -38,7 +39,7 @@ import {
 } from "@/src/components/ui/dialog";
 import { Separator } from "@/src/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
-import { getApiBaseUrl } from "@/src/lib/api";
+import { getApiBaseUrl, type TriageStep } from "@/src/lib/api";
 import { getContract, useContracts } from "@/src/store/contracts";
 import { cn, formatDate, formatDateTime, formatGbp, formatRelative, titleCase } from "@/src/lib/utils";
 import type { ContractDetail, GateCheck } from "@/src/types";
@@ -205,12 +206,16 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
   const [detail, setDetail] = React.useState<ContractDetail | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [busy, setBusy] = React.useState<ActionId | null>(null);
+  // Live steps from the streaming re-evaluate run — shown while ``busy`` is
+  // ``reevaluate``; cleared each time the modal reopens or another run starts.
+  const [reevalSteps, setReevalSteps] = React.useState<TriageStep[]>([]);
 
   React.useEffect(() => {
     if (!open || !contractId) return;
     let cancelled = false;
     setLoading(true);
     setDetail(null);
+    setReevalSteps([]);
     void getContract(contractId).then((d) => {
       if (!cancelled) {
         setDetail(d ?? null);
@@ -232,11 +237,16 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
 
   // Re-evaluate = a fresh AI run that *replaces* everything (classification,
   // gates, proposed changes, outcome, score) — the one action that deliberately
-  // discards the current analysis, so no keepAnalysis here.
+  // discards the current analysis, so no keepAnalysis here. Streams node-by-node
+  // via the SSE endpoint so the reviewer sees the run narrate itself instead of
+  // staring at a silent spinner.
   const onReevaluate = async () => {
     if (!contractId) return;
     setBusy("reevaluate");
-    const updated = await triage(contractId);
+    setReevalSteps([]);
+    const updated = await triage(contractId, (step) =>
+      setReevalSteps((prev) => [...prev, step]),
+    );
     if (updated) setDetail(updated);
     setBusy(null);
   };
@@ -563,6 +573,12 @@ export function ContractDetailModal({ contractId, open, onOpenChange }: Contract
                 </TabsContent>
               </div>
             </Tabs>
+
+            {busy === "reevaluate" || reevalSteps.length > 0 ? (
+              <div className="shrink-0 border-t border-border bg-muted/20 p-4">
+                <TriageRunLog steps={reevalSteps} running={busy === "reevaluate"} />
+              </div>
+            ) : null}
 
             <Separator className="shrink-0" />
             <DialogFooter className="shrink-0 gap-2 p-4 sm:justify-between">

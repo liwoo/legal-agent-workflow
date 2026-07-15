@@ -7,7 +7,10 @@ intake-review and forward-obligation helpers used by the intake / side-effect
 nodes live here too, next to the scoring they feed.
 """
 
+import logging
+
 from .. import agents
+from ..io.observability import record_workflow_attribute
 from ..models import (
     EndState,
     ForwardObligation,
@@ -18,22 +21,13 @@ from ..models import (
 )
 from ..models.state import TriageState
 
+_log = logging.getLogger(__name__)
+
 # node-id constant (matches the frontend workflow-graph fixture / GET /api/workflow/graph)
 N_START = "START"
 
 
 # ── scoring / finalisation ──────────────────────────────────────────────────
-
-_SCORE = {
-    EndState.SIGNED_NO_EDITS: 95,
-    EndState.SIGNED_DESK_EDITS: 85,
-    EndState.SIGNED_WITH_DEVIATION: 62,
-    EndState.MORE_INFO_NEEDED: 30,
-    EndState.BLOCKED: 35,
-    EndState.BUSINESS_DECISION: 45,
-    EndState.ESCALATED: 50,
-    EndState.DECLINED: 40,
-}
 
 _RECOMMENDATION = {
     EndState.SIGNED_NO_EDITS: "Auto-approve and spot-check — clean own-paper template.",
@@ -48,19 +42,23 @@ _RECOMMENDATION = {
 
 
 async def finalize(state: TriageState) -> None:
-    """Set score, recommended action and the reviewer explanation.
+    """Set confidence, recommended action and the reviewer explanation.
 
-    This is the one place every terminal/pause node passes through, so it is
-    also where the agent *itself* records its outcome to SQLite (``db.save_-
-    outcome``) — the graph writes its own result, independent of the API layer.
+    The confidence score is the mean of the per-decision self-reported
+    confidences pushed onto ``state.confidence_scores`` by each LLM node
+    (classifier + each applicable policy gate + redline advisor). Averaging
+    across independent decisions smooths a signal that is poorly calibrated
+    in any single call. Presented on the 0-100 scale expected by the UI.
+    Emitted as an OTEL span attribute so it lands as trace metadata in
+    Langfuse.
+
+    Every terminal/pause node passes through here, so this is also where the
+    agent *itself* records its outcome to SQLite (``db.save_outcome``) — the
+    graph writes its own result, independent of the API layer.
     """
     if state.end_state is None:
         state.end_state = EndState.SIGNED_DESK_EDITS
     state.recommended_action = _RECOMMENDATION.get(state.end_state)
-    base = _SCORE.get(state.end_state, 50)
-    if state.has_action_required() and base > 60:
-        base -= 8
-    state.score = max(0, min(100, base))
     # A "signed" outcome with policy checks still flagged is NOT a clean approve:
     # the flagged actions are preconditions to signature, so say so instead of
     # recommending signature outright.
@@ -69,6 +67,24 @@ async def finalize(state: TriageState) -> None:
             "Do not sign yet — clear the flagged policy checks first "
             f"({_flagged_gate_labels(state)}). Complete the required actions, then approve."
         )
+
+    scores = [c.score for c in state.confidence_scores]
+    if scores:
+        mean = sum(scores) / len(scores)
+        state.score = round(mean * 10)  # 0-10 mean → 0-100 percentage
+    else:
+        state.score = None
+    _log.info(
+        "confidence: item=%s end_state=%s per_stage=%s mean_of_10=%s score=%s",
+        state.item.id,
+        state.end_state.value if state.end_state else None,
+        [f"{c.stage}={c.score}" for c in state.confidence_scores],
+        f"{sum(scores) / len(scores):.2f}" if scores else "None",
+        state.score,
+    )
+    if state.score is not None:
+        record_workflow_attribute("triage.confidence", state.score / 100.0)
+
     state.explanation = await agents.explain(state)
     _persist_outcome(state)
 

@@ -14,14 +14,18 @@ domain types in :mod:`contract_triage.models`.
 
 from __future__ import annotations
 
+import logging
 import os
 from enum import Enum
 from functools import lru_cache
 from typing import Any
 
+_log = logging.getLogger(__name__)
+
 from pydantic import BaseModel
 
 from ..models import (
+    ConfidenceScore,
     DataFlag,
     Direction,
     DocumentFamily,
@@ -111,6 +115,10 @@ class ClassificationLLM(BaseModel):
     ask_supported: bool = True            # is any provided sender's ask consistent with the document?
     ask_note: str | None = None           # when ask_supported is false, what the document actually supports
     rationale: str
+    # Self-reported confidence in this classification, 0 (guessing) → 10 (certain).
+    # Averaged with the other decisions in ``finalize`` for the run-level score.
+    confidence: int = 5
+    confidence_note: str | None = None
 
 
 class IntakeReview(BaseModel):
@@ -130,6 +138,8 @@ class GateLLM(BaseModel):
     findings: list[str]
     required_actions: list[str]
     legal_basis: list[str]
+    confidence: int = 5
+    confidence_note: str | None = None
 
 
 class RedlineLLM(BaseModel):
@@ -143,6 +153,8 @@ class RedlineLLM(BaseModel):
 
 class RedlinesLLM(BaseModel):
     redlines: list[RedlineLLM]
+    confidence: int = 5
+    confidence_note: str | None = None
 
 
 # ── System instructions (loaded from prompts/*.md) ───────────────────────────
@@ -191,6 +203,11 @@ class LLMUnavailableError(RuntimeError):
 async def _structured(instructions: str, prompt: str, schema: type[BaseModel]) -> Any:
     """Run a one-shot structured call and return the parsed model.
 
+    Every graph decision (classify, gates, redlines) runs at ``temperature=0``
+    so re-triaging the same paper does not silently reroute through a different
+    graph path — a warm-day classifier flipping ``counterparty`` to
+    ``counterparty_fixed`` used to skip ``map_redline`` entirely on re-eval.
+
     Raises ``LLMUnavailableError`` if no client is configured, and lets any
     provider/parse error propagate — the agent is LLM-first, so there is no
     deterministic fallback to swallow the failure.
@@ -201,7 +218,9 @@ async def _structured(instructions: str, prompt: str, schema: type[BaseModel]) -
             "No chat client configured — set OPENAI_API_KEY (see app/agent/.env)."
         )
     agent = client.as_agent(id="triage", name="Triage", instructions=instructions)
-    resp = await agent.run(prompt, options={"response_format": schema})
+    resp = await agent.run(
+        prompt, options={"response_format": schema, "temperature": 0.0}
+    )
     value = getattr(resp, "value", None)
     if isinstance(value, schema):
         return value
@@ -268,13 +287,15 @@ def _parse_date(value: str | None):
 
 async def classify_llm(
     item: InboxItem, inherited: list[str], prior_ids: list[str]
-) -> tuple[IntakeClassification, list[str], IntakeReview]:
+) -> tuple[IntakeClassification, list[str], IntakeReview, ConfidenceScore]:
     """LLM classification, merged with ground-truth inherited flags.
 
     Also returns the document-grounded intake review — the counterparty name and
     the sender's ask the model read from the paper, plus whether any ask supplied
     at intake stands up to the document. The ``classify`` node applies these so a
     bare-PDF contract still triages and a provided ask is validated, not trusted.
+    The fourth return value is the classifier's self-reported confidence in its
+    call, folded into the run-level score by :func:`finalize`.
     """
     result = await _structured(
         CLASSIFIER_INSTRUCTIONS, _item_context(item, inherited), ClassificationLLM
@@ -314,23 +335,48 @@ async def classify_llm(
         ask_supported=result.ask_supported,
         ask_note=(result.ask_note or "").strip() or None,
     )
-    return cls, flags, review
+    confidence = ConfidenceScore(
+        stage="classify",
+        score=_clamp_confidence(result.confidence),
+        note=(result.confidence_note or "").strip() or None,
+    )
+    return cls, flags, review, confidence
 
 
-async def gate_llm(state, gate: GateType) -> GateCheck | None:
-    """LLM verdict for one policy gate; None ⇒ the gate does not apply."""
+async def gate_llm(
+    state, gate: GateType
+) -> tuple[GateCheck | None, ConfidenceScore | None]:
+    """LLM verdict for one policy gate.
+
+    Returns ``(None, None)`` if the gate does not apply — a skipped gate has no
+    decision, so it contributes no confidence to the run-level average.
+    Otherwise returns the check plus the gate's self-reported confidence in it.
+    """
     inherited = list(state.flags or [])
     prompt = _item_context(state.item, inherited) + _gate_state_suffix(state)
     result = await _structured(_GATE_BRIEF[gate], prompt, GateLLM)
     if not result.applies:
-        return None
-    return GateCheck(
+        return None, None
+    check = GateCheck(
         gate=gate,
         status=result.status,
         findings=result.findings,
         required_actions=result.required_actions,
         legal_basis=result.legal_basis,
     )
+    confidence = ConfidenceScore(
+        stage=f"gate_{gate.value}",
+        score=_clamp_confidence(result.confidence),
+        note=(result.confidence_note or "").strip() or None,
+    )
+    return check, confidence
+
+
+def _clamp_confidence(score: int | float | None) -> int:
+    """Force any model-emitted number into the 0-10 range we display."""
+    if score is None:
+        return 5
+    return max(0, min(10, int(score)))
 
 
 def _gate_state_suffix(state) -> str:
@@ -348,13 +394,17 @@ def _gate_state_suffix(state) -> str:
     )
 
 
-async def redlines_llm(state) -> list[Redline]:
+async def redlines_llm(state) -> tuple[list[Redline], ConfidenceScore]:
     """LLM redline→playbook mapping, grounded in the desk's live playbook.
 
     The playbook sections are pulled fresh from the repository on every call and
     injected into the instructions, so a runtime edit to a position is reflected
     on the very next contract — the redline advisor maps against the desk's
-    *actual* standard/fallback/refusal ladders, not the model's prior."""
+    *actual* standard/fallback/refusal ladders, not the model's prior.
+
+    Returns the redlines plus the advisor's self-reported confidence in the
+    mapping, folded into the run-level score by :func:`finalize`.
+    """
     from ..io.playbook import playbook_repo
 
     inherited = list(state.flags or [])
@@ -365,7 +415,7 @@ async def redlines_llm(state) -> list[Redline]:
     )
     result = await _structured(instructions, prompt, RedlinesLLM)
     assert isinstance(result, RedlinesLLM)
-    return [
+    redlines = [
         Redline(
             clause_ref=r.clause_ref,
             description=r.description,
@@ -376,6 +426,12 @@ async def redlines_llm(state) -> list[Redline]:
         )
         for r in result.redlines
     ]
+    confidence = ConfidenceScore(
+        stage="redlines",
+        score=_clamp_confidence(result.confidence),
+        note=(result.confidence_note or "").strip() or None,
+    )
+    return redlines, confidence
 
 
 # ── Reviewer explanation ─────────────────────────────────────────────────────
